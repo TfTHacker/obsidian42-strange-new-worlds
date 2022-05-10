@@ -1,0 +1,14 @@
+
+.snw-inline-ref{
+    background-color: rgba(71, 70, 70, 0.349);
+    font-size: 7pt;
+    color: grey;
+    margin-left: 2px;
+    margin-right: 2px;
+    padding-left:   3px;
+    padding-right:  4px;
+    padding-bottom: 1px;
+    top: -8px;
+    border-radius: 5px;
+    position: relative !important;
+}

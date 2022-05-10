@@ -1,0 +1,10 @@
+{
+  "id": "obsidian42-strange-new-worlds",
+  "name": "Obsidian42: Strange New Worlds",
+  "version": "0.0.1",
+  "minAppVersion": "0.13.8",
+  "description": "revealing networked thought and the strange new worlds created by your vault",
+  "author": "TfTHacker",
+  "authorUrl": "https://twitter.com/TfTHacker",
+  "isDesktopOnly": false
+}
