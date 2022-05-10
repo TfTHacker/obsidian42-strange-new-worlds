@@ -5,6 +5,7 @@ import {
     stripHeading,
     TFile,
     Pos,
+    editorLivePreviewField,
 } from "obsidian";
 import { Link, ListItem, Section, TransformedCache } from "./types";
 
@@ -78,7 +79,6 @@ export function buildLinksAndReferences(app: App): void {
             }
         }
     });
-    console.log(refs)
     references = refs;
 }
 
@@ -119,8 +119,9 @@ export function getCurrentPage({
             (header: {
                 heading: string;
                 position: Pos;
+                level: number;
             }) => ({
-                original: header.heading,
+                original: "#".repeat(header.level) + " " + header.heading,
                 key: stripHeading(header.heading),
                 pos: header.position,
 
@@ -146,6 +147,7 @@ export function getCurrentPage({
             }
             return {
                 key: link.link,
+                original: link.original,
                 type: "link",
                 pos: link.position,
                 page: file.basename,
@@ -208,6 +210,19 @@ export function getCurrentPage({
                 }
                 return embed;
             });
+
+            //remove duplicate blocks
+            transformedCache.embedsWithDuplicates = transformedCache.embeds.filter((embed, index, self)=>
+                index === self.findIndex((t) => (
+                    t.key === embed.key
+                ))
+            )
+
+            transformedCache.linksWithoutDuplicates = transformedCache.links.filter((link, index, self)=>
+                index === self.findIndex((t) => (
+                    t.key === link.key
+                ))
+            )
         }
     }
     return transformedCache;

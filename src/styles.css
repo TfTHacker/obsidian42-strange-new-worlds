@@ -1,14 +1,30 @@
 
-.snw-inline-ref{
-    background-color: rgba(71, 70, 70, 0.349);
+.snw-reference {
+    color: black;
     font-size: 7pt;
-    color: grey;
+    min-width: 10px !important;
     margin-left: 2px;
-    margin-right: 2px;
-    padding-left:   3px;
-    padding-right:  4px;
+    margin-right: 1px;
+    padding-left:   1px;
+    padding-right:  1px;
     padding-bottom: 1px;
-    top: -8px;
-    border-radius: 5px;
+    top: -7px;
+    border-radius: 3px;
     position: relative !important;
+}
+
+.snw-block {
+    background-color: darkgreen;
+}
+
+.snw-heading {
+    background-color: deepskyblue;
+}
+
+.snw-embed {
+    background-color: lightblue;
+}
+
+.snw-link {
+    background-color: darkkhaki;
 }
