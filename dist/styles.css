@@ -1,16 +1,16 @@
 
 .snw-reference {
     color: black;
-    display: inline-block;
-    position: relative !important;
-    top: -7px;
-    border-radius: 3px;
     font-size: 7pt;
-    text-align: center;
     min-width: 10px !important;
-    margin-left: 3px;
+    margin-left: 2px;
+    margin-right: 1px;
     padding-left:   1px;
     padding-right:  1px;
+    padding-bottom: 1px;
+    top: -7px;
+    border-radius: 3px;
+    position: relative !important;
 }
 
 .snw-block {

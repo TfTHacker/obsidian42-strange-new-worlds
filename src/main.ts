@@ -1,5 +1,5 @@
 import {debounce, Plugin} from "obsidian";
-import {initializeCodeMirrorExtensions } from "./extensions/extensions";
+import InlineReferenceExtension from "./inline-refs";
 import {buildLinksAndReferences} from "./indexer";
 
 export default class ThePlugin extends Plugin {
@@ -12,37 +12,18 @@ export default class ThePlugin extends Plugin {
         const indexDebounce = debounce( () =>{ buildLinksAndReferences(this.app) }, 3000, true );
 
         const initializeEnvironment = () => {
-               
-                this.registerEvent(
-                    this.app.vault.on("delete", () => {
-                        indexDebounce(); 
-                    })
-                );
+            
+            this.registerEditorExtension([InlineReferenceExtension]); //enable the codemirror extensions
+            
+            this.registerEvent(
+                this.app.metadataCache.on("resolve", (file) => {
+                    indexDebounce();
+                })
+            );
 
-                this.registerEvent(
-                    this.app.workspace.on("layout-change", () => {
-                        // indexDebounce();
-                        // previewDebounce();
-                    })
-                );
-
-                // this.registerEvent(
-                //     this.app.workspace.on("file-open", (file): void => {
-                //         indexDebounce();
-                //         // this.page = getCurrentPage({ file, app: this.app });
-                //         // previewDebounce();
-                //     })
-                // );
-
-                this.registerEvent(
-                    this.app.metadataCache.on("resolve", (file) => {
-                        indexDebounce();
-                        // this.page = getCurrentPage({ file, app: this.app });
-                        // previewDebounce();
-                    })
-                );
-
-                initializeCodeMirrorExtensions(this); //enable the codemirror extensions
+            this.registerMarkdownPostProcessor((el, ctx) => {
+                console.log("markdown post processor", el, ctx, ctx.getSectionInfo(el))
+            });
         }
 
         // enable while developing

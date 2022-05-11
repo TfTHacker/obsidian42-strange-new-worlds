@@ -5,7 +5,6 @@ import {
     stripHeading,
     TFile,
     Pos,
-    editorLivePreviewField,
 } from "obsidian";
 import { Link, ListItem, Section, TransformedCache } from "./types";
 
@@ -173,6 +172,13 @@ export function getCurrentPage({
                 }
                 return link;
             });
+            // remove duplicate links
+            if(transformedCache.links)
+                transformedCache.linksWithoutDuplicates = transformedCache.links.filter((link, index, self)=>
+                    index === self.findIndex((t) => (
+                        t.key === link.key
+                    ))
+                )            
         }
     }
 
@@ -210,19 +216,14 @@ export function getCurrentPage({
                 }
                 return embed;
             });
-
             //remove duplicate blocks
+            if(transformedCache.embeds)
             transformedCache.embedsWithDuplicates = transformedCache.embeds.filter((embed, index, self)=>
                 index === self.findIndex((t) => (
                     t.key === embed.key
                 ))
             )
-
-            transformedCache.linksWithoutDuplicates = transformedCache.links.filter((link, index, self)=>
-                index === self.findIndex((t) => (
-                    t.key === link.key
-                ))
-            )
+    
         }
     }
     return transformedCache;

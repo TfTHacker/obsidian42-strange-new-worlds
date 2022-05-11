@@ -1,9 +1,8 @@
 import {WidgetType, EditorView, Decoration} from "@codemirror/view";
 import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
 import {RangeSetBuilder} from "@codemirror/rangeset";
-import {App, editorViewField, MarkdownView, Notice, Pos, TFile} from "obsidian";
+import {App, editorViewField, MarkdownView, Notice} from "obsidian";
 import {getCurrentPage } from "src/indexer";
-import {TransformedCachedItem} from "../types";
 
 class InlineReferenceWidget extends WidgetType {
     referenceCount: number;
@@ -21,7 +20,7 @@ class InlineReferenceWidget extends WidgetType {
     // }
 
     toDOM() {
-        let wrap = document.createElement("span")
+        const wrap = document.createElement("span")
         wrap.className = "snw-reference snw-" + this.cssclass;
         wrap.innerText= this.referenceCount.toString(); 
         // wrap.setAttribute("data-snw-pos", this.positionInDocument.toString());
@@ -40,8 +39,8 @@ interface referenceLocation {
 }
 
 function matchAll(source: string, find: string) {
-    var result = [];
-    for(let i:number=0;i<source.length; ++i) 
+    const result = [];
+    for(let i=0;i<source.length; ++i) 
       if (source.substring(i, i + find.length) == find) 
         result.push(i);
     return result;
@@ -49,10 +48,10 @@ function matchAll(source: string, find: string) {
 
  
 function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownView) {
-    let rangeSetBuilder = new RangeSetBuilder<Decoration>();
+    const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
-    let referenceLocations: referenceLocation[] = [];
+    const referenceLocations: referenceLocation[] = [];
 
     // const allLinks: Link[] = theApp.fileManager.getAllLinkResolutions();
     //const incomingFiles = allLinks.filter(f=>f.resolvedFile.path===currentViewDocumentFilePath);
@@ -77,6 +76,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                         break;
                     }
 
+                    
             if(transformedCache.headings) 
                 for (const value of transformedCache.headings) 
                     if(value.references.length>0 && t===value.original) {
@@ -146,7 +146,7 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
     decorations: v => v.decorations,
     eventHandlers: {
         mousedown: (e, view) => {
-            let target = (e.target as HTMLElement).closest(".snw-inline-ref");
+            const target = (e.target as HTMLElement).closest(".snw-inline-ref");
             if(target) {
                 console.log("click", target)
                 new Notice("click   ")
