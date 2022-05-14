@@ -3,15 +3,17 @@ import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
 import {RangeSetBuilder} from "@codemirror/rangeset";
 import {App, editorViewField, MarkdownView, Notice} from "obsidian";
 import {getCurrentPage } from "src/indexer";
+import htmlReferenceElement from "./htmlDecorations";
 
 class InlineReferenceWidget extends WidgetType {
     referenceCount: number;
-    cssclass: string;
+    referenceType: string;
+    key: string;    //a unique identifer for the reference
 
     constructor(refCount: number, cssclass: string) {
         super();
         this.referenceCount = refCount;
-        this.cssclass = cssclass;
+        this.referenceType = cssclass;
     }
 
     // eq(other: InlineReferenceWidget) { 
@@ -20,11 +22,7 @@ class InlineReferenceWidget extends WidgetType {
     // }
 
     toDOM() {
-        const wrap = document.createElement("span")
-        wrap.className = "snw-reference snw-" + this.cssclass;
-        wrap.innerText= this.referenceCount.toString(); 
-        // wrap.setAttribute("data-snw-pos", this.positionInDocument.toString());
-        return wrap
+        return htmlReferenceElement(this.referenceCount, this.referenceType, this.key);
     }
 
     destroy() {}
@@ -36,6 +34,7 @@ interface referenceLocation {
     type: "block" | "heading" | "embed" | "link";
     pos: number;
     count: number;
+    key: string; //identifier for the reference
 }
 
 function matchAll(source: string, find: string) {
@@ -66,21 +65,19 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
 
     let currentLocationInDocument = 0; 
 
-
     const processBlocks = (t:string)=> {
         if(viewPort.to>=currentLocationInDocument && viewPort.from<=currentLocationInDocument) {
             if(transformedCache.blocks) 
                 for (const value of transformedCache.blocks) 
                     if(value.references.length>0 && t.endsWith(` ^${value.key}`)) {
-                        referenceLocations.push({type:"block", pos: value.pos.end.offset, count: value.references.length});     
+                        referenceLocations.push({type:"block", pos: value.pos.end.offset, count: value.references.length, key: value.key});     
                         break;
                     }
-
                     
             if(transformedCache.headings) 
                 for (const value of transformedCache.headings) 
                     if(value.references.length>0 && t===value.original) {
-                        referenceLocations.push({type:"heading", pos: currentLocationInDocument + t.length, count: value.references.length});   
+                        referenceLocations.push({type:"heading", pos: currentLocationInDocument + t.length, count: value.references.length, key: value.original});   
                         break;
                     }
 
@@ -89,16 +86,14 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                     if(value.references.length>0) 
                         matchAll(t, value.key).forEach(match=>
                             referenceLocations.push({ type:"embed", count: value.references.length,
-                                                      pos: currentLocationInDocument + match + value.key.length +2})
-                        )
+                                                      pos: currentLocationInDocument + match + value.key.length +2, key: value.key}));
 
             if(transformedCache.linksWithoutDuplicates)
                 for (const value of transformedCache.linksWithoutDuplicates) 
                     if(value.references.length>0) 
                         matchAll(t, value.key).forEach(match=>
                             referenceLocations.push({ type:"link", count: value.references.length,
-                                                        pos: currentLocationInDocument + match + value.key.length})
-                        )
+                                                        pos: currentLocationInDocument + match + value.key.length, key: value.key}));
         }
     }
 

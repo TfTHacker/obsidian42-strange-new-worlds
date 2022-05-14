@@ -16,6 +16,12 @@ declare module "obsidian" {
             }
         }
     }
+
+    interface Vault {
+        fileMap: {
+            [x: string]: TFile
+        }
+    }
 }
 
 export interface Link {
