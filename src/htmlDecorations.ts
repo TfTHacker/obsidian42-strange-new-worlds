@@ -6,7 +6,7 @@ export default function htmlReferenceElement(count: number, referenceType: strin
     element.innerText= " " + count.toString() + " ";
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-type", referenceType);
-    element.onclick = (e) => {
+    element.onclick = (e: any ) => {
         const key = e.target.getAttribute("data-snw-key");
         const refType = e.target.getAttribute("data-snw-type");
         console.log('click ' + refType + " " + key )

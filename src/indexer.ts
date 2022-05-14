@@ -5,6 +5,7 @@ import {
     stripHeading,
     TFile,
     Pos,
+    hexToArrayBuffer,
 } from "obsidian";
 import { Link, ListItem, Section, TransformedCache } from "./types";
 
@@ -88,7 +89,12 @@ export function getCurrentPage({
     file: TFile;
     app: App;
 }): TransformedCache {
-    const cache = app.metadataCache.getFileCache(file);
+    const transformedCache: TransformedCache = {};
+    const cachedMetaData = app.metadataCache.getFileCache(file);
+    if (!cachedMetaData) {
+        return transformedCache;
+    }
+ 
     if (!references) {
         buildLinksAndReferences(app);
     }
@@ -103,9 +109,8 @@ export function getCurrentPage({
         }
         return acc;
     }, []);
-    const transformedCache: TransformedCache = {};
-    if (cache.blocks) {
-        transformedCache.blocks = Object.values(cache.blocks).map((block) => ({
+    if (cachedMetaData?.blocks) {
+        transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => ({
             key: block.id,
             pos: block.position,
             page: file.basename,
@@ -113,8 +118,8 @@ export function getCurrentPage({
             references: references[`${file.basename}#^${block.id}`] || [],
         }));
     }
-    if (cache.headings) {
-        transformedCache.headings = cache.headings.map(
+    if (cachedMetaData?.headings) {
+        transformedCache.headings = cachedMetaData.headings.map(
             (header: {
                 heading: string;
                 position: Pos;
@@ -133,13 +138,13 @@ export function getCurrentPage({
             })
         );
     }
-    if (cache.sections) {
+    if (cachedMetaData?.sections) {
         transformedCache.sections = createListSections(
-            cache
+            cachedMetaData
         );
     }
-    if (cache.links) {
-        transformedCache.links = cache.links.map((link) => {
+    if (cachedMetaData?.links) {
+        transformedCache.links = cachedMetaData.links.map((link) => {
             if (link.link.includes("/")) {
                 const keyArr = link.link.split("/");
                 link.link = keyArr[keyArr.length - 1];
@@ -182,8 +187,8 @@ export function getCurrentPage({
         }
     }
 
-    if (cache.embeds) {
-        transformedCache.embeds = cache.embeds.map((embed) => {
+    if (cachedMetaData?.embeds) {
+        transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
             if (embed.link.includes("/")) {
                 const keyArr = embed.link.split("/");
                 embed.link = keyArr[keyArr.length - 1];
