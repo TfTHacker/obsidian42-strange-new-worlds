@@ -1,35 +1,23 @@
+import { MarkdownRenderer } from "obsidian";
 import { getReferencesCache } from "./indexer";
 import ThePlugin from "./main";
 
 const processReferenceEvent = async (event: MouseEvent, thePlugin: ThePlugin) => {
 
     const key = event.target.getAttribute("data-snw-key");
-    const refType = event.target.getAttribute("data-snw-type");
+    // const refType = event.target.getAttribute("data-snw-type");
 
-    console.log('refcach', getReferencesCache())
-    const refCache = getReferencesCache()[key];
-    const filePath = thePlugin.app.workspace.activeLeaf.view.file.path;
+    // await thePlugin.app.vault.adapter.write("test.md", output)
 
-    console.log("key: " + key);
-    console.log("refType: " + refType);
-    console.log(refCache);
-    console.log(filePath);
-    
-    let output = "";
-    refCache.forEach(ref => {
-        if(filePath!=ref.sourceFile.path)
-            output += `- [[${ref.sourceFile.path.replace(".md","")}]]\n`;
-    })
+    thePlugin.activateView(key);
 
-    await thePlugin.app.vault.adapter.write("test.md", output)
-
-    app.workspace.trigger("hover-link", {
-        event: event,
-        source: 'source',
-        hoverParent: document.querySelector(".markdown-preview-view"),
-        targetEl: null,
-        linktext: 'test',
-    });
+    // app.workspace.trigger("hover-link", {
+    //     event: event,
+    //     source: 'source',
+    //     hoverParent: document.querySelector(".markdown-preview-view"),
+    //     targetEl: null,
+    //     linktext: 'test',
+    // });
 
 }
 

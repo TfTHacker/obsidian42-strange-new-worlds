@@ -2,10 +2,12 @@ import {debounce, Plugin} from "obsidian";
 import InlineReferenceExtension from "./references-cm6";
 import {buildLinksAndReferences, getCurrentPage} from "./indexer";
 import markdownPreviewProcessor from "./references-preview";
+import { SidePaneView, VIEW_TYPE_SNW } from "./sidepane";
 
 export default class ThePlugin extends Plugin {
     appName = "Obsidian42 - Strange New Worlds";
     appID = "obsidian42-strange-new-worlds";
+    sidepaneOutput: string;
 
     async onload(): Promise < void > {
         console.clear();
@@ -27,7 +29,11 @@ export default class ThePlugin extends Plugin {
                 markdownPreviewProcessor(el, ctx, this);
             });
 
-            
+
+            this.registerView(
+                VIEW_TYPE_SNW,
+                (leaf) =>  new SidePaneView(leaf, this)
+              );
             
         }
 
@@ -43,5 +49,22 @@ export default class ThePlugin extends Plugin {
                
     }
 
-    onunload(): void { console.log("unloading " + this.appName) }
+    async activateView(lastRef: string ) {
+        this.sidepaneOutput = lastRef;
+        this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+
+        await this.app.workspace.getRightLeaf(false).setViewState({
+            type: VIEW_TYPE_SNW,
+            active: true,
+        });
+
+        this.app.workspace.revealLeaf(
+            this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]
+        );
+    }
+
+    onunload(): void { 
+        this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+        console.log("unloading " + this.appName) 
+    }
 }
