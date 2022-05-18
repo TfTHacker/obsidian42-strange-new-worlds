@@ -1,8 +1,9 @@
 import {MarkdownPostProcessorContext, Plugin} from "obsidian";
 import htmlReferenceElement from "./htmlDecorations";
 import {getCurrentPage} from "./indexer";
+import ThePlugin from "./main";
 
-export default function markdownPreviewProcessor(el: HTMLElement, ctx : MarkdownPostProcessorContext, thePlugin : Plugin) {
+export default function markdownPreviewProcessor(el: HTMLElement, ctx : MarkdownPostProcessorContext, thePlugin : ThePlugin) {
     const transformedCache = getCurrentPage({file: thePlugin.app.vault.fileMap[ctx.sourcePath], app: thePlugin.app});
     if(transformedCache?.blocks || transformedCache.embedsWithDuplicates || transformedCache.headings || transformedCache.linksWithoutDuplicates  ) {
         const sectionInfo = ctx.getSectionInfo(el);
@@ -10,7 +11,7 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx : Markdown
         if(transformedCache?.blocks) {
             for (const value of transformedCache.blocks) {
                 if(value.references.length>0 && value.pos.end.line === sectionInfo.lineEnd) {
-                    const referenceElement = htmlReferenceElement(value.references.length, "block", value.key);
+                    const referenceElement = htmlReferenceElement(thePlugin, value.references.length, "block", value.key);
                     let blockElement: HTMLElement = el.querySelector('p')
                     if(!blockElement) {
                         blockElement = el.querySelector("li");
@@ -25,14 +26,13 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx : Markdown
         }
         
         if(transformedCache?.embedsWithDuplicates) {
-            console.log("embedsWithDuplicates", transformedCache.embedsWithDuplicates);
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embedsWithDuplicates) {
                     if(value.references.length>0 && embedKey.endsWith(value.key)) {
                         element.addClass('snw-embed-preview');
-                        element.after(htmlReferenceElement(value.references.length, "embed", value.key));
-                        break; 
+                        element.after(htmlReferenceElement(thePlugin, value.references.length, "embed", value.key));
+                        break;  
                     }
                 }
             });
@@ -42,7 +42,7 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx : Markdown
             const headerKey = el.querySelector("[data-heading]").textContent;
             for (const value of transformedCache.headings) 
                 if(value.references.length>0 && value.key === headerKey) {
-                    const referenceElement = htmlReferenceElement(value.references.length, "heading", value.key);
+                    const referenceElement = htmlReferenceElement(thePlugin, value.references.length, "heading", value.key);
                     el.querySelector("h1").insertAdjacentElement("beforeend", referenceElement);
                     el.querySelector("h1").addClass("snw-heading-preview");
                     break;
@@ -55,7 +55,7 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx : Markdown
                 for (const value of transformedCache.linksWithoutDuplicates) 
                     if(value.references.length>0 && value.key === link) {
                         element.addClass('snw-link-preview');
-                        element.after(htmlReferenceElement(value.references.length, "link", value.key));
+                        element.after(htmlReferenceElement(thePlugin, value.references.length, "link", value.key));
                         break; 
                     }
             });

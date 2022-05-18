@@ -4,16 +4,20 @@ import {RangeSetBuilder} from "@codemirror/rangeset";
 import {App, editorViewField, MarkdownView, Notice} from "obsidian";
 import {getCurrentPage } from "src/indexer";
 import htmlReferenceElement from "./htmlDecorations";
+import ThePlugin from "./main";
 
 class InlineReferenceWidget extends WidgetType {
     referenceCount: number;
     referenceType: string;
     key: string;    //a unique identifer for the reference
+    thePlugin: ThePlugin;
 
-    constructor(refCount: number, cssclass: string) {
+    constructor(refCount: number, cssclass: string, key:string, thePlugin: ThePlugin) {
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
+        this.key = key;
+        this.thePlugin = thePlugin;
     }
 
     // eq(other: InlineReferenceWidget) { 
@@ -22,7 +26,7 @@ class InlineReferenceWidget extends WidgetType {
     // }
 
     toDOM() {
-        return htmlReferenceElement(this.referenceCount, this.referenceType, this.key);
+        return htmlReferenceElement(this.thePlugin, this.referenceCount, this.referenceType, this.key);
     }
 
     destroy() {}
@@ -46,7 +50,7 @@ function matchAll(source: string, find: string) {
   }
 
  
-function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownView) {
+function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownView, thePlugin: ThePlugin) {
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
@@ -115,7 +119,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
     referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
         rangeSetBuilder.add(
             r.pos, r.pos,
-            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type), side: 1})
+            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, this.thePlugin), side: 1})
         );        
     });
 
@@ -126,16 +130,18 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
     app: App;
     mdView: MarkdownView;
     decorations : DecorationSet;
+    thePlugin: ThePlugin;
 
-    constructor(view: EditorView) { 
+    constructor(view: EditorView, plugin: ThePlugin) { 
         this.mdView = view.state.field(editorViewField);
         this.app = this.mdView.app;
-        this.decorations = calclulateInlineReferences(view, this.app, this.mdView)
+        this.thePlugin = plugin;
+        this.decorations = calclulateInlineReferences(view, this.app, this.mdView, this.thePlugin)
     }
 
     update(update : ViewUpdate) { 
         // if (update.docChanged || update.viewportChanged) 
-            this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView)
+            this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView,  this.thePlugin)
     }
 }, {
     decorations: v => v.decorations,

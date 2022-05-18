@@ -26,6 +26,9 @@ export default class ThePlugin extends Plugin {
             this.registerMarkdownPostProcessor((el, ctx) => {
                 markdownPreviewProcessor(el, ctx, this);
             });
+
+            
+            
         }
 
         // enable while developing

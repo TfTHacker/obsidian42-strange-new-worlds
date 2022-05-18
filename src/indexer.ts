@@ -82,6 +82,10 @@ export function buildLinksAndReferences(app: App): void {
     references = refs;
 }
 
+export function getReferencesCache() {
+    return references;
+}
+
 export function getCurrentPage({
     file,
     app,
