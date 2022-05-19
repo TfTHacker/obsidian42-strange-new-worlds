@@ -92,9 +92,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
 
     const allLinks: Link[] = theApp.fileManager.getAllLinkResolutions();
     const incomingFiles = allLinks.filter(f=>f.resolvedFile.path===mdView.file.path);
-    if(incomingFiles.length>0) {
-        setHeaderWithReferenceCounts(incomingFiles, mdView)
-    }
+    setHeaderWithReferenceCounts(thePlugin, incomingFiles, mdView)
     // console.log("incomingFiles", incomingFiles)
 
 

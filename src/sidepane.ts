@@ -30,7 +30,22 @@ export class SidePaneView extends ItemView {
         const link = this.thePlugin.lastSelectedReferenceLink;
         const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
 
-        let refCache = refType === "link" ?  getReferencesCache()[key] :  getReferencesCache()[link];
+        let refCache: Link[] = [];
+
+        if(refType === "link") 
+            refCache = getReferencesCache()[key];
+        else if(refType === "File") {
+            console.log("FILE")
+            Object.entries(getReferencesCache()).forEach((value, key) => {
+                value[1].forEach((element:Link[]) => {
+                    // console.log(element, link)
+                    if(element.resolvedFile.path === link) {
+                        refCache.push(element)
+                    }
+                });
+            })
+        } else
+            refCache =  getReferencesCache()[link];
 
         console.log("key", key)
         console.log("link", link)
@@ -39,7 +54,7 @@ export class SidePaneView extends ItemView {
         let output = `<div class="snw-sidepane-container">`;
 
         output += `<h1 class="snw-sidepane-header">${refType}</h1>`;
-        const sourceLink = refCache[0].reference.link;
+        const sourceLink = refType === "File" ? link : refCache[0].reference.link;
         output += `Source: <a class="internal-link snw-sidepane-link" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
 
         output += `<h2 class="snw-sidepane-header-references">References</h2>`;

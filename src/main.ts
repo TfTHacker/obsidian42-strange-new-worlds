@@ -42,7 +42,7 @@ export default class ThePlugin extends Plugin {
         }
 
         // enable while developing
-        // initializeEnvironment();
+        initializeEnvironment();
 
         this.app.workspace.onLayoutReady(() => {
             const resolved = this.app.metadataCache.on("resolved", () => {
@@ -54,6 +54,9 @@ export default class ThePlugin extends Plugin {
     }
 
     async activateView(key: string, refType: string, link: string) {
+
+        console.log('activateView', key, refType, link);
+
         this.lastSelectedReferenceKey = key;
         this.lastSelectedReferenceType = refType;
         this.lastSelectedReferenceLink = link;
