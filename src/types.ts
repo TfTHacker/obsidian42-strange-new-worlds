@@ -24,6 +24,14 @@ declare module "obsidian" {
     }
 }
 
+export interface ReferenceLocation {
+    type: "block" | "heading" | "embed" | "link";
+    pos: number;
+    count: number;
+    key: string; //identifier for the reference
+    link: string; // full link to reference
+}
+
 export interface Link {
     reference: {
         link: string

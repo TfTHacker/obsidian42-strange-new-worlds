@@ -4,12 +4,15 @@ import ThePlugin from "./main";
 
 const processReferenceEvent = async (event: MouseEvent, thePlugin: ThePlugin) => {
 
+
+    console.log('hi', thePlugin)
     const key = event.target.getAttribute("data-snw-key");
-    // const refType = event.target.getAttribute("data-snw-type");
+    const refType = event.target.getAttribute("data-snw-type");
+    const link = event.target.getAttribute("data-snw-link")
 
     // await thePlugin.app.vault.adapter.write("test.md", output)
 
-    thePlugin.activateView(key);
+    thePlugin.activateView(key, refType, link);
 
     // app.workspace.trigger("hover-link", {
     //     event: event,
@@ -22,12 +25,13 @@ const processReferenceEvent = async (event: MouseEvent, thePlugin: ThePlugin) =>
 }
 
 
-export default function htmlReferenceElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string): HTMLElement {
+export default function htmlReferenceElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string, link: string): HTMLElement {
     const element = document.createElement("span")
     element.className = "snw-reference snw-" + referenceType;
     element.innerText= " " + count.toString() + " ";
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-type", referenceType);
+    element.setAttribute("data-snw-link", link);
 
     element.onclick = (e: any ) => processReferenceEvent(e, thePlugin);
     

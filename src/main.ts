@@ -1,5 +1,5 @@
 import {debounce, Plugin} from "obsidian";
-import InlineReferenceExtension from "./references-cm6";
+import InlineReferenceExtension, { setPluginVariableForCM6 } from "./references-cm6";
 import {buildLinksAndReferences, getCurrentPage} from "./indexer";
 import markdownPreviewProcessor from "./references-preview";
 import { SidePaneView, VIEW_TYPE_SNW } from "./sidepane";
@@ -7,7 +7,9 @@ import { SidePaneView, VIEW_TYPE_SNW } from "./sidepane";
 export default class ThePlugin extends Plugin {
     appName = "Obsidian42 - Strange New Worlds";
     appID = "obsidian42-strange-new-worlds";
-    sidepaneOutput: string;
+    lastSelectedReferenceKey: string;
+    lastSelectedReferenceType: string;
+    lastSelectedReferenceLink: string;
 
     async onload(): Promise < void > {
         console.clear();
@@ -16,6 +18,8 @@ export default class ThePlugin extends Plugin {
         const indexDebounce = debounce( () =>{ buildLinksAndReferences(this.app) }, 3000, true );
 
         const initializeEnvironment = () => {
+            
+            setPluginVariableForCM6(this);
             
             this.registerEditorExtension([InlineReferenceExtension]); //enable the codemirror extensions
             
@@ -49,8 +53,10 @@ export default class ThePlugin extends Plugin {
                
     }
 
-    async activateView(lastRef: string ) {
-        this.sidepaneOutput = lastRef;
+    async activateView(key: string, refType: string, link: string) {
+        this.lastSelectedReferenceKey = key;
+        this.lastSelectedReferenceType = refType;
+        this.lastSelectedReferenceLink = link;
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
 
         await this.app.workspace.getRightLeaf(false).setViewState({

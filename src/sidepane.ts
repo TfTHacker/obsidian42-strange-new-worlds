@@ -1,5 +1,6 @@
 import {ItemView, MarkdownPreviewRenderer, MarkdownRenderer, WorkspaceLeaf} from "obsidian";
 import { getReferencesCache } from "./indexer";
+import { Link } from "./types";
 import ThePlugin from "./main";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
@@ -18,47 +19,53 @@ export class SidePaneView extends ItemView {
     }
 
     getDisplayText() {
-        return "SNW view";
+        return "Strange New Worlds";
     }
 
     async onOpen() {
         const container: HTMLElement = this.containerEl;
         container.empty();
-        const key = this.thePlugin.sidepaneOutput;
-
-        const refCache = getReferencesCache()[key];
-
+        const key = this.thePlugin.lastSelectedReferenceKey;
+        const refType = this.thePlugin.lastSelectedReferenceType;
+        const link = this.thePlugin.lastSelectedReferenceLink;
         const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
-    
-        console.log("key: " + key);
-        
-        let output = "";  
+
+        let refCache = refType === "link" ?  getReferencesCache()[key] :  getReferencesCache()[link];
+
+        console.log("key", key)
+        console.log("link", link)
+        console.log("refCache", refCache)
+
+        let output = `<div class="snw-sidepane-container">`;
+
+        output += `<h1 class="snw-sidepane-header">${refType}</h1>`;
+        const sourceLink = refCache[0].reference.link;
+        output += `Source: <a class="internal-link snw-sidepane-link" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
+
+        output += `<h2 class="snw-sidepane-header-references">References</h2>`;
+
+        output += `<ul>`;
         refCache.forEach(ref => {
-            if(filePath!=ref.sourceFile.path)
-                output += `- [[${ref.sourceFile.path.replace(".md","")}]]\n`;
+            if(filePath!=ref.sourceFile.path){
+                output += `<li><a class="internal-link snw-sidepane-link" data-href="${ref.sourceFile.path}" href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a></li>`;
+            }
         })
-        console.log(output)
+        output += `</ul>`;
+        output += `</div>`; //end of container
+
+        container.innerHTML = output;
 
         setTimeout(() => {
-            console.log('hello')
-            document.querySelectorAll('[data-type="Strange New Worlds"] a').forEach(el => {
-                console.log(el);
+            document.querySelectorAll('.snw-sidepane-link').forEach(el => {
                 el.addEventListener('click', (e) => {
                     e.preventDefault();
-                    console.log(e.target.innerText);
-                    const fileT = app.metadataCache.getFirstLinkpathDest(e.target.innerText, e.target.innerText);
+                    const filePath  = (e.target as HTMLElement).getAttribute("data-href");
+                    const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                     this.thePlugin.app.workspace.activeLeaf.openFile(fileT);
                 })
-            });
-        }, 300);
-        try {
-            await MarkdownRenderer.renderMarkdown(output, container, "", null )
-
-        } catch (error) {
-            
-        }
-
-        // container.createEl("div", {text: this.thePlugin.sidepaneOutput});
+            });    
+        }, 200);
+        
     }
 
     async onClose() { // Nothing to clean up.
