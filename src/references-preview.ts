@@ -1,5 +1,5 @@
 import {MarkdownPostProcessorContext, Plugin} from "obsidian";
-import htmlReferenceElement from "./htmlDecorations";
+import {htmlReferenceElement} from "./htmlDecorations";
 import {getCurrentPage} from "./indexer";
 import ThePlugin from "./main";
 

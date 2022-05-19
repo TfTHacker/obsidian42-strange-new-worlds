@@ -1,16 +1,12 @@
-import { MarkdownRenderer } from "obsidian";
-import { getReferencesCache } from "./indexer";
+import { MarkdownView } from "obsidian";
 import ThePlugin from "./main";
+import { Link } from "./types";
 
 const processReferenceEvent = async (event: MouseEvent, thePlugin: ThePlugin) => {
-
-
-    console.log('hi', thePlugin)
+    event.preventDefault();
     const key = event.target.getAttribute("data-snw-key");
     const refType = event.target.getAttribute("data-snw-type");
     const link = event.target.getAttribute("data-snw-link")
-
-    // await thePlugin.app.vault.adapter.write("test.md", output)
 
     thePlugin.activateView(key, refType, link);
 
@@ -24,8 +20,7 @@ const processReferenceEvent = async (event: MouseEvent, thePlugin: ThePlugin) =>
 
 }
 
-
-export default function htmlReferenceElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string, link: string): HTMLElement {
+export function htmlReferenceElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string, link: string): HTMLElement {
     const element = document.createElement("span")
     element.className = "snw-reference snw-" + referenceType;
     element.innerText= " " + count.toString() + " ";
@@ -35,10 +30,37 @@ export default function htmlReferenceElement(thePlugin: ThePlugin, count: number
 
     element.onclick = (e: any ) => processReferenceEvent(e, thePlugin);
     
-    // element.onmouseover = async (e: any ) => processReferenceEvent(e, thePlugin);
+    // element.onmouseover = async (e: any ) => processReferenceEvent(e, thePlugin); 
 
     return element;
 }
+
+export function setHeaderWithReferenceCounts(incomingLinks: Link[], mdView: MarkdownView) {
+    const headerTitleDiv: HTMLDivElement = mdView.containerEl.querySelector(".view-action");
+    // console.log("setHeaderWithReferenceCounts", incomingLinks, headerTitleDiv)
+
+    console.log('hi', incomingLinks) 
+
+    const fileList = (incomingLinks.map(link => link.sourceFile.path.replace(".md",""))).join("\n")
+    console.log(fileList) 
+
+    if (headerTitleDiv) {
+        let snwTitleRefCountDisplayCountEl: HTMLElement = mdView.containerEl.querySelector(".snw-header-count");
+        if (!snwTitleRefCountDisplayCountEl) {
+            const wrapper: HTMLElement = document.createElement("a");
+            wrapper.className = "view-action";
+            wrapper.className = "snw-header-count-wrapper";
+            snwTitleRefCountDisplayCountEl = document.createElement("div");
+            snwTitleRefCountDisplayCountEl.className = "snw-header-count";
+            wrapper.appendChild(snwTitleRefCountDisplayCountEl);
+            wrapper.insertAfter(headerTitleDiv);
+        }
+        snwTitleRefCountDisplayCountEl.innerText = " " + incomingLinks.length.toString() + " ";
+        snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList;
+    }
+}
+
+
 
     
     // element.addClass("internal-link")

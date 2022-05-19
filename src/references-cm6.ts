@@ -3,9 +3,9 @@ import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
 import {RangeSetBuilder} from "@codemirror/rangeset";
 import {App, editorViewField, MarkdownView} from "obsidian";
 import {getCurrentPage } from "src/indexer";
-import htmlReferenceElement from "./htmlDecorations";
+import {htmlReferenceElement, setHeaderWithReferenceCounts} from "./htmlDecorations";
 import ThePlugin from "./main";
-import { ReferenceLocation } from "./types";
+import { ReferenceLocation, Link } from "./types";
 
 let thePlugin: ThePlugin;
 
@@ -88,9 +88,15 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
 
     const referenceLocations: ReferenceLocation[] = [];
 
-    // const allLinks: Link[] = theApp.fileManager.getAllLinkResolutions();
-    //const incomingFiles = allLinks.filter(f=>f.resolvedFile.path===currentViewDocumentFilePath);
+    // console.log('cm6 runn')
+
+    const allLinks: Link[] = theApp.fileManager.getAllLinkResolutions();
+    const incomingFiles = allLinks.filter(f=>f.resolvedFile.path===mdView.file.path);
+    if(incomingFiles.length>0) {
+        setHeaderWithReferenceCounts(incomingFiles, mdView)
+    }
     // console.log("incomingFiles", incomingFiles)
+
 
     const transformedCache = getCurrentPage({ file: mdView.file, app });
     

@@ -1,16 +1,19 @@
 
 .snw-reference {
+    position: relative !important;
     color: black;
     font-size: 7pt;
-    min-width: 10px !important;
-    margin-left: 2px;
-    margin-right: 1px;
-    padding-left:   1px;
+    line-height: 10pt;
+    width: 13px;
+    height: 13px;
+    top: -7px;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left:   3px;
     padding-right:  1px;
     padding-bottom: 1px;
-    top: -7px;
     border-radius: 3px;
-    position: relative !important;
+    display: inline-block;
 }
 
 .snw-block {
@@ -34,3 +37,21 @@
     padding-right: 10px;
 }
 
+.snw-header-count-wrapper {
+    min-width: 12px;
+    margin: 0px;
+}
+
+.snw-header-count {
+    position: relative;
+    background-color:cadetblue !important;
+    color: black;
+    font-size: 7pt;
+    padding-left: 4px;
+    padding-right:  1px;
+    padding-bottom: 1px;
+    border-radius: 3px;
+    height: 14px;
+    width: 15px;
+    line-height: 10pt;
+}

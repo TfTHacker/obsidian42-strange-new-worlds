@@ -42,7 +42,7 @@ export default class ThePlugin extends Plugin {
         }
 
         // enable while developing
-        initializeEnvironment();
+        // initializeEnvironment();
 
         this.app.workspace.onLayoutReady(() => {
             const resolved = this.app.metadataCache.on("resolved", () => {
