@@ -1,19 +1,12 @@
-import {
-    App,
-    CachedMetadata,
-    HeadingCache,
-    stripHeading,
-    TFile,
-    Pos,
-    hexToArrayBuffer
-} from "obsidian";
+import { App, CachedMetadata, HeadingCache, stripHeading, TFile, Pos} from "obsidian";
 import {Link, ListItem, Section, TransformedCache} from "./types";
 
 let references: {[x:string]:Link[]};
 
 export function buildLinksAndReferences(app: App): void {
+    console.log("building links and references");
     const refs = app.fileManager.getAllLinkResolutions().reduce((acc : {
-        [x : string]: Link[]
+        [x : string]: Link[] 
     }, link : Link) : {
         [x : string]: Link[]
     } => {
@@ -67,6 +60,10 @@ export function buildLinksAndReferences(app: App): void {
             }
         }
     });
+
+    // update incoming link references
+
+
     references = refs;
 }
 
@@ -74,10 +71,7 @@ export function getReferencesCache() {
     return references;
 }
 
-export function getCurrentPage({file, app} : {
-    file : TFile;
-    app : App;
-}): TransformedCache {
+export function getCurrentPage(file: TFile, app: App): TransformedCache {
     const transformedCache: TransformedCache = {};
     const cachedMetaData = app.metadataCache.getFileCache(file);
     if (! cachedMetaData) {

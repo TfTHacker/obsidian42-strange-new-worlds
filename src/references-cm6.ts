@@ -3,9 +3,9 @@ import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
 import {RangeSetBuilder} from "@codemirror/rangeset";
 import {App, editorViewField, MarkdownView} from "obsidian";
 import {getCurrentPage } from "src/indexer";
-import {htmlReferenceElement, setHeaderWithReferenceCounts} from "./htmlDecorations";
 import ThePlugin from "./main";
-import { ReferenceLocation, Link } from "./types";
+import {ReferenceLocation} from "./types";
+import {htmlDecorationForReferencesElement} from "./htmlDecorations";
 
 let thePlugin: ThePlugin;
 
@@ -25,8 +25,9 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
     }    
 
     update(update : ViewUpdate) { 
-        // if (update.docChanged || update.viewportChanged) 
+        if (update.docChanged || update.viewportChanged) {
             this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView)
+        }
     }
 }, {
     decorations: v => v.decorations,
@@ -58,20 +59,18 @@ class InlineReferenceWidget extends WidgetType {
         this.link = link;
     }
 
-    // eq(other: InlineReferenceWidget) { 
-    //     console.log("other", other.referenceCount, this.referenceCount)
-    //     return other.referenceCount == this.referenceCount; 
-    // }
+    eq(other: InlineReferenceWidget) { 
+        return other.referenceCount == this.referenceCount; 
+    }
 
     toDOM() {
-        return htmlReferenceElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link);
+        return htmlDecorationForReferencesElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link);
     }
 
     destroy() {}
 
     ignoreEvent() { return false }
 }
-
 
 function matchAll(source: string, find: string) {
     const result = [];
@@ -80,24 +79,13 @@ function matchAll(source: string, find: string) {
         result.push(i);
     return result;
   }
-
  
 function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownView) {
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
     const referenceLocations: ReferenceLocation[] = [];
-
-    // console.log('cm6 runn')
-
-    const allLinks: Link[] = theApp.fileManager.getAllLinkResolutions();
-    const incomingFiles = allLinks.filter(f=>f.resolvedFile.path===mdView.file.path);
-    setHeaderWithReferenceCounts(thePlugin, incomingFiles, mdView)
-    // console.log("incomingFiles", incomingFiles)
-
-
-    const transformedCache = getCurrentPage({ file: mdView.file, app });
-    
+    const transformedCache = getCurrentPage(mdView.file, theApp);
     const viewPort = view.viewport; 
 
     // walk through the elements of the document (blocks, headings, embeds, links) and test each line to see if it contains
