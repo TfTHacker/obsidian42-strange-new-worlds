@@ -1,0 +1,2 @@
+
+1. If vault has file with same name more thane once it breaks into the pain

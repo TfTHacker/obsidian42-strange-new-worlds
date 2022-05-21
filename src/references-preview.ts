@@ -41,9 +41,10 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
         }
 
         if (transformedCache?.headings?.length > 0 && el.querySelector("[data-heading]")) {
+            console.log('headings preview', transformedCache.headings)
             const headerKey = el.querySelector("[data-heading]").textContent;
             for (const value of transformedCache.headings) 
-                if (value.references.length > 1 && value.key === headerKey) {
+                if (value.references.length > 0 && value.key === headerKey) {
                     const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(CurrentFile, value));
                     el.querySelector("h1").insertAdjacentElement("beforeend", referenceElement);
                     el.querySelector("h1").addClass("snw-heading-preview");
