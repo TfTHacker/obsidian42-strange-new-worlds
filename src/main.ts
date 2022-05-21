@@ -37,6 +37,7 @@ export default class ThePlugin extends Plugin {
         // managing state for debugging purpsoes
         setTimeout(() => {
             if (!this.pluginInitialized) {
+                this.pluginInitialized = true;
                 initializeEnvironment();
             }
         }, 4000);
@@ -45,6 +46,7 @@ export default class ThePlugin extends Plugin {
             const resolved = this.app.metadataCache.on("resolved", () => {
                 this.app.metadataCache.offref(resolved);
                 if (!this.pluginInitialized) {
+                    this.pluginInitialized = true;
                     initializeEnvironment();
                 }
             });

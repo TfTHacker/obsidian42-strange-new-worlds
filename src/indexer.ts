@@ -4,7 +4,6 @@ import {Link, ListItem, Section, TransformedCache} from "./types";
 let references: {[x:string]:Link[]};
 
 export function buildLinksAndReferences(app: App): void {
-    console.log("building links and references");
     const refs = app.fileManager.getAllLinkResolutions().reduce((acc : {
         [x : string]: Link[] 
     }, link : Link) : {

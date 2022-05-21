@@ -111,7 +111,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                     
             if(transformedCache.headings) 
                 for (const value of transformedCache.headings) 
-                    if(value.references.length>0 && t===value.original) {
+                    if(value.references.length>1 && t===value.original) {
                         referenceLocations.push({type:"heading", pos: currentLocationInDocument + t.length, count: value.references.length, 
                                                 key: value.original, link: value.references[0].reference.link,
                                                 arialLabel: generateArialLabel(CurrentFile, value)});   
@@ -120,9 +120,9 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
 
             if(transformedCache.embeds)
                 for (const value of transformedCache.embedsWithDuplicates) 
-                    if(value.references.length>0) 
+                    if(value.references.length>1) 
                         matchAll(t, value.key).forEach(match=>
-                            referenceLocations.push({ type:"embed", count: value.references.length,
+                            referenceLocations.push({ type:"embed", count: value.references.length-1,
                                                       pos: currentLocationInDocument + match + value.key.length +2, key: value.key, 
                                                       link: value.references[0].reference.link,
                                                       arialLabel: generateArialLabel(CurrentFile, value)}
@@ -130,9 +130,9 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
 
             if(transformedCache.linksWithoutDuplicates)
                 for (const value of transformedCache.linksWithoutDuplicates) 
-                    if(value.references.length>0) 
+                    if(value.references.length>1) 
                         matchAll(t, value.key).forEach(match=>
-                            referenceLocations.push({ type:"link", count: value.references.length,
+                            referenceLocations.push({ type:"link", count: value.references.length-1,
                                                         pos: currentLocationInDocument + match + value.key.length, key: value.key, 
                                                         link: value.references[0].reference.link,
                                                         arialLabel: generateArialLabel(CurrentFile, value)
@@ -154,7 +154,6 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
         });
     }
     
-    // console.log(referenceLocations)
     referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
         rangeSetBuilder.add(
             r.pos, r.pos,

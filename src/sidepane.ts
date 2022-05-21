@@ -1,6 +1,6 @@
-import {ItemView, MarkdownPreviewRenderer, MarkdownRenderer, Notice, WorkspaceLeaf} from "obsidian";
-import { getReferencesCache } from "./indexer";
-import { Link } from "./types";
+import {CachedMetadata, ItemView, MetadataCache, WorkspaceLeaf} from "obsidian";
+import {getCurrentPage, getReferencesCache} from "./indexer";
+import {Link} from "./types";
 import ThePlugin from "./main";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
@@ -14,9 +14,7 @@ export class SidePaneView extends ItemView {
         this.thePlugin = thePlugin;
     }
 
-    getViewType() {
-        return VIEW_TYPE_SNW;
-    }
+    getViewType() { return VIEW_TYPE_SNW }
 
     getDisplayText() {
         return "Strange New Worlds";
@@ -29,27 +27,25 @@ export class SidePaneView extends ItemView {
         const refType = this.thePlugin.lastSelectedReferenceType;
         const link = this.thePlugin.lastSelectedReferenceLink;
         const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
+        let lineNumber = 0;
         
         let refCache: Link[] = [];
         
         if(refType === "link") 
-        refCache = getReferencesCache()[key];
+           refCache = getReferencesCache()[key];
         else if(refType === "File") {
             Object.entries(getReferencesCache()).forEach((value, key) => {
                 value[1].forEach((element:Link[]) => {
-                    // console.log(element, link)
                     if(element.resolvedFile.path === link) {
                         refCache.push(element)
                     }
                 });
             })
         } else
-        refCache =  getReferencesCache()[link];
+            refCache =  getReferencesCache()[link];
         
         let output = '<div class="snw-sidepane-container">';
 
-        
-        
         output = output + '<h1 class="snw-sidepane-header">' + refType + '</h1>';
         const sourceLink = refType === "File" ? link : refCache[0].reference.link;
         output += `Source: <a class="internal-link snw-sidepane-link" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
@@ -57,9 +53,43 @@ export class SidePaneView extends ItemView {
         output += `<h2 class="snw-sidepane-header-references">References</h2>`;
         
         output += `<ul>`;
+
+        const findPositionInFile = (filePath:string, link: string) => {
+            console.log(filePath, link)
+            // let lineNu = 0;
+            const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
+            console.log("cachedData", cachedData);
+            
+            if(cachedData?.links) {
+                for (const i of cachedData?.links) {
+                    if(i.link===link) {
+                        return i.position.start.line;
+                    }
+                }
+            }
+            // if(cachedData?.blocks) {
+            //     for (const i of Object.entries(cachedData?.blocks)) {
+            //         console.log("i",i)
+            //         if(i.link===link) {
+            //             return i.position.start.line;
+            //         }
+            //     }
+            // }
+
+             
+            // cachedData?.links.forEach(l => {
+            //     if(l.link === link) {
+            //         lineNu = l.position.start.line;
+            //     }
+            // });
+
+            return 0;
+        }
+
         refCache.forEach(ref => {
-            if(filePath!=ref.sourceFile.path){
-                output += `<li><a class="internal-link snw-sidepane-link" data-href="${ref.sourceFile.path}" href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a></li>`;
+            if(filePath!=ref.sourceFile.path){ 
+                lineNumber = findPositionInFile(ref.sourceFile.path, ref.reference.link);
+                output += `<li><a class="internal-link snw-sidepane-link" data-line-number="${lineNumber}" data-href="${ref.sourceFile.path}" href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a></li>`;
             }
         })
         
@@ -72,9 +102,17 @@ export class SidePaneView extends ItemView {
             document.querySelectorAll('.snw-sidepane-link').forEach(el => {
                 el.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const filePath  = (e.target as HTMLElement).getAttribute("data-href");
+                    const target = e.target as HTMLElement;
+                    const filePath  = target.getAttribute("data-href");
+                    const LineNu = Number(target.getAttribute("data-line-number"));
                     const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                     this.thePlugin.app.workspace.activeLeaf.openFile(fileT);
+                    if(LineNu!=0) {
+                        setTimeout(() => {
+                            console.log("lineNumber", LineNu)
+                            this.thePlugin.app.workspace.activeLeaf.view.setEphemeralState({line: LineNu })
+                        }, 500);
+                    }
                 })
             });    
         }, 200);
