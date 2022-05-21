@@ -35,7 +35,6 @@ export class SidePaneView extends ItemView {
         if(refType === "link") 
         refCache = getReferencesCache()[key];
         else if(refType === "File") {
-            console.log("FILE")
             Object.entries(getReferencesCache()).forEach((value, key) => {
                 value[1].forEach((element:Link[]) => {
                     // console.log(element, link)

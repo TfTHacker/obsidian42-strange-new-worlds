@@ -38,7 +38,7 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
         snwTitleRefCountDisplayCountEl.setAttribute("data-snw-key", mdView.file.basename);
         snwTitleRefCountDisplayCountEl.setAttribute("data-snw-type", "File");
         snwTitleRefCountDisplayCountEl.setAttribute("data-snw-link", mdView.file.path);
-        snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList;
+        snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
         snwTitleRefCountDisplayCountEl.onclick = (e : any) => processHtmlDecorationReferenceEvent(e, thePlugin);
     }
 }

@@ -6,6 +6,7 @@ import {getCurrentPage } from "src/indexer";
 import ThePlugin from "./main";
 import {ReferenceLocation} from "./types";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
+import { generateArialLabel } from "./references-preview";
 
 let thePlugin: ThePlugin;
 
@@ -49,14 +50,16 @@ class InlineReferenceWidget extends WidgetType {
     referenceType: string;
     key: string;    //a unique identifer for the reference
     link: string;
+    arialLabel: string;
     thePlugin: ThePlugin;
 
-    constructor(refCount: number, cssclass: string, key:string, link: string) {
+    constructor(refCount: number, cssclass: string, key:string, link: string, arialLabel: string) {
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
         this.key = key;
         this.link = link;
+        this.arialLabel = arialLabel;
     }
 
     eq(other: InlineReferenceWidget) { 
@@ -64,7 +67,7 @@ class InlineReferenceWidget extends WidgetType {
     }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link);
+        return htmlDecorationForReferencesElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel);
     }
 
     destroy() {}
@@ -84,6 +87,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
+    const CurrentFile = mdView.file.path;
     const referenceLocations: ReferenceLocation[] = [];
     const transformedCache = getCurrentPage(mdView.file, theApp);
     const viewPort = view.viewport; 
@@ -98,7 +102,10 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
             if(transformedCache.blocks) 
                 for (const value of transformedCache.blocks) 
                     if(value.references.length>0 && t.endsWith(` ^${value.key}`)) {
-                        referenceLocations.push({type:"block", pos: value.pos.end.offset, count: value.references.length, key: value.key, link: value.references[0].reference.link});     
+                        referenceLocations.push({type:"block", pos: value.pos.end.offset, count: value.references.length, 
+                                                key: value.key, link: value.references[0].reference.link, 
+                                                arialLabel: generateArialLabel(CurrentFile, value)}
+                                                ); 
                         break;
                     }
                     
@@ -106,7 +113,8 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                 for (const value of transformedCache.headings) 
                     if(value.references.length>0 && t===value.original) {
                         referenceLocations.push({type:"heading", pos: currentLocationInDocument + t.length, count: value.references.length, 
-                                                key: value.original, link: value.references[0].reference.link});   
+                                                key: value.original, link: value.references[0].reference.link,
+                                                arialLabel: generateArialLabel(CurrentFile, value)});   
                         break;
                     }
 
@@ -115,14 +123,20 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                     if(value.references.length>0) 
                         matchAll(t, value.key).forEach(match=>
                             referenceLocations.push({ type:"embed", count: value.references.length,
-                                                      pos: currentLocationInDocument + match + value.key.length +2, key: value.key, link: value.references[0].reference.link}));
+                                                      pos: currentLocationInDocument + match + value.key.length +2, key: value.key, 
+                                                      link: value.references[0].reference.link,
+                                                      arialLabel: generateArialLabel(CurrentFile, value)}
+                                                    ));
 
             if(transformedCache.linksWithoutDuplicates)
                 for (const value of transformedCache.linksWithoutDuplicates) 
                     if(value.references.length>0) 
                         matchAll(t, value.key).forEach(match=>
                             referenceLocations.push({ type:"link", count: value.references.length,
-                                                        pos: currentLocationInDocument + match + value.key.length, key: value.key, link: value.references[0].reference.link}));
+                                                        pos: currentLocationInDocument + match + value.key.length, key: value.key, 
+                                                        link: value.references[0].reference.link,
+                                                        arialLabel: generateArialLabel(CurrentFile, value)
+                                                    }));
         }
     }
 
@@ -144,7 +158,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
     referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
         rangeSetBuilder.add(
             r.pos, r.pos,
-            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link), side: 1})
+            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel), side: 1})
         );        
     });
 

@@ -19,13 +19,14 @@ export const processHtmlDecorationReferenceEvent = async (event: MouseEvent, plu
 
 }
 
-export function htmlDecorationForReferencesElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string, link: string): HTMLElement {
+export function htmlDecorationForReferencesElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string, link: string, ariaLabel: string): HTMLElement {
     const element = document.createElement("span")
     element.className = "snw-reference snw-" + referenceType;
     element.innerText= " " + count.toString() + " ";
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-type", referenceType);
     element.setAttribute("data-snw-link", link);
+    element.ariaLabel = ariaLabel;
     
 
     element.onclick = (e: any ) => processHtmlDecorationReferenceEvent(e, thePlugin);

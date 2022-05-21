@@ -6,6 +6,7 @@ import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
 import setHeaderWithReferenceCounts from "./header-incoming-count";
 
 export default class ThePlugin extends Plugin {
+    pluginInitialized = false;
     appName = "Obsidian42 - Strange New Worlds";
     appID = "obsidian42-strange-new-worlds";
     lastSelectedReferenceKey : string;
@@ -33,17 +34,21 @@ export default class ThePlugin extends Plugin {
             });
         }
 
-        // enable while developing
-        initializeEnvironment();
+        // managing state for debugging purpsoes
+        setTimeout(() => {
+            if (!this.pluginInitialized) {
+                initializeEnvironment();
+            }
+        }, 4000);
 
         this.app.workspace.onLayoutReady(() => {
             const resolved = this.app.metadataCache.on("resolved", () => {
-                console.log("resolved");
                 this.app.metadataCache.offref(resolved);
-                initializeEnvironment();
+                if (!this.pluginInitialized) {
+                    initializeEnvironment();
+                }
             });
         });
-
     }
 
     async activateView(key : string, refType : string, link : string) {
@@ -51,9 +56,7 @@ export default class ThePlugin extends Plugin {
         this.lastSelectedReferenceType = refType;
         this.lastSelectedReferenceLink = link;
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
-
         await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
-
         this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
     }
 
