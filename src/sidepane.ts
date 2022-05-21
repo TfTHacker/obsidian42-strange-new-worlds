@@ -30,8 +30,6 @@ export class SidePaneView extends ItemView {
         const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
         let lineNumber = 0;
 
-        // console.log("Sideview key,reftype, link, filePath, basename", key, refType, link, filePath, this.thePlugin.app.workspace.activeLeaf.view.file.basename );
-        
         let refCache: Link[] = [];
         
         if(refType === "link" || refType === "embed") {
@@ -53,21 +51,25 @@ export class SidePaneView extends ItemView {
             refCache =  getReferencesCache()[link];
         }
 
-            
-        //     console.log(getReferencesCache())
-        // console.log("Sideview refcache", refCache);
-        
+        console.log("refCache", refCache)
+
         let output = '<div class="snw-sidepane-container">';
         output = output + '<h1 class="snw-sidepane-header">' + refType + '</h1>';
         const sourceLink = refType === "File" ? link : refCache[0].reference.link;
         output += `Source: <a class="internal-link snw-sidepane-link" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
         output += `<h2 class="snw-sidepane-header-references">References</h2>`;
         output += `<ul>`;
+
         const findPositionInFile = (filePath:string, link: string) => {
-            console.log(filePath, link)
-            // let lineNu = 0;
             const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
-            console.log("cachedData", cachedData);
+            console.log(link,cachedData)
+            if(cachedData?.embeds) {
+                for (const i of cachedData?.embeds) {
+                    if(i.link===link) {
+                        return i.position.start.line;
+                    }
+                }
+            }
             if(cachedData?.links) {
                 for (const i of cachedData?.links) {
                     if(i.link===link) {

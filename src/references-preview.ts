@@ -41,7 +41,6 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
         }
 
         if (transformedCache?.headings?.length > 0 && el.querySelector("[data-heading]")) {
-            console.log('headings preview', transformedCache.headings)
             const headerKey = el.querySelector("[data-heading]").textContent;
             for (const value of transformedCache.headings) 
                 if (value.references.length > 0 && value.key === headerKey) {
@@ -50,18 +49,18 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                     el.querySelector("h1").addClass("snw-heading-preview");
                     break;
                 }
-            
         }
 
         if (transformedCache?.linksWithoutDuplicates?.length > 0) {
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
-                for (const value of transformedCache.linksWithoutDuplicates) 
-                    if (value.references.length > 1 && value.key === link) {
+                for (const value of transformedCache.linksWithoutDuplicates) {
+                    if (value.references.length > 1 && (value.key === link || value.original.includes(link))) {
                         element.addClass('snw-link-preview');
                         element.after(htmlDecorationForReferencesElement(thePlugin, value.references.length-1, "link", value.key, value.references[0].reference.link, generateArialLabel(CurrentFile, value)));
                         break;
                     }
+                }
             });
         }
     }
