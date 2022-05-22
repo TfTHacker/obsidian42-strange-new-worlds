@@ -13,7 +13,7 @@ export default function setHeaderWithReferenceCounts(thePlugin: ThePlugin) {
 function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
     const allLinks: Link[] = thePlugin.app.fileManager.getAllLinkResolutions();
     const incomingLinks = allLinks.filter(f=>f.resolvedFile.path===mdView.file.path);
-
+ 
     const headerTitleDiv: HTMLDivElement = mdView.containerEl.querySelector(".view-actions");
     const fileList = (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).join("\n")
 

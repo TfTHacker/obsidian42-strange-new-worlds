@@ -1,2 +1,6 @@
 
-1. If vault has file with same name more thane once it breaks into the pain
+Header links should open properly to destination source
+
+Enable hover view on links
+
+Shift+click will open link in new pane
