@@ -1,6 +1,5 @@
 
 Enable hover view on links
 
-Shift+click will open link in new pane
 
 file rename causes error

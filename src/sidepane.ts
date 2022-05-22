@@ -125,7 +125,6 @@ export class SidePaneView extends ItemView {
             document.querySelectorAll('.snw-sidepane-link').forEach(el => {
                 el.addEventListener('click', (e: PointerEvent) => {
                     e.preventDefault();
-                    console.log("click",e)
                     const target = e.target as HTMLElement;
                     const filePath  = target.getAttribute("data-href");
                     const LineNu = Number(target.getAttribute("data-line-number"));
@@ -141,9 +140,20 @@ export class SidePaneView extends ItemView {
                             this.thePlugin.app.workspace.activeLeaf.view.setEphemeralState({line: LineNu })
                         }, 500);
                     }
-                })
+                });
+                el.addEventListener('mouseover', (e: PointerEvent) => {
+                    const target = e.target as HTMLElement;
+                    const filePath  = target.getAttribute("data-href");
+                    app.workspace.trigger("hover-link", {
+                        event: e,
+                        source: 'source',
+                        hoverParent: document.querySelector(".markdown-preview-view"),
+                        targetEl: null,
+                        linktext: filePath,
+                     });                    
+                });                
             });    
-        }, 200);
+        }, 500);
         
     }
 
