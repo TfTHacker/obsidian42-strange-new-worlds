@@ -26,22 +26,11 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
     }    
 
     update(update : ViewUpdate) { 
-        if (update.docChanged || update.viewportChanged) {
+        if (update.docChanged || update.viewportChanged) 
             this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView)
-        }
     }
 }, {
-    decorations: v => v.decorations,
-    // eventHandlers: {
-    //     mousedown: (e, view) => {
-    //         const target = (e.target as HTMLElement).closest(".snw-reference");
-    //         console.log("click", target)
-    //         if(target) {
-    //             console.log(thePlugin)
-    //             new Notice("click   ")
-    //         }   
-    //     }
-    // }
+    decorations: v => v.decorations
 })
 
 

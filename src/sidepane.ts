@@ -97,7 +97,6 @@ export class SidePaneView extends ItemView {
 
         //REFERENCES TO THIS RESOURCE
         const sourceLink = refType === "File" ? link : refCache[0].resolvedFile.path;
-        console.log("refCache", refCache[0]);
         const sourceFileLineNumber = refType === "File" ? 0 : findPositionInFile(refCache[0].resolvedFile.path, refCache[0].reference.link.replace(refCache[0].resolvedFile.basename, "").replace("#^",""));
         output += `<a class="internal-link snw-sidepane-link" data-line-number="${sourceFileLineNumber}" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
         output += `<h2 class="snw-sidepane-header-references-header">${sidePaneReferencesTitle}</h2>`;
@@ -124,13 +123,19 @@ export class SidePaneView extends ItemView {
 
         setTimeout(() => {
             document.querySelectorAll('.snw-sidepane-link').forEach(el => {
-                el.addEventListener('click', (e) => {
+                el.addEventListener('click', (e: PointerEvent) => {
                     e.preventDefault();
+                    console.log("click",e)
                     const target = e.target as HTMLElement;
                     const filePath  = target.getAttribute("data-href");
                     const LineNu = Number(target.getAttribute("data-line-number"));
                     const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
-                    this.thePlugin.app.workspace.activeLeaf.openFile(fileT);
+                    if(e.shiftKey)  
+                        (app.workspace.splitActiveLeaf('horizontal')).openFile(fileT);
+                    else if(e.ctrlKey)  
+                        (app.workspace.splitActiveLeaf('vertical')).openFile(fileT);
+                    else
+                        this.thePlugin.app.workspace.activeLeaf.openFile(fileT);
                     if(LineNu!=0) {
                         setTimeout(() => {
                             this.thePlugin.app.workspace.activeLeaf.view.setEphemeralState({line: LineNu })
