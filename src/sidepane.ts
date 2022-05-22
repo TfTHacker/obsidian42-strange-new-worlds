@@ -67,51 +67,43 @@ export class SidePaneView extends ItemView {
         //PANE HEADER
         let output = '<div class="snw-sidepane-container">';
         output = output + '<h1 class="snw-sidepane-header">' + sidePaneResourceTypeTitle + '</h1>';
-        
-        //REFERENCES TO THIS RESOURCE
-        const sourceLink = refType === "File" ? link : refCache[0].reference.link;
-        output += `<a class="internal-link snw-sidepane-link" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
-        output += `<h2 class="snw-sidepane-header-references-header">${sidePaneReferencesTitle}</h2>`;
-        output += `<ul class="snw-sidepane-references">`;
 
         const findPositionInFile = (filePath:string, link: string) => {
             const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
-            console.log(filePath, link,cachedData)
-            if(cachedData?.links) {
-                for (const i of cachedData?.links) {
-                    if(i.link===link) {
+            if(cachedData?.links) 
+                for (const i of cachedData?.links) 
+                    if(i.link===link) 
                         return i.position.start.line;
-                    }
-                }
-            } 
-            if(cachedData?.embeds) {
-                for (const i of cachedData?.embeds) {
-                    if(i.link===link) {
+
+            if(cachedData?.embeds) 
+                for (const i of cachedData?.embeds) 
+                    if(i.link===link) 
                         return i.position.start.line;
-                    }
-                }
-            }
-            if(cachedData?.blocks) {
-                for (const i of Object.entries(cachedData?.blocks)) {
-                    if(i[1].id===link) {
+
+            if(cachedData?.blocks) 
+                for (const i of Object.entries(cachedData?.blocks)) 
+                    if(i[1].id===link) 
                         return i[1].position.start.line;
-                    }
-                }
-            }
+
             if(cachedData?.headings) {
                 const headingLink = link.replace("#","");
-                for (const i of cachedData.headings) {
-                    if(i.heading===headingLink) {
+                for (const i of cachedData.headings) 
+                    if(i.heading===headingLink) 
                         return i.position.start.line;
-                    }
-                }
-            }             
+
+            }
             return 0;
         }
 
+        //REFERENCES TO THIS RESOURCE
+        const sourceLink = refType === "File" ? link : refCache[0].resolvedFile.path;
+        console.log("refCache", refCache[0]);
+        const sourceFileLineNumber = refType === "File" ? 0 : findPositionInFile(refCache[0].resolvedFile.path, refCache[0].reference.link.replace(refCache[0].resolvedFile.basename, "").replace("#^",""));
+        output += `<a class="internal-link snw-sidepane-link" data-line-number="${sourceFileLineNumber}" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
+        output += `<h2 class="snw-sidepane-header-references-header">${sidePaneReferencesTitle}</h2>`;
+        output += `<ul class="snw-sidepane-references">`;
+
         refCache.forEach(ref => {
-            console.log(ref)
-            if(filePath!=ref.sourceFile.path){ 
                 lineNumberRefType = findPositionInFile(ref.sourceFile.path, ref.reference.link);
                 lineNumberResolvedFile = findPositionInFile(ref.resolvedFile.path, ref.reference.link.replace(ref.resolvedFile.basename,"").replace("#^",""));
                 output += `<li class="snw-sidepane-reference-item">`;
@@ -121,7 +113,8 @@ export class SidePaneView extends ItemView {
                 if(refType==="File") 
                     output += `<span class="snw-sidepane-reference-label-to">To: </span><a class="internal-link snw-sidepane-link snw-sidepane-reference-item-to" data-line-number="${lineNumberResolvedFile}" data-href="${ref.resolvedFile.path}" href="${ref.resolvedFile.path}">${ref.reference.link}</a>`;
                 output += `</li>`;
-            }
+                // if(filePath!=ref.sourceFile.path){ 
+                // }
         })
         
         output += `</ul>`;
@@ -140,7 +133,6 @@ export class SidePaneView extends ItemView {
                     this.thePlugin.app.workspace.activeLeaf.openFile(fileT);
                     if(LineNu!=0) {
                         setTimeout(() => {
-                            console.log("lineNumber", LineNu)
                             this.thePlugin.app.workspace.activeLeaf.view.setEphemeralState({line: LineNu })
                         }, 500);
                     }
