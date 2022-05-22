@@ -4,7 +4,8 @@
   "description": "Revealing networked thought and the strange new worlds created by your vault",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "node esbuild.config.mjs production"
+    "build": "node esbuild.config.mjs production",
+    "lint": "eslint . --ext .ts"
   },
   "author": "TfTHacker",
   "license": "MIT",

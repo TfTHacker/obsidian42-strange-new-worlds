@@ -1,5 +1,3 @@
 
-Enable hover view on links
-
 
 file rename causes error

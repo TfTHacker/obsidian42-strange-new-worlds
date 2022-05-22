@@ -1,5 +1,4 @@
 import { ListItemCache, Pos, SectionCache, TFile} from "obsidian";
-
 declare module "obsidian" {
     interface FileManager {
         getAllLinkResolutions: () => Link[]
@@ -30,8 +29,8 @@ export interface ReferenceLocation {
     count: number;
     key: string; //identifier for the reference
     link: string; // full link to reference
-    arialLabel: string;
-}
+    arialLabel: string; 
+} 
 
 export interface Link {
     reference: {
@@ -41,7 +40,7 @@ export interface Link {
     }
     resolvedFile: TFile
     resolvedPaths: string[]
-    sourceFile: TFile
+    sourceFile: TFile 
 }
 
 export interface TransformedCachedItem {
@@ -50,7 +49,7 @@ export interface TransformedCachedItem {
     page: string
     type: string
     references: Link[]
-    original?: string
+    original?: string 
 }
 
 export interface TransformedCache {
@@ -62,7 +61,7 @@ export interface TransformedCache {
     embedsWithDuplicates?: TransformedCachedItem[]
     sections?: SectionCache[]
 }
-
+ 
 export interface ListItem extends ListItemCache {
     pos: number
     key: string
