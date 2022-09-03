@@ -1,6 +1,6 @@
 import {WidgetType, EditorView, Decoration} from "@codemirror/view";
 import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
-import {RangeSetBuilder} from "@codemirror/rangeset";
+import {RangeSetBuilder} from "@codemirror/state";
 import {App, editorViewField, MarkdownView} from "obsidian";
 import {getCurrentPage } from "src/indexer";
 import ThePlugin from "./main";
