@@ -1,12 +1,12 @@
 import {WidgetType, EditorView, Decoration} from "@codemirror/view";
 import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
 import {RangeSetBuilder} from "@codemirror/state";
-import {App, editorViewField, MarkdownView} from "obsidian";
-import {getCurrentPage } from "src/indexer";
+import {App, editorInfoField, MarkdownFileInfo, } from "obsidian";
+import {getCurrentPage} from "src/indexer";
 import ThePlugin from "./main";
 import {ReferenceLocation} from "./types";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
-import { generateArialLabel } from "./references-preview";
+import {generateArialLabel} from "./references-preview";
 
 let thePlugin: ThePlugin;
 
@@ -16,11 +16,11 @@ export function setPluginVariableForCM6(plugin: ThePlugin) {
 
 const InlineReferenceExtension = ViewPlugin.fromClass(class {
     app: App;
-    mdView: MarkdownView;
+    mdView: MarkdownFileInfo
     decorations : DecorationSet;
 
     constructor(view: EditorView) { 
-        this.mdView = view.state.field(editorViewField);
+        this.mdView = view.state.field( editorInfoField )
         this.app = this.mdView.app;
         this.decorations = calclulateInlineReferences(view, this.app, this.mdView)
     }    
@@ -72,7 +72,7 @@ function matchAll(source: string, find: string) {
     return result;
   }
  
-function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownView) {
+function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownFileInfo) {
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
 

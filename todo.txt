@@ -1,3 +1,2 @@
-
-
-file rename causes error
+- Embeds in livepreview when line is not selected don't show counter
+- Header count not working since 0.16.0
