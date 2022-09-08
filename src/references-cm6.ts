@@ -65,10 +65,12 @@ class InlineReferenceWidget extends WidgetType {
 }
 
 function matchAll(source: string, find: string) {
+    // console.log("matchall", source, find)
     const result = [];
     for(let i=0;i<source.length; ++i) 
-      if (source.substring(i, i + find.length) == find) 
+      if (source.substring(i, i + find.length) == find) {
         result.push(i);
+      }
     return result;
   }
  
@@ -107,20 +109,27 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                         break;
                     }
 
-            if(transformedCache.embeds)
-                for (const value of transformedCache.embedsWithDuplicates) 
+            if(transformedCache.embedsWithDuplicates)
+                for (const value of transformedCache.embedsWithDuplicates) {
                     if(value.references.length>1) 
-                        matchAll(t, value.key).forEach(match=>
+                        matchAll(t, value.key).forEach(match=> {
+                            if(t==value.references[0].reference.original) {
+                                match +=1; // for embeds that are on a line by themselves, they won't render unles the position is incremented by one
+                                           // unfortunately this push it down a line
+                            } 
                             referenceLocations.push({ type:"embed", count: value.references.length-1,
-                                                      pos: currentLocationInDocument + match + value.key.length +2, key: value.key, 
+                                                      pos:  currentLocationInDocument + match + value.key.length +2, 
+                                                      key: value.key, 
                                                       link: value.references[0].reference.link,
                                                       arialLabel: generateArialLabel(CurrentFile, value)}
-                                                    ));
+                                                    );
+                        });
+                    }
 
             if(transformedCache.linksWithoutDuplicates)
                 for (const value of transformedCache.linksWithoutDuplicates) 
                     if(value.references.length>1) 
-                        matchAll(t, value.key).forEach(match=>
+                        matchAll(t, value.key).forEach(match=> 
                             referenceLocations.push({ type:"link", count: value.references.length-1,
                                                         pos: currentLocationInDocument + match + value.key.length, key: value.key, 
                                                         link: value.references[0].reference.link,
@@ -142,6 +151,9 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
             currentLocationInDocument += t.length + 1;
         });
     }
+
+    // console.log("transformedCache", transformedCache);
+    // console.log("referenceLocations", referenceLocations)
     
     referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
         rangeSetBuilder.add(
