@@ -129,19 +129,20 @@ export class SidePaneView extends ItemView {
             document.querySelectorAll('.snw-sidepane-link').forEach(el => {
                 el.addEventListener('click', (e: PointerEvent) => {
                     e.preventDefault(); 
-                    console.log('hello')
                     const target = e.target as HTMLElement;
                     const filePath  = target.getAttribute("data-href");
                     const LineNu = Number(target.getAttribute("data-line-number"));
                     const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
+                    console.log(e)
                     if(e.shiftKey)  
-                        this.thePlugin.app.workspace.getLeaf(true).openFile(fileT);
+                        this.thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
                     else if(e.ctrlKey || e.metaKey)  
-                        this.thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT) //    (app.workspace.splitActiveLeaf('horizontal')).openFile(fileT);
+                        this.thePlugin.app.workspace.getLeaf("window").openFile(fileT);
                     else if(e.altKey)
-                        this.thePlugin.app.workspace.getLeaf("window").openFile(fileT) //    (app.workspace.splitActiveLeaf('horizontal')).openFile(fileT);
-                    else
-                        this.thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT) //(app.workspace.splitActiveLeaf('vertical')).openFile(fileT);
+                        this.thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT);
+                    else {
+                        this.thePlugin.app.workspace.getLeaf(false).openFile(fileT);
+                    }
                     if(LineNu!=0) {
                         setTimeout(() => {
                             this.thePlugin.app.workspace.activeLeaf.view.setEphemeralState({line: LineNu })

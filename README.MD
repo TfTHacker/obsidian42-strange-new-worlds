@@ -3,11 +3,19 @@ This plugin helps you to see the connections between the different parts of your
 
 The basic idea is I want to see when links, block references and embeds have associations with other files in my vault. The problem is you have to search, open backlinks and such to find out what is going on. But there are so many strange new worlds of networked thought to discover in my vault. This plugin attempts to surface that information and not be to intrusive (or not too intrusive).
 
+The Strange New Worlds plugin is abbreviated as SNW in this documentation.
+
 # Lazy networking (linking)
 I am not known to be lazy, but for this plugin I had to be. This plugin leverages the indexing Obsidian does in the background, which is amazing. However, for performance reasons some things don't update right away. So some of the numbers shown by this plugin may be off as you work with links, embeds and blocks. But eventaully they will be correct. Eventually is better than nothing, right?
 
 # Prototype insatity
 So I have invested 0 time into the presentation and formatting. So I am sorry it is ugly. But its a prototype. Let us prove the concept before adding the polish. Having said that, I left many breadcrumbs in the CSS for you to format the presentation. Consult the sytles css for the class definitions: https://github.com/TfTHacker/obsidian42-strange-new-worlds/blob/master/src/styles.css
+
+# SNW Pane Shortcuts
+When references are viewed in the right side pane, they can be clicked on to open the referenced documents. By default, they will open into the active pane. However, using a keyboard plus click combinations allow for more flexibility in how documents are opened:
++ Shift + Click - Opens reference in a vertical side pane
++ Alt + Click - Opens reference in a horizontal side pane
++ CTRL/CMD + Click - Opens reference in a new window
 
 # odd issues
 Modifying the underyling Obsidian rendering engine is not easy. It is a complex piece of software. There are some issues I have not been able to resolve, so have had to compromise. I will list such examples as they surface here:
