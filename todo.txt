@@ -1,2 +1,1 @@
-- Embeds in livepreview when line is not selected don't show counter
-- Header count not working since 0.16.0
+- sidebar - should open into current document if empty, not open new documents
