@@ -16,3 +16,11 @@ Modifying the underyling Obsidian rendering engine is not easy. It is a complex 
 ## Credit
 I need to thank [Sam](https://github.com/Shabegom) and [Murf Man](https://github.com/gitmurf) for all their inspiration and work from this plugin: https://github.com/shabegom/obsidian-reference-count. 
 
+# Say Thank You
+If you are enjoying this plugin then feel free to buying me a coffee on [https://ko-fi/TfTHacker](https://ko-fi.com/TfTHacker).
+
+Please also help spread the word by sharing your enthusiasim for this plugin on Twitter, Reddit, or any other social media platform you regularly use. 
+
+You can find me on Twitter [@TfTHacker](https://twitter.com/TfTHacker)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N16TNFD)
