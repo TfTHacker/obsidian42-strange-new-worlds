@@ -10,11 +10,6 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     // check for incompatibility with other plugins
     if(app.metadataCache.getFileCache(currentFile)?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
     
-    console.log("el", el)
-    console.log( "currentFile", currentFile)
-    console.log( app.metadataCache.getFileCache( currentFile )?.frontmatter?.["kanban-plugin"] );
-
-
     const currentFilePath = currentFile.path;
     const transformedCache = getCurrentPage(currentFile, thePlugin.app);
 

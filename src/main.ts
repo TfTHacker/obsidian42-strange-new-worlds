@@ -3,12 +3,15 @@ import InlineReferenceExtension, {setPluginVariableForCM6} from "./references-cm
 import {buildLinksAndReferences} from "./indexer";
 import markdownPreviewProcessor from "./references-preview";
 import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
-import setHeaderWithReferenceCounts from "./header-incoming-count";
+import setHeaderWithReferenceCounts from "./headerImageCount";
+import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./settingsTab";
+import SnwAPI from "./snwApi";
 
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;
     appName = "Obsidian42 - Strange New Worlds";
     appID = "obsidian42-strange-new-worlds";
+	settings: Settings;
     lastSelectedReferenceKey : string;
     lastSelectedReferenceType : string;
     lastSelectedReferenceLink : string;
@@ -20,8 +23,8 @@ export default class ThePlugin extends Plugin {
             buildLinksAndReferences(this.app)
         }, 3000, true);
 
-        const initializeEnvironment = () => {
-
+        const initializeEnvironment = async () => {
+            await this.loadSettings();
             setPluginVariableForCM6(this);
 
             this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
@@ -32,13 +35,19 @@ export default class ThePlugin extends Plugin {
             this.app.workspace.on("layout-change", async () => {
                 setHeaderWithReferenceCounts(this);
             });
+
+            this.addSettingTab(new SettingsTab(this.app, this));
+            
+            //@ts-ignore
+            globalThis.snwAPI = new SnwAPI(this);
+
         }
 
         // managing state for debugging purpsoes
-        setTimeout(() => {
+        setTimeout(async () => {
             if (!this.pluginInitialized) {
                 this.pluginInitialized = true;
-                initializeEnvironment();
+                await initializeEnvironment();
             }
         }, 4000);
 
@@ -66,4 +75,8 @@ export default class ThePlugin extends Plugin {
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
         console.log("unloading " + this.appName)
     }
+
+    async loadSettings(): Promise<void> { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) }
+
+	async saveSettings(): Promise<void> { await this.saveData(this.settings) }
 }

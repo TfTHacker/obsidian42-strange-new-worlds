@@ -33,26 +33,22 @@
 .snw-header-count-wrapper {
     position: absolute;  
     z-index:1000;
-    /* top: 10px; */
     margin-top: 10px;
     right: 20px;
-    /* width: 15px !important; */
     font-size: 8pt;
-    /* min-width: 20px !important; */
     height: 20px;
     border-radius: 5px;
     border: 1px dotted;
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
     opacity: 0.5;
 }
 
 .snw-header-count {
     text-align: center;
     min-width: 15px !important;
-    /* opacity: 0.5 !important; */
-    /* height: 20px; */
+    height: 0px;
+    padding-top: 3px;
+    /* padding: 5px; */
+    /* border: 1px solid red; */
 }
 
 .snw-sidepane-container {
