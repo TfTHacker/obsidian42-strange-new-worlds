@@ -117,7 +117,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                                 match +=1; // for embeds that are on a line by themselves, they won't render unles the position is incremented by one
                                            // unfortunately this push it down a line
                             } 
-                            referenceLocations.push({ type:"embed", count: value.references.length-1,
+                            referenceLocations.push({ type:"embed", count: value.references.length,
                                                       pos:  currentLocationInDocument + match + value.key.length +2, 
                                                       key: value.key, 
                                                       link: value.references[0].reference.link,
@@ -130,7 +130,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                 for (const value of transformedCache.linksWithoutDuplicates) 
                     if(value.references.length>1) 
                         matchAll(t, value.key).forEach(match=> 
-                            referenceLocations.push({ type:"link", count: value.references.length-1,
+                            referenceLocations.push({ type:"link", count: value.references.length,
                                                         pos: currentLocationInDocument + match + value.key.length, key: value.key, 
                                                         link: value.references[0].reference.link,
                                                         arialLabel: generateArialLabel(CurrentFile, value)

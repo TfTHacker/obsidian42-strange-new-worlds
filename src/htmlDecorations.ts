@@ -29,7 +29,7 @@ export function htmlDecorationForReferencesElement(thePlugin: ThePlugin, count: 
     element.setAttribute("data-snw-link", link);
     element.ariaLabel = ariaLabel;
 
-    element.onclick = (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e, thePlugin);
+    element.onclick = (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e, thePlugin);        
     
     // element.onmouseover = async (e: any ) => processReferenceEvent(e, thePlugin); 
 

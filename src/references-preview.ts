@@ -5,15 +5,25 @@ import ThePlugin from "./main";
 import {TransformedCachedItem} from "./types";
 
 export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext, thePlugin : ThePlugin) {
-    const CurrentFile = thePlugin.app.vault.fileMap[ctx.sourcePath].path;
-    const transformedCache = getCurrentPage(thePlugin.app.vault.fileMap[ctx.sourcePath], thePlugin.app);
+
+    const currentFile = thePlugin.app.vault.fileMap[ctx.sourcePath];
+    // check for incompatibility with other plugins
+    if(app.metadataCache.getFileCache(currentFile)?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
+    
+    console.log("el", el)
+    console.log( "currentFile", currentFile)
+    console.log( app.metadataCache.getFileCache( currentFile )?.frontmatter?.["kanban-plugin"] );
+
+
+    const currentFilePath = currentFile.path;
+    const transformedCache = getCurrentPage(currentFile, thePlugin.app);
 
     if (transformedCache?.blocks || transformedCache.embedsWithDuplicates || transformedCache.headings || transformedCache.linksWithoutDuplicates) {
         const sectionInfo = ctx.getSectionInfo(el);
         if (transformedCache?.blocks) {
             for (const value of transformedCache.blocks) {
-                if (value.references.length > 0 && value.pos.end.line === sectionInfo.lineEnd) {
-                    const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "block", value.key, value.references[0].reference.link, generateArialLabel(CurrentFile, value));
+                if (value.references.length > 0 && value.pos.end.line === sectionInfo?.lineEnd) {
+                    const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "block", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value));
                     let blockElement: HTMLElement = el.querySelector('p')
                     if (! blockElement) {
                         blockElement = el.querySelector("li");
@@ -33,7 +43,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 for (const value of transformedCache.embedsWithDuplicates) {
                     if (value.references.length > 1 && embedKey.endsWith(value.key)) {
                         element.addClass('snw-embed-preview');
-                        element.after(htmlDecorationForReferencesElement(thePlugin, value.references.length-1, "embed", value.key, value.references[0].reference.link, generateArialLabel(CurrentFile, value)));
+                        element.after(htmlDecorationForReferencesElement(thePlugin, value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value)));
                         break;
                     }
                 }
@@ -44,7 +54,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             const headerKey = el.querySelector("[data-heading]").textContent;
             for (const value of transformedCache.headings) 
                 if (value.references.length > 0 && value.key === headerKey) {
-                    const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(CurrentFile, value));
+                    const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value));
                     el.querySelector("h1").insertAdjacentElement("beforeend", referenceElement);
                     el.querySelector("h1").addClass("snw-heading-preview");
                     break;
@@ -57,7 +67,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 for (const value of transformedCache.linksWithoutDuplicates) {
                     if (value.references.length > 1 && (value.key === link || value.original.includes(link))) {
                         element.addClass('snw-link-preview');
-                        element.after(htmlDecorationForReferencesElement(thePlugin, value.references.length-1, "link", value.key, value.references[0].reference.link, generateArialLabel(CurrentFile, value)));
+                        element.after(htmlDecorationForReferencesElement(thePlugin, value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value)));
                         break;
                     }
                 }

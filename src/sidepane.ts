@@ -5,7 +5,11 @@ import ThePlugin from "./main";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
 
-const findPositionInFile = (filePath:string, link: string) => {
+
+const findPositionInFile = (filePath:string, link: string): number => {
+
+    console.log("findposition infile", filePath, link)
+
     const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
     if(cachedData?.links) {
         for (const i of cachedData.links) {
@@ -32,6 +36,7 @@ const findPositionInFile = (filePath:string, link: string) => {
             if(i.heading===headingLink) 
                 return i.position.start.line;
     }
+    
     return 0;  
 }
 
@@ -57,6 +62,12 @@ export class SidePaneView extends ItemView {
         const key = this.thePlugin.lastSelectedReferenceKey;
         const refType = this.thePlugin.lastSelectedReferenceType;
         const link = this.thePlugin.lastSelectedReferenceLink;
+
+        console.log(`------------------ sidepane opened with.` )
+        console.log("key",key)
+        console.log("refType", refType)
+        console.log("link", link)
+
         // const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
         let sidePaneResourceTypeTitle = "" 
         let sidePaneReferencesTitle = "" 
@@ -93,6 +104,8 @@ export class SidePaneView extends ItemView {
                 Object.entries(getReferencesCache()).forEach((value, key)=>{ value[1].forEach((element:Link[]) => { if(element.resolvedFile.path === link)  refCache.push(element)})});
                 break;
             } 
+
+        console.log("refCache", refCache)
 
         //PANE HEADER 
         let output = '<div class="snw-sidepane-container">'; 
@@ -133,7 +146,6 @@ export class SidePaneView extends ItemView {
                     const filePath  = target.getAttribute("data-href");
                     const LineNu = Number(target.getAttribute("data-line-number"));
                     const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
-                    console.log(e)
                     if(e.shiftKey)  
                         this.thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
                     else if(e.ctrlKey || e.metaKey)  
