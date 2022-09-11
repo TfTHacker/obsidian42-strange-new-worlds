@@ -35,9 +35,9 @@ export function buildLinksAndReferences(app: App): void {
                         displayText: link.link,
                         position: link.position
                     },
-                    resolvedFile: app.vault.getAbstractFileByPath(key)as TFile,
+                    resolvedFile: app.vault.getAbstractFileByPath(key) as TFile,
                     resolvedPaths: [link.link],
-                    sourceFile: app.vault.getAbstractFileByPath(key)as TFile
+                    sourceFile: app.vault.getAbstractFileByPath(key) as TFile
                 };
                 acc.push(newLink);
             }

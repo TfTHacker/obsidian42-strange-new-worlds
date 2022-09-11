@@ -1,4 +1,5 @@
 sidebar 
+- stop using findPositionInFile() - as its not accurate
 - preview popup - can it position to location in document?
 - embed/blocks displayed in pane should include full reference (not just the originating document) - hopefully will help with preview
 - can we integrate graph view

@@ -74,50 +74,57 @@ export class SidePaneView extends ItemView {
         let lineNumberRefType = 0;
 
         let refCache: Link[] = [];
+        let hoverLinkUrl = ""; //used by hover popup to control the reference used
         
         switch (refType) {
             case "link":
                 refCache = getReferencesCache()[key];
-                sidePaneResourceTypeTitle   = "Link";
+                sidePaneResourceTypeTitle   = "Target:";
                 sidePaneReferencesTitle     = "Backlinks";
                 break;
             case "embed":
-                sidePaneResourceTypeTitle   = "Embed";
+                sidePaneResourceTypeTitle   = "Target:";
                 sidePaneReferencesTitle     = "Backlinks";
                 refCache = getReferencesCache()[key];
                 break;
             case "block":
-                sidePaneResourceTypeTitle   = "Block";
+                sidePaneResourceTypeTitle   = "Target:";
                 sidePaneReferencesTitle     = "Backlinks";
                 refCache =  getReferencesCache()[link];
                 if(refCache === undefined)
                 refCache = getReferencesCache()[this.thePlugin.app.workspace.activeLeaf.view.file.basename + "#^" + key];            
                 break;
             case "heading":
-                sidePaneResourceTypeTitle   = "Heading";
+                sidePaneResourceTypeTitle   = "Target:";
                 sidePaneReferencesTitle     = "Backlinks";
                 refCache =  getReferencesCache()[link];
                 break;
             case "File":
-                sidePaneResourceTypeTitle   = "File";
+                sidePaneResourceTypeTitle   = "Target:";
                 sidePaneReferencesTitle     = "Incoming links";
                 Object.entries(getReferencesCache()).forEach((value, key)=>{ value[1].forEach((element:Link[]) => { if(element.resolvedFile.path === link)  refCache.push(element)})});
                 break;
             } 
 
-        console.log("refCache", refCache)
+        window.snwAPI.console("refCache", refCache)
 
         //PANE HEADER 
         let output = '<div class="snw-sidepane-container">'; 
         output = output + '<div class="snw-sidepane-header">' + sidePaneResourceTypeTitle + '</div>';
 
         //REFERENCES TO THIS RESOURCE
-        const sourceLink = refType === "File" ? link : refCache[0].resolvedFile.path;
+        const sourceLink =  refType === "File" ? link : refCache[0]?.resolvedFile.path;
         const sourceFileLineNumber = refType === "File" ? 0 : findPositionInFile(refCache[0].resolvedFile.path, refCache[0].reference.link.replace(refCache[0].resolvedFile.basename, "").replace("#^",""));
-        output += `<a class="internal-link snw-sidepane-link" data-line-number="${sourceFileLineNumber}" data-href="${sourceLink}" href="${sourceLink}">${sourceLink.replace(".md","")}</a> `;
+        output += `<a class="internal-link snw-sidepane-link" 
+                      snw-data-line-number="${sourceFileLineNumber}" 
+                      snw-data-file-name="${sourceLink}"
+                      data-href="${link}">${link.replace(".md","")}</a> `;
+        
+        // Display type of link
         output += `<div class="snw-sidepane-header-references-header">${sidePaneReferencesTitle}</div>`;
+        
+        //Loop through references and list them out
         output += `<ul class="snw-sidepane-references">`;
-
         refCache.forEach(ref => {
             // if(filePath!=ref.sourceFile.path){ 
             // }
@@ -125,13 +132,22 @@ export class SidePaneView extends ItemView {
             output += `<li class="snw-sidepane-reference-item">`;
             if(refType==="File") 
             output += `<span class="snw-sidepane-reference-label-from">From: </span>`;
-            output += `<a class="internal-link snw-sidepane-link snw-sidepane-reference-item-from" data-line-number="${lineNumberRefType}" data-href="${ref.sourceFile.path}" href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a><br/>`;
+            output += `<a class="internal-link snw-sidepane-link snw-sidepane-reference-item-from" 
+                          snw-data-line-number="${lineNumberRefType}" 
+                          snw-data-file-name="${ref.sourceFile.path}"
+                          data-href="${ref.sourceFile.path}" 
+                          href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a><br/>`;
             if(refType==="File") {
                 const lineNumberResolvedFile = findPositionInFile(ref.resolvedFile.path, ref.reference.link.replace(ref.resolvedFile.basename,"").replace("#^",""));
-                output += `<span class="snw-sidepane-reference-label-to">To: </span><a class="internal-link snw-sidepane-link snw-sidepane-reference-item-to" data-line-number="${lineNumberResolvedFile}" data-href="${ref.resolvedFile.path}" href="${ref.resolvedFile.path}">${ref.reference.link}</a>`;
+                output += `<span class="snw-sidepane-reference-label-to">To: </span>
+                            <a class="internal-link snw-sidepane-link snw-sidepane-reference-item-to" 
+                            snw-data-line-number="${lineNumberResolvedFile}" 
+                            snw-data-file-name="${ref.resolvedFile.path}"
+                            data-href="${ref.resolvedFile.path}" 
+                            href="${ref.resolvedFile.path}">${ref.reference.link}</a>`;
             }
             output += `</li>`;
-        })
+        }) 
         
         output += `</ul>`;
         output += `</div>`; //end of container
@@ -141,10 +157,12 @@ export class SidePaneView extends ItemView {
         setTimeout(() => {
             document.querySelectorAll('.snw-sidepane-link').forEach(el => {
                 el.addEventListener('click', (e: PointerEvent) => {
+                    console.log('hi')
                     e.preventDefault(); 
                     const target = e.target as HTMLElement;
-                    const filePath  = target.getAttribute("data-href");
-                    const LineNu = Number(target.getAttribute("data-line-number"));
+                    const filePath  = target.getAttribute("snw-data-file-name");
+                    const LineNu = Number(target.getAttribute("snw-data-line-number"));
+                    console.log("filepath", filePath)
                     const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                     if(e.shiftKey)  
                         this.thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
@@ -164,12 +182,13 @@ export class SidePaneView extends ItemView {
                 el.addEventListener('mouseover', (e: PointerEvent) => {
                     const target = e.target as HTMLElement;
                     const filePath  = target.getAttribute("data-href");
+                    console.log(filePath)
                     app.workspace.trigger("hover-link", {
                         event: e,
                         source: 'source',
                         hoverParent: document.querySelector(".markdown-preview-view"),
                         targetEl: null,
-                        linktext: filePath,
+                        linktext:  filePath,
                      });                    
                 });                
             });    
