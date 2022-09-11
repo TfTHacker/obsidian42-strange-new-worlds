@@ -37,6 +37,12 @@ export default class ThePlugin extends Plugin {
             });
 
             this.addSettingTab(new SettingsTab(this.app, this));
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (this.app.workspace as any).registerHoverLinkSource(this.appID, {
+                display: this.appName,
+                defaultMod: true,
+            });
             
             //@ts-ignore
             globalThis.snwAPI = new SnwAPI(this);
@@ -73,6 +79,8 @@ export default class ThePlugin extends Plugin {
 
     onunload(): void {
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (this.app.workspace as any).unregisterHoverLinkSource(this.appID);
         console.log("unloading " + this.appName)
     }
 

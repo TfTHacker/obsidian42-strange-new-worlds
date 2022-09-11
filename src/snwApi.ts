@@ -18,7 +18,7 @@ export default class SnwAPI {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     console = (logDescription: string, ...outputs: any[]): void => {
         if(this.plugin.settings.debugMode===true)
-            console.log(logDescription, outputs)
+            console.log("SNW: " + logDescription, outputs)
     }
 
     /**

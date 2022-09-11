@@ -11,6 +11,9 @@ I am not known to be lazy, but for this plugin I had to be. This plugin leverage
 # Prototype insatity
 So I have invested 0 time into the presentation and formatting. So I am sorry it is ugly. But its a prototype. Let us prove the concept before adding the polish. Having said that, I left many breadcrumbs in the CSS for you to format the presentation. Consult the sytles css for the class definitions: https://github.com/TfTHacker/obsidian42-strange-new-worlds/blob/master/src/styles.css
 
+# Recommendations
+Make sure to enable the "Page preview" core plugin. This provides a convenient hovering popup window to view contents of a link. SNW uses this plugin to provide the same functionality in the SNW sidepane. If you really want to amp up your experience, install the Hover Editor plugin which builds on Page preview but offers a lot more functionality.
+
 # SNW Pane Shortcuts
 When references are viewed in the right side pane, they can be clicked on to open the referenced documents. By default, they will open into the active pane. However, using a keyboard plus click combinations allow for more flexibility in how documents are opened:
 + Shift + Click - Opens reference in a vertical side pane

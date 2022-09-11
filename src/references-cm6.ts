@@ -152,9 +152,6 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
         });
     }
 
-    // console.log("transformedCache", transformedCache);
-    // console.log("referenceLocations", referenceLocations)
-    
     referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
         rangeSetBuilder.add(
             r.pos, r.pos,

@@ -1,7 +1,6 @@
 import ThePlugin from "./main";
 
 export const processHtmlDecorationReferenceEvent = async (event: MouseEvent, plugin: ThePlugin) => {
-    console.log("hi from processHtmlDecorationReferenceEvent")
     event.preventDefault();
     const target = event.target as HTMLElement;
     const key = target.getAttribute("data-snw-key");

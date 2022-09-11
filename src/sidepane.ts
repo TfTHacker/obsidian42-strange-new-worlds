@@ -1,4 +1,4 @@
-import {CachedMetadata, ItemView, WorkspaceLeaf} from "obsidian";
+import {CachedMetadata, ItemView, MarkdownView, WorkspaceLeaf} from "obsidian";
 import {getReferencesCache} from "./indexer";
 import {Link} from "./types";
 import ThePlugin from "./main";
@@ -7,8 +7,6 @@ export const VIEW_TYPE_SNW = "Strange New Worlds";
 
 
 const findPositionInFile = (filePath:string, link: string): number => {
-
-    console.log("findposition infile", filePath, link)
 
     const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
     if(cachedData?.links) {
@@ -63,50 +61,43 @@ export class SidePaneView extends ItemView {
         const refType = this.thePlugin.lastSelectedReferenceType;
         const link = this.thePlugin.lastSelectedReferenceLink;
 
-        console.log(`------------------ sidepane opened with.` )
-        console.log("key",key)
-        console.log("refType", refType)
-        console.log("link", link)
-
         // const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
         let sidePaneResourceTypeTitle = "" 
         let sidePaneReferencesTitle = "" 
-        let lineNumberRefType = 0;
 
         let refCache: Link[] = [];
-        let hoverLinkUrl = ""; //used by hover popup to control the reference used
         
         switch (refType) {
             case "link":
                 refCache = getReferencesCache()[key];
                 sidePaneResourceTypeTitle   = "Target:";
-                sidePaneReferencesTitle     = "Backlinks";
+                sidePaneReferencesTitle     = "Backlinks to target:";
                 break;
             case "embed":
                 sidePaneResourceTypeTitle   = "Target:";
-                sidePaneReferencesTitle     = "Backlinks";
+                sidePaneReferencesTitle     = "Backlinks to target:";
                 refCache = getReferencesCache()[key];
                 break;
             case "block":
                 sidePaneResourceTypeTitle   = "Target:";
-                sidePaneReferencesTitle     = "Backlinks";
+                sidePaneReferencesTitle     = "Backlinks to target:";
                 refCache =  getReferencesCache()[link];
                 if(refCache === undefined)
                 refCache = getReferencesCache()[this.thePlugin.app.workspace.activeLeaf.view.file.basename + "#^" + key];            
                 break;
             case "heading":
                 sidePaneResourceTypeTitle   = "Target:";
-                sidePaneReferencesTitle     = "Backlinks";
+                sidePaneReferencesTitle     = "Backlinks to target:";
                 refCache =  getReferencesCache()[link];
                 break;
             case "File":
                 sidePaneResourceTypeTitle   = "Target:";
-                sidePaneReferencesTitle     = "Incoming links";
+                sidePaneReferencesTitle     = "Incoming links to target:";
                 Object.entries(getReferencesCache()).forEach((value, key)=>{ value[1].forEach((element:Link[]) => { if(element.resolvedFile.path === link)  refCache.push(element)})});
                 break;
             } 
 
-        window.snwAPI.console("refCache", refCache)
+        if(refCache.length===0) return; //This may get callled when Obsidian initializes. So if there are no references, just exit
 
         //PANE HEADER 
         let output = '<div class="snw-sidepane-container">'; 
@@ -123,17 +114,20 @@ export class SidePaneView extends ItemView {
         // Display type of link
         output += `<div class="snw-sidepane-header-references-header">${sidePaneReferencesTitle}</div>`;
         
+        const sortedRefCache = refCache.sort((a,b)=>{
+            return a.sourceFile.basename.localeCompare(b.sourceFile.basename) ||
+                   Number(a.reference.position.start.line) - Number(b.reference.position.start.line);
+        });
+
+        window.snwAPI.console("sortedRefCache", sortedRefCache)
+
         //Loop through references and list them out
         output += `<ul class="snw-sidepane-references">`;
-        refCache.forEach(ref => {
-            // if(filePath!=ref.sourceFile.path){ 
-            // }
-            lineNumberRefType = findPositionInFile(ref.sourceFile.path, ref.reference.link);
+        sortedRefCache.forEach(ref => {
             output += `<li class="snw-sidepane-reference-item">`;
-            if(refType==="File") 
-            output += `<span class="snw-sidepane-reference-label-from">From: </span>`;
+            if(refType==="File") output += `<span class="snw-sidepane-reference-label-from">From: </span>`;
             output += `<a class="internal-link snw-sidepane-link snw-sidepane-reference-item-from" 
-                          snw-data-line-number="${lineNumberRefType}" 
+                          snw-data-line-number="${ref.reference.position.start.line}" 
                           snw-data-file-name="${ref.sourceFile.path}"
                           data-href="${ref.sourceFile.path}" 
                           href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a><br/>`;
@@ -143,7 +137,7 @@ export class SidePaneView extends ItemView {
                             <a class="internal-link snw-sidepane-link snw-sidepane-reference-item-to" 
                             snw-data-line-number="${lineNumberResolvedFile}" 
                             snw-data-file-name="${ref.resolvedFile.path}"
-                            data-href="${ref.resolvedFile.path}" 
+                            data-href="${ref.reference.link}" 
                             href="${ref.resolvedFile.path}">${ref.reference.link}</a>`;
             }
             output += `</li>`;
@@ -157,12 +151,10 @@ export class SidePaneView extends ItemView {
         setTimeout(() => {
             document.querySelectorAll('.snw-sidepane-link').forEach(el => {
                 el.addEventListener('click', (e: PointerEvent) => {
-                    console.log('hi')
                     e.preventDefault(); 
                     const target = e.target as HTMLElement;
                     const filePath  = target.getAttribute("snw-data-file-name");
                     const LineNu = Number(target.getAttribute("snw-data-line-number"));
-                    console.log("filepath", filePath)
                     const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                     if(e.shiftKey)  
                         this.thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
@@ -173,24 +165,38 @@ export class SidePaneView extends ItemView {
                     else {
                         this.thePlugin.app.workspace.getLeaf(false).openFile(fileT);
                     }
-                    if(LineNu!=0) {
-                        setTimeout(() => {
-                            this.thePlugin.app.workspace.activeLeaf.view.setEphemeralState({line: LineNu })
-                        }, 100);
-                    }
+                    setTimeout(() => {
+                        this.thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
+                    }, 100);
                 });
-                el.addEventListener('mouseover', (e: PointerEvent) => {
-                    const target = e.target as HTMLElement;
-                    const filePath  = target.getAttribute("data-href");
-                    console.log(filePath)
-                    app.workspace.trigger("hover-link", {
-                        event: e,
-                        source: 'source',
-                        hoverParent: document.querySelector(".markdown-preview-view"),
-                        targetEl: null,
-                        linktext:  filePath,
-                     });                    
-                });                
+                // el.addEventListener('mouseover', (e: PointerEvent) => {
+                //     const target = e.target as HTMLElement;
+                //     const filePath  = target.getAttribute("data-href");
+                //     console.log(filePath)
+                //     app.workspace.trigger("hover-link", {
+                //         event: e,
+                //         source: 'source',
+                //         hoverParent: document.querySelector(".markdown-preview-view"),
+                //         targetEl: null,
+                //         linktext:  filePath,
+                //      });   
+                // });    
+
+                // @ts-ignore
+                if(this.app.internalPlugins.plugins['page-preview'].enabled===true) {
+                    el.addEventListener('mouseover', (e: PointerEvent) => {
+                        //false for the following variable means CTRL/CMD not needed to use hover preview, otherwise check for these keys if returns undefined
+                        // @ts-ignore
+                        const hoverMetaKeyRequired = app.internalPlugins.plugins['page-preview'].instance.overrides['obsidian42-strange-new-worlds']==false ? false : true;
+                        if( hoverMetaKeyRequired===false || (hoverMetaKeyRequired===true && (e.ctrlKey || e.metaKey)) ) {
+                            const target = e.target as HTMLElement;
+                            const previewLocation = { scroll: Number(target.getAttribute("snw-data-line-number")) };
+                            const filePath  = target.getAttribute("snw-data-file-name");
+                            // parameter signature for link-hover parent: HoverParent, targetEl: HTMLElement, linkText: string, sourcePath: string, eState: EphemeralState
+                            app.workspace.trigger( "link-hover", {}, target, filePath, "", previewLocation);   
+                        }
+                    });    
+                }
             });    
         }, 500);
         
