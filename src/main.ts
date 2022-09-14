@@ -15,6 +15,7 @@ export default class ThePlugin extends Plugin {
     lastSelectedReferenceKey : string;
     lastSelectedReferenceType : string;
     lastSelectedReferenceLink : string;
+    snwAPI: SnwAPI;
 
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
@@ -44,8 +45,12 @@ export default class ThePlugin extends Plugin {
                 defaultMod: true,
             });
             
-            //@ts-ignore
-            globalThis.snwAPI = new SnwAPI(this);
+            this.snwAPI = new SnwAPI(this);
+            
+            // @ts-ignore
+            globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
+
+            this.snwAPI.settings = this.settings
 
         }
 

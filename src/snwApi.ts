@@ -1,5 +1,6 @@
 import { getCurrentPage } from "./indexer";
 import ThePlugin from "./main";
+import { Settings } from "./settingsTab";
 
 /**
  * Provide a simple API for use with Templater, Dataview and debugging the complexities of various pages.
@@ -10,6 +11,7 @@ import ThePlugin from "./main";
  */
 export default class SnwAPI {
     plugin: ThePlugin;
+    settings: Settings;
 
     constructor(plugin: ThePlugin) {
         this.plugin = plugin    
