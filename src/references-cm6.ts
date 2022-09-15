@@ -4,7 +4,7 @@ import {RangeSetBuilder} from "@codemirror/state";
 import {App, editorInfoField, MarkdownFileInfo, } from "obsidian";
 import {getCurrentPage} from "src/indexer";
 import ThePlugin from "./main";
-import {ReferenceLocation} from "./types";
+import {ReferenceLocation, TransformedCachedItem} from "./types";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
 import {generateArialLabel} from "./references-preview";
 
@@ -14,6 +14,14 @@ export function setPluginVariableForCM6(plugin: ThePlugin) {
     thePlugin = plugin;
 }
 
+/** 
+ * Codemirror extension - hook into the CM editor
+ * 
+ * CM will call update as the doc updates. 
+ * 
+ * calclulateInlineReferences is the key. It finds the references in the file and then returns
+ * the info needed by CM to process and display found matches
+ */
 const InlineReferenceExtension = ViewPlugin.fromClass(class {
     app: App;
     mdView: MarkdownFileInfo
@@ -22,33 +30,49 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
     constructor(view: EditorView) { 
         this.mdView = view.state.field( editorInfoField )
         this.app = this.mdView.app;
-        this.decorations = calclulateInlineReferences(view, this.app, this.mdView)
+        this.decorations = calclulateInlineReferences(view, this.app, this.mdView);
+
+        if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
+            thePlugin.snwAPI.console("InlineReferenceExtension constructor(EditorView)", view)
+
     }    
 
     update(update : ViewUpdate) { 
-        if (update.docChanged || update.viewportChanged) 
-            this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView)
+        if (update.docChanged || update.viewportChanged)  {
+            this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView);
+            if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
+               thePlugin.snwAPI.console("InlineReferenceExtension update(ViewUpdate, deocrations)", update, this.decorations)
+        }
     }
 }, {
-    decorations: v => v.decorations
-})
+    decorations: v => v.decorations  
+}) // END InlineReferenceExtension
 
 
+
+/**
+ * CM widget for renderinged matched ranges of references. This allows us to provide our UX for matches.
+ *
+ * @class InlineReferenceWidget
+ * @extends {WidgetType}
+ */
 class InlineReferenceWidget extends WidgetType {
     referenceCount: number;
     referenceType: string;
     key: string;    //a unique identifer for the reference
     link: string;
     arialLabel: string;
+    addCssClass: string; //if a reference need special treatment, this class can be assigned
     thePlugin: ThePlugin;
 
-    constructor(refCount: number, cssclass: string, key:string, link: string, arialLabel: string) {
+    constructor(refCount: number, cssclass: string, key:string, link: string, arialLabel: string, addCSSClass: string ) {
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
         this.key = key;
         this.link = link;
         this.arialLabel = arialLabel;
+        this.addCssClass = addCSSClass;
     }
 
     eq(other: InlineReferenceWidget) { 
@@ -56,24 +80,26 @@ class InlineReferenceWidget extends WidgetType {
     }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel);
+        return htmlDecorationForReferencesElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel, this.addCssClass);
     }
 
     destroy() {}
 
     ignoreEvent() { return false }
-}
+} // END InlineReferenceWidget
 
-function matchAll(source: string, find: string) {
-    // console.log("matchall", source, find)
-    const result = [];
-    for(let i=0;i<source.length; ++i) 
-      if (source.substring(i, i + find.length) == find) {
-        result.push(i);
-      }
-    return result;
-  }
- 
+
+/**
+ * Welcome to the crown jewels.
+ * 
+ * Locates inline references, and tells CM editor where they are, 
+ * and provides additional meta data for later use through out the plugin
+ *
+ * @param {EditorView} view
+ * @param {App} theApp
+ * @param {MarkdownFileInfo} mdView
+ * @return {*} 
+ */
 function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownFileInfo) {
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
@@ -83,84 +109,52 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
     const transformedCache = getCurrentPage(mdView.file, theApp);
     const viewPort = view.viewport; 
 
-    // walk through the elements of the document (blocks, headings, embeds, links) and test each line to see if it contains
-    // something that should be featured in the editor
-
-    let currentLocationInDocument = 0; 
-
-    const processBlocks = (t:string)=> {
-        if(viewPort.to>=currentLocationInDocument && viewPort.from<=currentLocationInDocument) {
-            if(transformedCache.blocks) 
-                for (const value of transformedCache.blocks) 
-                    if(value.references.length>0 && t.endsWith(` ^${value.key}`)) {
-                        referenceLocations.push({type:"block", pos: value.pos.end.offset, count: value.references.length, 
-                                                key: value.key, link: value.references[0].reference.link, 
-                                                arialLabel: generateArialLabel(CurrentFile, value)}
-                                                ); 
-                        break;
+    const processReferences = (references: TransformedCachedItem[]) => {
+        references.forEach(ref=>{
+            if( ref.references.length > 0 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
+                // if it is an embed, see if the embed is alone in the paragraph
+                // the reason is embeds on their own line render differently than if they are inline with text. 
+                // we have to handle this case as special
+                let addClass = null;
+                let position = ref.pos.end.offset;
+                if(ref.type==="embed") {
+                    for (const section of transformedCache.sections ) { //find if the embedd is alone on its own line (not inline with other content)
+                        if( section.position.start.offset===ref.pos.start.offset && section.position.end.offset===ref.pos.end.offset ) {
+                            addClass = "snw-embed-special";
+                            position = ref.pos.start.offset - 1; //force to beginning of line
+                            break;
+                        }
                     }
-                    
-            if(transformedCache.headings) 
-                for (const value of transformedCache.headings) 
-                    if(value.references.length>1 && t===value.original) {
-                        referenceLocations.push({type:"heading", pos: currentLocationInDocument + t.length, count: value.references.length, 
-                                                key: value.original, link: value.references[0].reference.link,
-                                                arialLabel: generateArialLabel(CurrentFile, value)});   
-                        break;
-                    }
+                }
 
-            if(transformedCache.embedsWithDuplicates)
-                for (const value of transformedCache.embedsWithDuplicates) {
-                    if(value.references.length>1) 
-                        matchAll(t, value.key).forEach(match=> {
-                            if(t==value.references[0].reference.original) {
-                                match +=1; // for embeds that are on a line by themselves, they won't render unles the position is incremented by one
-                                           // unfortunately this push it down a line
-                            } 
-                            referenceLocations.push({ type:"embed", count: value.references.length,
-                                                      pos:  currentLocationInDocument + match + value.key.length +2, 
-                                                      key: value.key, 
-                                                      link: value.references[0].reference.link,
-                                                      arialLabel: generateArialLabel(CurrentFile, value)}
-                                                    );
-                        });
-                    }
-
-            if(transformedCache.linksWithoutDuplicates)
-                for (const value of transformedCache.linksWithoutDuplicates) 
-                    if(value.references.length>1) 
-                        matchAll(t, value.key).forEach(match=> 
-                            referenceLocations.push({ type:"link", count: value.references.length,
-                                                        pos: currentLocationInDocument + match + value.key.length, key: value.key, 
-                                                        link: value.references[0].reference.link,
-                                                        arialLabel: generateArialLabel(CurrentFile, value)
-                                                    }));
-        }
+                referenceLocations.push({
+                    type: ref.type,
+                    count: ref.references.length,
+                    pos: position, 
+                    key: ref.key,
+                    link: ref.references[0].reference.link,
+                    arialLabel: generateArialLabel(CurrentFile, ref),
+                    attachClass: addClass
+                });
+            }
+        })
     }
 
-    if(view.state.doc.children) {
-        view.state.doc.children.forEach((child)=>{
-            child.text.forEach((t:string)=> {
-                processBlocks(t);
-                currentLocationInDocument += t.length + 1;
-            });
-        });
-    } else {
-        view.state.doc.text.forEach((t:string)=> {
-            processBlocks(t);
-            currentLocationInDocument += t.length + 1;
-        });
-    }
+    if(transformedCache.blocks)     processReferences(transformedCache.blocks);
+    if(transformedCache.embeds)     processReferences(transformedCache.embeds);
+    if(transformedCache.headings)   processReferences(transformedCache.headings);
+    if(transformedCache.links)      processReferences(transformedCache.links);
 
     referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
         rangeSetBuilder.add(
             r.pos, r.pos,
-            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel), side: 1})
+            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
         );        
     });
 
     return rangeSetBuilder.finish(); 
-}
+
+} // END calclulateInlineReferences
 
 
 export default InlineReferenceExtension;

@@ -24,12 +24,13 @@ declare module "obsidian" {
 }
 
 export interface ReferenceLocation {
-    type: "block" | "heading" | "embed" | "link";
+    type: "block" | "heading" | "embed" | "link" | string;
     pos: number;
     count: number;
     key: string; //identifier for the reference
     link: string; // full link to reference
     arialLabel: string; 
+    attachClass: string; // allows a custom class to be attached when processing cm6 references
 } 
 
 export interface Link {

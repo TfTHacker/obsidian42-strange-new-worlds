@@ -89,7 +89,7 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
         }
         return acc;
     }, []);
-    if (cachedMetaData ?. blocks) {
+    if (cachedMetaData?.blocks) {
         transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => ({
             key: block.id,
             pos: block.position,
@@ -102,7 +102,7 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
                 }`] || []
         }));
     }
-    if (cachedMetaData ?. headings) {
+    if (cachedMetaData?.headings) {
         transformedCache.headings = cachedMetaData.headings.map((header : {
             heading: string;
             position: Pos;
@@ -121,10 +121,10 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
                 }`] || []
         }));
     }
-    if (cachedMetaData ?. sections) {
+    if (cachedMetaData?.sections) {
         transformedCache.sections = createListSections(cachedMetaData);
     }
-    if (cachedMetaData ?. links) {
+    if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
             if (link.link.includes("/")) {
                 const keyArr = link.link.split("/");
@@ -166,7 +166,7 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
         }
     }
 
-    if (cachedMetaData ?. embeds) {
+    if (cachedMetaData?.embeds) {
         transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
             if (embed.link.includes("/")) {
                 const keyArr = embed.link.split("/");
@@ -175,7 +175,7 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
             return {
                 key: embed.link,
                 page: file.basename,
-                type: "link",
+                type: "embed",
                 pos: embed.position,
                 references: references[embed.link] || []
             };

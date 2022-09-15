@@ -6,7 +6,6 @@ import ThePlugin from "./main";
 import {processHtmlDecorationReferenceEvent} from "./htmlDecorations";
 
 
-
 /**
  * Iterates all open documents to see if they are markdown file, and if so callsed processHeader
  *
@@ -15,13 +14,14 @@ import {processHtmlDecorationReferenceEvent} from "./htmlDecorations";
  */
 export default function setHeaderWithReferenceCounts(thePlugin: ThePlugin) {
     if(thePlugin.settings.displayIncomingFilesheader===false) return;
-    thePlugin.snwAPI.console("headerImageCount.setHeaderWithReferenceCounts(thePlugin)", ThePlugin);
+    if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
+        thePlugin.snwAPI.console("headerImageCount.setHeaderWithReferenceCounts(thePlugin)", ThePlugin);
+    
     thePlugin.app.workspace.iterateAllLeaves((leaf : WorkspaceLeaf) => {
         if (leaf.view.getViewType() === "markdown") 
             processHeader(thePlugin, leaf.view as MarkdownView);
     })
 }
-
 
 
 /**
@@ -31,7 +31,9 @@ export default function setHeaderWithReferenceCounts(thePlugin: ThePlugin) {
  * @param {MarkdownView} mdView
  */
 function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
-    thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
+    if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
+        thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
+    
     const allLinks: Link[] = thePlugin.app.fileManager.getAllLinkResolutions();
     const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
 
@@ -64,7 +66,9 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
         snwTitleRefCountDisplayCountEl.setAttribute("data-snw-link", mdView.file.path);
         snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
         snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent) => processHtmlDecorationReferenceEvent(e, thePlugin);
-        thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
+
+        if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
+            thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
     }
 
 }

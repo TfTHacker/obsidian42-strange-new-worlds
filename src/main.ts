@@ -26,6 +26,11 @@ export default class ThePlugin extends Plugin {
 
         const initializeEnvironment = async () => {
             await this.loadSettings();
+
+            this.snwAPI = new SnwAPI(this);            
+            // @ts-ignore
+            globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
+
             setPluginVariableForCM6(this);
 
             this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
@@ -45,10 +50,6 @@ export default class ThePlugin extends Plugin {
                 defaultMod: true,
             });
             
-            this.snwAPI = new SnwAPI(this);
-            
-            // @ts-ignore
-            globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
             this.snwAPI.settings = this.settings
 

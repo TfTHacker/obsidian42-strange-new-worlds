@@ -1,42 +1,11 @@
+// Sidepane used by SNW for displaying references
+
 import {CachedMetadata, ItemView, MarkdownView, WorkspaceLeaf} from "obsidian";
 import {getReferencesCache} from "./indexer";
 import {Link} from "./types";
 import ThePlugin from "./main";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
-
-
-const findPositionInFile = (filePath:string, link: string): number => {
-
-    const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
-    if(cachedData?.links) {
-        for (const i of cachedData.links) {
-            if(i.link===link) 
-                return i.position.start.line;
-        }
-    }
-
-    if(cachedData?.embeds) {
-        for (const i of cachedData.embeds) 
-            if(i.link===link) 
-                return i.position.start.line;
-    }
-
-    if(cachedData?.blocks) {
-        for (const i of Object.entries(cachedData?.blocks)) 
-            if(i[1].id===link) 
-                return i[1].position.start.line;
-    }
-
-    if(cachedData?.headings) {
-        const headingLink = link.replace("#","");
-        for (const i of cachedData.headings) 
-            if(i.heading===headingLink) 
-                return i.position.start.line;
-    }
-    
-    return 0;  
-}
 
 export class SidePaneView extends ItemView {
     contentEl: HTMLElement;
@@ -185,7 +154,6 @@ export class SidePaneView extends ItemView {
                 // @ts-ignore
                 if(this.app.internalPlugins.plugins['page-preview'].enabled===true) {
                     el.addEventListener('mouseover', (e: PointerEvent) => {
-                        //false for the following variable means CTRL/CMD not needed to use hover preview, otherwise check for these keys if returns undefined
                         // @ts-ignore
                         const hoverMetaKeyRequired = app.internalPlugins.plugins['page-preview'].instance.overrides['obsidian42-strange-new-worlds']==false ? false : true;
                         if( hoverMetaKeyRequired===false || (hoverMetaKeyRequired===true && (e.ctrlKey || e.metaKey)) ) {
@@ -204,4 +172,43 @@ export class SidePaneView extends ItemView {
 
     async onClose() { // Nothing to clean up.
     }
+}
+
+/**
+ *  For the given file, find the link passed in and returns the line number. 
+ *
+ * @param {string} filePath
+ * @param {string} link
+ * @return {*}  {number}
+ */
+ const findPositionInFile = (filePath:string, link: string): number => {
+
+    const cachedData: CachedMetadata = app.metadataCache.getCache(filePath);
+    if(cachedData?.links) {
+        for (const i of cachedData.links) {
+            if(i.link===link) 
+                return i.position.start.line;
+        }
+    }
+
+    if(cachedData?.embeds) {
+        for (const i of cachedData.embeds) 
+            if(i.link===link) 
+                return i.position.start.line;
+    }
+
+    if(cachedData?.blocks) {
+        for (const i of Object.entries(cachedData?.blocks)) 
+            if(i[1].id===link) 
+                return i[1].position.start.line;
+    }
+
+    if(cachedData?.headings) {
+        const headingLink = link.replace("#","");
+        for (const i of cachedData.headings) 
+            if(i.heading===headingLink) 
+                return i.position.start.line;
+    }
+    
+    return 0;  
 }

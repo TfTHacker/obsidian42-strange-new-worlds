@@ -2,6 +2,7 @@ import { getCurrentPage } from "./indexer";
 import ThePlugin from "./main";
 import { Settings } from "./settingsTab";
 
+
 /**
  * Provide a simple API for use with Templater, Dataview and debugging the complexities of various pages.
  * main.ts will attach this to window.snwAPI
@@ -12,6 +13,11 @@ import { Settings } from "./settingsTab";
 export default class SnwAPI {
     plugin: ThePlugin;
     settings: Settings;
+    enableDebugging = {
+        LinkCountInHeader: false,
+        HtmlDecorationElements: false,
+        CM6Extension: false
+    }
 
     constructor(plugin: ThePlugin) {
         this.plugin = plugin    
@@ -19,8 +25,7 @@ export default class SnwAPI {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     console = (logDescription: string, ...outputs: any[]): void => {
-        if(this.plugin.settings.debugMode===true)
-            console.log("SNW: " + logDescription, outputs)
+        console.log("SNW: " + logDescription, outputs)
     }
 
     /**
