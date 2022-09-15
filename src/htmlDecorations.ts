@@ -22,7 +22,7 @@ export function htmlDecorationForReferencesElement(thePlugin: ThePlugin, count: 
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(ThePlugin, count, referenceType, key, link, arialLabel)", thePlugin, count,referenceType,key,link,ariaLabel);
 
-    const element = document.createElement("span")
+    const element = document.createElement("div")
     element.className = "snw-reference snw-" + referenceType;
     element.innerText= " " + count.toString() + " ";
     element.setAttribute("data-snw-key", key);

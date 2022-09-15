@@ -118,10 +118,10 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                 let addClass = null;
                 let position = ref.pos.end.offset;
                 if(ref.type==="embed") {
-                    for (const section of transformedCache.sections ) { //find if the embedd is alone on its own line (not inline with other content)
+                    for (const section of transformedCache.sections ) { //find if the embed is alone on its own line (not inline with other content)
                         if( section.position.start.offset===ref.pos.start.offset && section.position.end.offset===ref.pos.end.offset ) {
                             addClass = "snw-embed-special";
-                            position = ref.pos.start.offset - 1; //force to beginning of line
+                            position = ref.pos.end.offset + 1; //force to beginning of line
                             break;
                         }
                     }
@@ -137,7 +137,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
                     attachClass: addClass
                 });
             }
-        })
+        });
     }
 
     if(transformedCache.blocks)     processReferences(transformedCache.blocks);

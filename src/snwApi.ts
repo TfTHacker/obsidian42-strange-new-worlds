@@ -14,9 +14,10 @@ export default class SnwAPI {
     plugin: ThePlugin;
     settings: Settings;
     enableDebugging = {
-        LinkCountInHeader: false,
+        CM6Extension: false,
         HtmlDecorationElements: false,
-        CM6Extension: false
+        LinkCountInHeader: false,
+        PreviewRendering: false
     }
 
     constructor(plugin: ThePlugin) {

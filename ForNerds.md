@@ -15,6 +15,10 @@ Keep in mind that the Live preview editor is using Codemirror, and we need code 
       - The widget uses the shared function htmlDecorationForReferencesElement() to create the html displayed in the UI. This same function is also used for the Preview renderer. So both CM editor and preview mode use the same rendering html.
 
 # Preview Renderer
+- registerMarkdownPostProcessor
 
+
+# Cache of document references
+- registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
 
 

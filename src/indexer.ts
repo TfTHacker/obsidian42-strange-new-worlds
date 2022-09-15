@@ -202,8 +202,6 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
             if (transformedCache.embeds) 
                 transformedCache.embedsWithDuplicates = transformedCache.embeds.filter((embed, index, self) => index === self.findIndex((t) => (t.key === embed.key)))
 
-            
-
         }
     }
     return transformedCache;

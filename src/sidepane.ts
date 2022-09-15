@@ -88,8 +88,6 @@ export class SidePaneView extends ItemView {
                    Number(a.reference.position.start.line) - Number(b.reference.position.start.line);
         });
 
-        this.thePlugin.snwAPI.console("sortedRefCache", sortedRefCache)
-
         //Loop through references and list them out
         output += `<ul class="snw-sidepane-references">`;
         sortedRefCache.forEach(ref => {
