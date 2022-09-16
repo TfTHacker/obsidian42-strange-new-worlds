@@ -1,6 +1,10 @@
 import ThePlugin from "./main";
 
+let thePlugin: ThePlugin;
 
+export function setPluginVariableForHtmlDecorations(plugin: ThePlugin) {
+    thePlugin = plugin;
+}
 
 /**
  * Shared function between refrences-cm6.ts and references-preview.s
@@ -9,7 +13,6 @@ import ThePlugin from "./main";
  * the function processHtmlDecorationReferenceEvent is called
  *
  * @export
- * @param {ThePlugin} thePlugin
  * @param {number} count            Number to show in the box
  * @param {string} referenceType    The type of references (block, embed, link, header)
  * @param {string} key              Unique key used to identify this reference based on its type
@@ -18,9 +21,9 @@ import ThePlugin from "./main";
  * @param {string} attachCSSClass   if special class is need for the elment
  * @return {*}  {HTMLElement}
  */
-export function htmlDecorationForReferencesElement(thePlugin: ThePlugin, count: number, referenceType: string, key: string, link: string, ariaLabel: string, attachCSSClass: string): HTMLElement {
-    if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(ThePlugin, count, referenceType, key, link, arialLabel)", thePlugin, count,referenceType,key,link,ariaLabel);
+export function htmlDecorationForReferencesElement(count: number, referenceType: string, key: string, link: string, ariaLabel: string, attachCSSClass: string): HTMLElement {
+    if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
+        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, link, arialLabel)", thePlugin, count,referenceType,key,link,ariaLabel);
 
     const element = document.createElement("div")
     element.className = "snw-reference snw-" + referenceType;
@@ -31,17 +34,17 @@ export function htmlDecorationForReferencesElement(thePlugin: ThePlugin, count: 
     element.ariaLabel = ariaLabel;
     if(attachCSSClass) element.addClass(attachCSSClass);
 
-    element.onclick = (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e, thePlugin);            
-    // element.onmouseover = async (e: any ) => processReferenceEvent(e, thePlugin); 
+    element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e);
+    // element.onmouseover = async (e: MouseEvent ) => console.log("mouseover"); 
 
-    if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
+    if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
 
     return element;
 }
 
 
-export const processHtmlDecorationReferenceEvent = async (event: MouseEvent, thePlugin: ThePlugin) => {
+export const processHtmlDecorationReferenceEvent = async (event: MouseEvent) => {
     event.preventDefault();
     const target = event.target as HTMLElement;
     const key = target.getAttribute("data-snw-key");

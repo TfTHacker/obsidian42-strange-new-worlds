@@ -41,7 +41,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 if ( value.references.length > 0 && 
                      (value.pos.start.line >= sectionInfo?.lineStart && value.pos.end.line <= sectionInfo?.lineEnd) &&
                      !isThisAnEmbed ) {
-                        const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "block", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                     let blockElement: HTMLElement = el.querySelector('p')
                     if (!blockElement) {
                         blockElement = el.querySelector("li");
@@ -62,7 +62,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embedsWithDuplicates) {
                     if (value.references.length > 0 && embedKey.endsWith(value.key)) {
-                        const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         element.after(referenceElement);
                         referenceElement.addClass('snw-embed-preview');
                         break;
@@ -75,7 +75,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             const headerKey = el.querySelector("[data-heading]").textContent;
             for (const value of transformedCache.headings) 
                 if (value.references.length > 0 && value.key === headerKey) {
-                    const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
+                    const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                     el.querySelector("h1").insertAdjacentElement("beforeend", referenceElement);
                     referenceElement.addClass("snw-heading-preview");
                     break;
@@ -87,7 +87,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.linksWithoutDuplicates) {
                     if (value.references.length > 0 && (value.key === link || value.original.includes(link))) {
-                        const referenceElement = htmlDecorationForReferencesElement(thePlugin, value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         element.after(referenceElement);
                         referenceElement.addClass('snw-link-preview');
                         break;

@@ -6,6 +6,8 @@ import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
 import setHeaderWithReferenceCounts from "./headerImageCount";
 import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./settingsTab";
 import SnwAPI from "./snwApi";
+import ReferenceGutterExtension from "./extensions/gutters";
+import { setPluginVariableForHtmlDecorations } from "./htmlDecorations";
 
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;
@@ -32,8 +34,10 @@ export default class ThePlugin extends Plugin {
             globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
             setPluginVariableForCM6(this);
+            setPluginVariableForHtmlDecorations(this);
 
             this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
+            this.registerEditorExtension(ReferenceGutterExtension );
             this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
             this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx, this));
             this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));

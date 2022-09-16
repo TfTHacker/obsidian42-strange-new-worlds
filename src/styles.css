@@ -1,8 +1,4 @@
 
-.snw-embed-special {
-    float: left;
-}
- 
 .snw-reference {
     font-size: 6pt;
     vertical-align: top;
@@ -35,6 +31,11 @@
 }
 
 .snw-embed {
+    margin-top: 1px;
+}
+
+.snw-embed-preview {
+    top: 2px;
 }
 
 .snw-link {
@@ -102,3 +103,9 @@
     padding-top: 0px;
     font-size: x-small;
 }
+
+.snw-embed-special {
+    opacity: 1 !important;
+    font-size: 8pt;
+}
+ 

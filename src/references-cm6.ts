@@ -80,7 +80,7 @@ class InlineReferenceWidget extends WidgetType {
     }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(thePlugin, this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel, this.addCssClass);
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel, this.addCssClass);
     }
 
     destroy() {}
@@ -101,6 +101,9 @@ class InlineReferenceWidget extends WidgetType {
  * @return {*} 
  */
 function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownFileInfo) {
+    if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
+        thePlugin.snwAPI.console("calclulateInlineReferences(EditorView, theApp, MarkdownFileInfo", view,theApp,mdView);
+    
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
     if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
@@ -112,29 +115,14 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
     const processReferences = (references: TransformedCachedItem[]) => {
         references.forEach(ref=>{
             if( ref.references.length > 0 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
-                // if it is an embed, see if the embed is alone in the paragraph
-                // the reason is embeds on their own line render differently than if they are inline with text. 
-                // we have to handle this case as special
-                let addClass = null;
-                let position = ref.pos.end.offset;
-                if(ref.type==="embed") {
-                    for (const section of transformedCache.sections ) { //find if the embed is alone on its own line (not inline with other content)
-                        if( section.position.start.offset===ref.pos.start.offset && section.position.end.offset===ref.pos.end.offset ) {
-                            addClass = "snw-embed-special";
-                            position = ref.pos.end.offset + 1; //force to beginning of line
-                            break;
-                        }
-                    }
-                }
-
                 referenceLocations.push({
                     type: ref.type,
                     count: ref.references.length,
-                    pos: position, 
+                    pos: ref.pos.end.offset, 
                     key: ref.key,
                     link: ref.references[0].reference.link,
                     arialLabel: generateArialLabel(CurrentFile, ref),
-                    attachClass: addClass
+                    attachClass: null
                 });
             }
         });
@@ -151,6 +139,9 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
             Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
         );        
     });
+
+    if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
+        thePlugin.snwAPI.console("calclulateInlineReferences - referenceLocations", referenceLocations)
 
     return rangeSetBuilder.finish(); 
 
