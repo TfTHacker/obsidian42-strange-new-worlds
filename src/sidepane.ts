@@ -65,11 +65,10 @@ export class SidePaneView extends ItemView {
                 break;
             case "File":
                 sidePaneResourceTypeTitle   = "Target:";
-                sidePaneReferencesTitle     = "Incoming links to target:";
+                sidePaneReferencesTitle     = "Incoming links:";
                 Object.entries(getReferencesCache()).forEach((value, key)=>{ value[1].forEach((element:Link[]) => { if(element.resolvedFile.path === link)  refCache.push(element)})});
                 break;
             } 
-
 
         if(refCache.length===0) return; //This may get callled when Obsidian initializes. So if there are no references, just exit
 
@@ -79,6 +78,7 @@ export class SidePaneView extends ItemView {
 
         //REFERENCES TO THIS RESOURCE
         const sourceLink =  refType === "File" ? link : refCache[0]?.resolvedFile.path;
+        // sourceFileLineNumber will be 0 when doing a header lookup, but if its a reference will goto the right line
         const sourceFileLineNumber = refType === "File" ? 0 : findPositionInFile(refCache[0].resolvedFile.path, refCache[0].reference.link.replace(refCache[0].resolvedFile.basename, "").replace("#^",""));
         output += `<a class="internal-link snw-sidepane-link" 
                       snw-data-line-number="${sourceFileLineNumber}" 
@@ -96,14 +96,16 @@ export class SidePaneView extends ItemView {
         //Loop through references and list them out
         output += `<ul class="snw-sidepane-references">`;
         sortedRefCache.forEach(ref => {
+            const refLineNumber = this.thePlugin.settings.displayLineNumberInSidebar ? `<span class="snw-sidepane-linenumber">(${ref.reference.position.start.line+1})</span>` : "";
             output += `<li class="snw-sidepane-reference-item">`;
             if(refType==="File") output += `<span class="snw-sidepane-reference-label-from">From: </span>`;
             output += `<a class="internal-link snw-sidepane-link snw-sidepane-reference-item-from" 
                           snw-data-line-number="${ref.reference.position.start.line}" 
                           snw-data-file-name="${ref.sourceFile.path}"
                           data-href="${ref.sourceFile.path}" 
-                          href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a><br/>`;
+                          href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a> ${refLineNumber}<br/>`;
             if(refType==="File") {
+                console.log(ref)
                 const lineNumberResolvedFile = findPositionInFile(ref.resolvedFile.path, ref.reference.link.replace(ref.resolvedFile.basename,"").replace("#^",""));
                 output += `<span class="snw-sidepane-reference-label-to">To: </span>
                             <a class="internal-link snw-sidepane-link snw-sidepane-reference-item-to" 
@@ -139,21 +141,8 @@ export class SidePaneView extends ItemView {
                     }
                     setTimeout(() => {
                         this.thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
-                    }, 100);
+                    }, 200);
                 });
-                // el.addEventListener('mouseover', (e: PointerEvent) => {
-                //     const target = e.target as HTMLElement;
-                //     const filePath  = target.getAttribute("data-href");
-                //     console.log(filePath)
-                //     app.workspace.trigger("hover-link", {
-                //         event: e,
-                //         source: 'source',
-                //         hoverParent: document.querySelector(".markdown-preview-view"),
-                //         targetEl: null,
-                //         linktext:  filePath,
-                //      });   
-                // });    
-
                 // @ts-ignore
                 if(this.app.internalPlugins.plugins['page-preview'].enabled===true) {
                     el.addEventListener('mouseover', (e: PointerEvent) => {

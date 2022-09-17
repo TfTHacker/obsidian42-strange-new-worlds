@@ -5,12 +5,14 @@ export interface Settings {
 	displayIncomingFilesheader: 	boolean;
 	displayInlineReferences: 		boolean;
 	displayEmbedReferencesInGutter:	boolean;
+	displayLineNumberInSidebar:		boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
 	displayIncomingFilesheader: true,
 	displayInlineReferences: true,
-	displayEmbedReferencesInGutter: true
+	displayEmbedReferencesInGutter: true,
+	displayLineNumberInSidebar: true
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -60,6 +62,17 @@ export class SettingsTab extends PluginSettingTab {
 				cb.setValue(this.plugin.settings.displayEmbedReferencesInGutter);
 				cb.onChange(async (value: boolean) => {
 					this.plugin.settings.displayEmbedReferencesInGutter = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('Show line number for file in sidepane')
+			.setDesc(`Displays a line number from the document in the sidepane.`	)
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.plugin.settings.displayLineNumberInSidebar);
+				cb.onChange(async (value: boolean) => {
+					this.plugin.settings.displayLineNumberInSidebar = value;
 					await this.plugin.saveSettings();
 				});
 			});

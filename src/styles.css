@@ -43,6 +43,7 @@
 }
 
 .snw-sidepane-container {
+    height: 100%;
 }
 
 .snw-header-count-wrapper {
@@ -86,6 +87,7 @@
 
 .snw-sidepane-references {
     margin-top: 0px;
+    padding-left: 20px;
 }
 
 .snw-sidepane-reference-item {
@@ -102,6 +104,11 @@
 .snw-sidepane-reference-item-to {
     padding-top: 0px;
     font-size: x-small;
+}
+
+.snw-sidepane-linenumber {
+    font-size: 7pt;
+    opacity: 0.7;
 }
 
 .snw-embed-special {

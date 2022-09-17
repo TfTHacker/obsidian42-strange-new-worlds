@@ -65,7 +65,7 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
         snwTitleRefCountDisplayCountEl.setAttribute("data-snw-type", "File");
         snwTitleRefCountDisplayCountEl.setAttribute("data-snw-link", mdView.file.path);
         snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
-        snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent) => processHtmlDecorationReferenceEvent(e, thePlugin);
+        snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent) => processHtmlDecorationReferenceEvent(e);
 
         if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
             thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
