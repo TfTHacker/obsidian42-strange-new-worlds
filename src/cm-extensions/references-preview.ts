@@ -17,6 +17,8 @@ import {TransformedCachedItem} from "../types";
  */
 export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext, thePlugin : ThePlugin) {
 
+    if(!thePlugin.settings.displayInlineReferences) return;
+
     if(thePlugin.snwAPI.enableDebugging.PreviewRendering)
         thePlugin.snwAPI.console("markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext", el, ctx, ctx.getSectionInfo(el))
 

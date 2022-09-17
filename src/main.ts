@@ -1,12 +1,12 @@
 import {debounce, Plugin} from "obsidian";
-import InlineReferenceExtension, {setPluginVariableForCM6} from "./cm-extensions/references-cm6";
+import InlineReferenceExtension, {setPluginVariableForCM6EditorExtension} from "./cm-extensions/references-cm6";
 import {buildLinksAndReferences} from "./indexer";
 import markdownPreviewProcessor from "./cm-extensions/references-preview";
 import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
 import setHeaderWithReferenceCounts from "./headerImageCount";
 import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./settingsTab";
 import SnwAPI from "./snwApi";
-import ReferenceGutterExtension from "./cm-extensions/gutters";
+import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
 import { setPluginVariableForHtmlDecorations } from "./htmlDecorations";
 
 export default class ThePlugin extends Plugin {
@@ -33,8 +33,9 @@ export default class ThePlugin extends Plugin {
             // @ts-ignore
             globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
-            setPluginVariableForCM6(this);
+            setPluginVariableForCM6EditorExtension(this);
             setPluginVariableForHtmlDecorations(this);
+            setPluginVariableForCM6Gutter(this);
 
             this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
             this.registerEditorExtension(ReferenceGutterExtension );

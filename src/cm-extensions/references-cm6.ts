@@ -10,7 +10,7 @@ import {generateArialLabel} from "./references-preview";
 
 let thePlugin: ThePlugin;
 
-export function setPluginVariableForCM6(plugin: ThePlugin) {
+export function setPluginVariableForCM6EditorExtension(plugin: ThePlugin) {
     thePlugin = plugin;
 }
 
@@ -38,10 +38,10 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
     }    
 
     update(update : ViewUpdate) { 
-        if (update.docChanged || update.viewportChanged)  {
+        if(update.docChanged || update.viewportChanged)  {
             this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView);
             if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-               thePlugin.snwAPI.console("InlineReferenceExtension update(ViewUpdate, deocrations)", update, this.decorations)
+                thePlugin.snwAPI.console("InlineReferenceExtension update(ViewUpdate, deocrations)", update, this.decorations)
         }
     }
 }, {
@@ -105,44 +105,47 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
         thePlugin.snwAPI.console("calclulateInlineReferences(EditorView, theApp, MarkdownFileInfo", view,theApp,mdView);
     
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
-    if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
-    const CurrentFile = mdView.file.path;
-    const referenceLocations: ReferenceLocation[] = [];
-    const transformedCache = getCurrentPage(mdView.file, theApp);
-    const viewPort = view.viewport; 
+    if(thePlugin?.settings.displayInlineReferences) {
 
-    const processReferences = (references: TransformedCachedItem[]) => {
-        references.forEach(ref=>{
-            if( ref.references.length > 1 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
-                console.log("ref.type",ref.type)
-                referenceLocations.push({
-                    type: ref.type,
-                    count: ref.references.length,
-                    pos: ref.pos.end.offset, 
-                    key: ref.key,
-                    link: ref.references[0].reference.link,
-                    arialLabel: generateArialLabel(CurrentFile, ref),
-                    attachClass: null
-                });
-            }
+        if(mdView?.file===undefined) return rangeSetBuilder.finish();
+
+        const CurrentFile = mdView.file.path;
+        const referenceLocations: ReferenceLocation[] = [];
+        const transformedCache = getCurrentPage(mdView.file, theApp);
+        const viewPort = view.viewport; 
+    
+        const processReferences = (references: TransformedCachedItem[]) => {
+            references.forEach(ref=>{
+                if( ref.references.length > 1 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
+                    referenceLocations.push({
+                        type: ref.type,
+                        count: ref.references.length,
+                        pos: ref.pos.end.offset, 
+                        key: ref.key,
+                        link: ref.references[0].reference.link,
+                        arialLabel: generateArialLabel(CurrentFile, ref),
+                        attachClass: null
+                    });
+                }
+            });
+        }
+    
+        if(transformedCache.blocks)     processReferences(transformedCache.blocks);
+        if(transformedCache.embeds)     processReferences(transformedCache.embeds);
+        if(transformedCache.headings)   processReferences(transformedCache.headings);
+        if(transformedCache.links)      processReferences(transformedCache.links);
+    
+        referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
+            rangeSetBuilder.add(
+                r.pos, r.pos,
+                Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
+            );        
         });
+    
+        if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
+            thePlugin.snwAPI.console("calclulateInlineReferences - referenceLocations", referenceLocations)
     }
-
-    if(transformedCache.blocks)     processReferences(transformedCache.blocks);
-    if(transformedCache.embeds)     processReferences(transformedCache.embeds);
-    if(transformedCache.headings)   processReferences(transformedCache.headings);
-    if(transformedCache.links)      processReferences(transformedCache.links);
-
-    referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
-        rangeSetBuilder.add(
-            r.pos, r.pos,
-            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
-        );        
-    });
-
-    if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-        thePlugin.snwAPI.console("calclulateInlineReferences - referenceLocations", referenceLocations)
 
     return rangeSetBuilder.finish(); 
 

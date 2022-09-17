@@ -2,11 +2,15 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from 'obsidian';
 import ThePlugin from './main';
 
 export interface Settings {
-	displayIncomingFilesheader: boolean
+	displayIncomingFilesheader: 	boolean;
+	displayInlineReferences: 		boolean;
+	displayEmbedReferencesInGutter:	boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-	displayIncomingFilesheader: true
+	displayIncomingFilesheader: true,
+	displayInlineReferences: true,
+	displayEmbedReferencesInGutter: true
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -33,6 +37,32 @@ export class SettingsTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
- 
+
+		new Setting(containerEl)
+			.setName('References Inline Documents')
+			.setDesc('Display inline of the text of documents all reference counts for links, blocks and embeds.')
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.plugin.settings.displayInlineReferences);
+				cb.onChange(async (value: boolean) => {
+					this.plugin.settings.displayInlineReferences = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+
+		new Setting(containerEl)
+			.setName('Embed references in Gutter in Live Preview Mode')
+			.setDesc(`Displays a count of references in the gutter while in live preview. This is done only in a
+					  special scenario. It has to do with the way Obsidian renders embeds, example: ![[link]] when  
+					  they are on its own line. Strange New Worlds cannot embed the count in this scenario, so a hint is 
+					  displayed in the gutter. It is a hack, but at least we get some information.`	)
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.plugin.settings.displayEmbedReferencesInGutter);
+				cb.onChange(async (value: boolean) => {
+					this.plugin.settings.displayEmbedReferencesInGutter = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
 	}
 }

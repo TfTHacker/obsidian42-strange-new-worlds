@@ -3,7 +3,14 @@ import { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/htmlDecorations";
 import { getCurrentPage } from "src/indexer";
+import ThePlugin from "src/main";
 import {generateArialLabel} from "./references-preview";
+
+let thePlugin: ThePlugin;
+
+export function setPluginVariableForCM6Gutter(plugin: ThePlugin) {
+    thePlugin = plugin;
+}
 
 const referenceGutterMarker = class extends GutterMarker {
     referenceCount: number;
@@ -35,6 +42,8 @@ const emptyMarker = new class extends GutterMarker {
 const ReferenceGutterExtension = gutter({
     class: "snw-gutter-ref",
     lineMarker(editorView: EditorView, line: BlockInfo) {
+
+        if(!thePlugin.settings.displayEmbedReferencesInGutter) return;
 
         const mdView = editorView.state.field( editorInfoField );
         
