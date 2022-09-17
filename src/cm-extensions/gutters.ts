@@ -3,7 +3,7 @@ import { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/htmlDecorations";
 import { getCurrentPage } from "src/indexer";
-import {generateArialLabel} from "../references-preview";
+import {generateArialLabel} from "./references-preview";
 
 const referenceGutterMarker = class extends GutterMarker {
     referenceCount: number;
@@ -48,7 +48,7 @@ const ReferenceGutterExtension = gutter({
                 if(embed.position.start.line +1 === lineNumberInFile) {
                     const transformedCache = getCurrentPage(mdView.file, mdView.app);
                     for (const ref of transformedCache.embeds) {
-                        if(ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
+                        if(ref?.references.length>1 && ref?.pos.start.line+1 === lineNumberInFile) {
                             // @ts-ignore
                             if( editorView.state.doc.lineAt(line.from).text.trim() ===  ref.references[0].reference.original ) {
                                 const arialLabel = generateArialLabel(mdView.file.path, ref);

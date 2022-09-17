@@ -3,9 +3,9 @@ import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
 import {RangeSetBuilder} from "@codemirror/state";
 import {App, editorInfoField, MarkdownFileInfo, } from "obsidian";
 import {getCurrentPage} from "src/indexer";
-import ThePlugin from "./main";
-import {ReferenceLocation, TransformedCachedItem} from "./types";
-import {htmlDecorationForReferencesElement} from "./htmlDecorations";
+import ThePlugin from "../main";
+import {ReferenceLocation, TransformedCachedItem} from "../types";
+import {htmlDecorationForReferencesElement} from "../htmlDecorations";
 import {generateArialLabel} from "./references-preview";
 
 let thePlugin: ThePlugin;
@@ -114,7 +114,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
 
     const processReferences = (references: TransformedCachedItem[]) => {
         references.forEach(ref=>{
-            if( ref.references.length > 0 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
+            if( ref.references.length > 1 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
                 referenceLocations.push({
                     type: ref.type,
                     count: ref.references.length,

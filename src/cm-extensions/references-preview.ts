@@ -1,8 +1,8 @@
 import {MarkdownPostProcessorContext} from "obsidian";
-import {htmlDecorationForReferencesElement} from "./htmlDecorations";
-import {getCurrentPage} from "./indexer";
-import ThePlugin from "./main";
-import {TransformedCachedItem} from "./types";
+import {htmlDecorationForReferencesElement} from "../htmlDecorations";
+import {getCurrentPage} from "../indexer";
+import ThePlugin from "../main";
+import {TransformedCachedItem} from "../types";
 
 /**
  * Function called by main.registerMarkdownPostProcessor - this function renders the html when in preview mode
@@ -38,7 +38,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             } catch (error) { /* nothing to do here */ }
             
             for (const value of transformedCache.blocks) {
-                if ( value.references.length > 0 && 
+                if ( value.references.length > 1 && 
                      (value.pos.start.line >= sectionInfo?.lineStart && value.pos.end.line <= sectionInfo?.lineEnd) &&
                      !isThisAnEmbed ) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
@@ -57,11 +57,11 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             }
         }
 
-        if (transformedCache?.embeds?.length > 0) {
+        if (transformedCache?.embeds) {
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embedsWithDuplicates) {
-                    if (value.references.length > 0 && embedKey.endsWith(value.key)) {
+                    if (value.references.length > 1 && embedKey.endsWith(value.key)) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         element.after(referenceElement);
                         referenceElement.addClass('snw-embed-preview');
@@ -71,10 +71,10 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             });
         }
 
-        if (transformedCache?.headings?.length > 0 && el.querySelector("[data-heading]")) {
+        if (transformedCache?.headings && el.querySelector("[data-heading]")) {
             const headerKey = el.querySelector("[data-heading]").textContent;
             for (const value of transformedCache.headings) 
-                if (value.references.length > 0 && value.key === headerKey) {
+                if (value.references.length > 1 && value.key === headerKey) {
                     const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                     el.querySelector("h1").insertAdjacentElement("beforeend", referenceElement);
                     referenceElement.addClass("snw-heading-preview");
@@ -82,11 +82,11 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 }
         }
 
-        if (transformedCache?.linksWithoutDuplicates?.length > 0) {
+        if (transformedCache?.linksWithoutDuplicates) {
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.linksWithoutDuplicates) {
-                    if (value.references.length > 0 && (value.key === link || value.original.includes(link))) {
+                    if (value.references.length > 1 && (value.key === link || value.original.includes(link))) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         element.after(referenceElement);
                         referenceElement.addClass('snw-link-preview');

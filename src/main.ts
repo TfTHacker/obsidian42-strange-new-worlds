@@ -1,12 +1,12 @@
 import {debounce, Plugin} from "obsidian";
-import InlineReferenceExtension, {setPluginVariableForCM6} from "./references-cm6";
+import InlineReferenceExtension, {setPluginVariableForCM6} from "./cm-extensions/references-cm6";
 import {buildLinksAndReferences} from "./indexer";
-import markdownPreviewProcessor from "./references-preview";
+import markdownPreviewProcessor from "./cm-extensions/references-preview";
 import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
 import setHeaderWithReferenceCounts from "./headerImageCount";
 import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./settingsTab";
 import SnwAPI from "./snwApi";
-import ReferenceGutterExtension from "./extensions/gutters";
+import ReferenceGutterExtension from "./cm-extensions/gutters";
 import { setPluginVariableForHtmlDecorations } from "./htmlDecorations";
 
 export default class ThePlugin extends Plugin {
