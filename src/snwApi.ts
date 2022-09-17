@@ -17,7 +17,8 @@ export default class SnwAPI {
         CM6Extension: false,
         HtmlDecorationElements: false,
         LinkCountInHeader: false,
-        PreviewRendering: false
+        PreviewRendering: false,
+        SidePane: false
     }
 
     constructor(plugin: ThePlugin) {

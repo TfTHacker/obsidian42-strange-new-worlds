@@ -115,6 +115,7 @@ function calclulateInlineReferences(view: EditorView, theApp: App, mdView: Markd
     const processReferences = (references: TransformedCachedItem[]) => {
         references.forEach(ref=>{
             if( ref.references.length > 1 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
+                console.log("ref.type",ref.type)
                 referenceLocations.push({
                     type: ref.type,
                     count: ref.references.length,

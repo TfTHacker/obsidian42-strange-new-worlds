@@ -30,6 +30,11 @@ export class SidePaneView extends ItemView {
         const refType = this.thePlugin.lastSelectedReferenceType;
         const link = this.thePlugin.lastSelectedReferenceLink;
 
+        if(this.thePlugin.snwAPI.enableDebugging.SidePane) {
+            this.thePlugin.snwAPI.console("sidepane.open() key, refType, link", key, refType,link);
+            this.thePlugin.snwAPI.console("sidepane.open() getReferencesCache()", getReferencesCache());
+        }
+
         // const filePath = this.thePlugin.app.workspace.activeLeaf.view.file.path;
         let sidePaneResourceTypeTitle = "" 
         let sidePaneReferencesTitle = "" 
@@ -51,8 +56,7 @@ export class SidePaneView extends ItemView {
                 sidePaneResourceTypeTitle   = "Target:";
                 sidePaneReferencesTitle     = "Backlinks to target:";
                 refCache =  getReferencesCache()[link];
-                if(refCache === undefined)
-                refCache = getReferencesCache()[this.thePlugin.app.workspace.activeLeaf.view.file.basename + "#^" + key];            
+                if(refCache === undefined) refCache = getReferencesCache()[this.thePlugin.app.workspace.activeLeaf.view.file.basename + "#^" + key];            
                 break;
             case "heading":
                 sidePaneResourceTypeTitle   = "Target:";
@@ -65,6 +69,7 @@ export class SidePaneView extends ItemView {
                 Object.entries(getReferencesCache()).forEach((value, key)=>{ value[1].forEach((element:Link[]) => { if(element.resolvedFile.path === link)  refCache.push(element)})});
                 break;
             } 
+
 
         if(refCache.length===0) return; //This may get callled when Obsidian initializes. So if there are no references, just exit
 

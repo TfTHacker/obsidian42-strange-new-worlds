@@ -113,7 +113,7 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
             pos: header.position,
 
             page: file.basename,
-            type: "header",
+            type: "heading",
             references: references[`${
                     file.basename
                 }#${
