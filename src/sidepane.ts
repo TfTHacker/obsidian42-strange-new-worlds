@@ -105,7 +105,6 @@ export class SidePaneView extends ItemView {
                           data-href="${ref.sourceFile.path}" 
                           href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a> ${refLineNumber}<br/>`;
             if(refType==="File") {
-                console.log(ref)
                 const lineNumberResolvedFile = findPositionInFile(ref.resolvedFile.path, ref.reference.link.replace(ref.resolvedFile.basename,"").replace("#^",""));
                 output += `<span class="snw-sidepane-reference-label-to">To: </span>
                             <a class="internal-link snw-sidepane-link snw-sidepane-reference-item-to" 

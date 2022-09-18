@@ -15,9 +15,10 @@ export default class SnwAPI {
     settings: Settings;
     enableDebugging = {
         CM6Extension: false,
-        HtmlDecorationElements: false,
-        LinkCountInHeader: false,
         PreviewRendering: false,
+        LinkCountInHeader: false,
+        GutterEmbedCounter: false,
+        HtmlDecorationElements: false,
         SidePane: false
     }
 

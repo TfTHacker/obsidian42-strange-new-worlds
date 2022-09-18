@@ -45,22 +45,33 @@ const ReferenceGutterExtension = gutter({
 
         if(!thePlugin.settings.displayEmbedReferencesInGutter) return;
 
+        if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
+            thePlugin.snwAPI.console("ReferenceGutterExtension(EditorView, BlockInfo)", editorView, line )
+
         const mdView = editorView.state.field( editorInfoField );
         
         if(!mdView.file) return;
 
         const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
+        // console.log(embedsFromMetaDataCache)
 
         if(embedsFromMetaDataCache?.length>0) {
             const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
             for (const embed of embedsFromMetaDataCache) {
                 if(embed.position.start.line +1 === lineNumberInFile) {
                     const transformedCache = getCurrentPage(mdView.file, mdView.app);
+                    if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
+                        thePlugin.snwAPI.console("ReferenceGutterExtension transformedCache", transformedCache );
                     for (const ref of transformedCache.embeds) {
                         if(ref?.references.length>1 && ref?.pos.start.line+1 === lineNumberInFile) {
                             // @ts-ignore
-                            if( editorView.state.doc.lineAt(line.from).text.trim() ===  ref.references[0].reference.original ) {
+                            let refOriginalLink = ref.references[0].reference.original;
+                            if(refOriginalLink.substring(0,1)!="!") 
+                                refOriginalLink = "!" + refOriginalLink;
+                            if( editorView.state.doc.lineAt(line.from).text.trim() ===  refOriginalLink) {
                                 const arialLabel = generateArialLabel(mdView.file.path, ref);
+                                if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
+                                    thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, arialLabel, "snw-embed-special" );
                                 return new referenceGutterMarker(ref.references.length, "embed", ref.key, ref.key, arialLabel, "snw-embed-special");
                             }
                         }
@@ -68,7 +79,7 @@ const ReferenceGutterExtension = gutter({
                 }
             }
         }
-    },
+    }, 
     initialSpacer: () => emptyMarker,
     domEventHandlers: {
         click(view, line, event) {
