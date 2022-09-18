@@ -34,7 +34,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     element.ariaLabel = ariaLabel;
     if(attachCSSClass) element.addClass(attachCSSClass);
 
-    element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e);
+    element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
@@ -43,9 +43,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
 }
 
 
-export const processHtmlDecorationReferenceEvent = async (event: MouseEvent) => {
-    event.preventDefault();
-    const target = event.target as HTMLElement;
+export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
     const key = target.getAttribute("data-snw-key");
     const refType = target.getAttribute("data-snw-type");
     const link = target.getAttribute("data-snw-link")

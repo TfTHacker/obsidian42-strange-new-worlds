@@ -4,7 +4,7 @@ import {MarkdownView, WorkspaceLeaf} from "obsidian";
 import {Link} from "./types";
 import ThePlugin from "./main";
 import {processHtmlDecorationReferenceEvent} from "./cm-extensions/htmlDecorations";
-import { getReferencesCache, getSnwAllLinksResolutions } from "./indexer";
+import {getSnwAllLinksResolutions} from "./indexer";
 
 
 /**
@@ -24,7 +24,6 @@ export default function setHeaderWithReferenceCounts(thePlugin: ThePlugin) {
     })
 }
 
-
 /**
  * Analyzes the page and if there is incoming links displays a header message
  *
@@ -40,46 +39,54 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
     
     // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
     if (incomingLinks.length === 0) {
-        if (mdView.containerEl.querySelector(".snw-header-count-wrapper")) 
-            mdView.containerEl.querySelector(".snw-header-count-wrapper").remove();
+        if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) 
+            mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
         return
     }
 
     const fileList = (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,20).join("\n")
-    const snwTitleRefCountDisplayCountEl: HTMLElement = mdView.containerEl.querySelector(".snw-header-count-wrapper");
-    
+    let snwTitleRefCountDisplayCountEl: HTMLElement = mdView.contentEl.querySelector(".snw-header-count");
+
     // header count is already displayed, just update information.
-    if (snwTitleRefCountDisplayCountEl) {
+    if( snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdView.file.basename ) {
         snwTitleRefCountDisplayCountEl.innerText =  " " + incomingLinks.length.toString() + " ";
         snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
         return
     }
-    
-    const containerTitleDiv: HTMLDivElement = mdView.containerEl.querySelector(".view-content");
-    
-    if (containerTitleDiv) {
-        let snwTitleRefCountDisplayCountEl: HTMLElement;
-        let wrapper: HTMLElement = mdView.containerEl.querySelector(".snw-header-count-wrapper");
 
-        if (!wrapper) {
-            wrapper = document.createElement("div");
-            wrapper.className = "snw-header-count-wrapper";
-            snwTitleRefCountDisplayCountEl = document.createElement("div");
-            snwTitleRefCountDisplayCountEl.className = "snw-header-count"; 
-            wrapper.appendChild(snwTitleRefCountDisplayCountEl);
-            containerTitleDiv.prepend(wrapper)
-        } else 
-            snwTitleRefCountDisplayCountEl = mdView.containerEl.querySelector(".snw-header-count");
+    const containerViewContent: HTMLElement = mdView.contentEl;
 
-        snwTitleRefCountDisplayCountEl.innerText = " " + incomingLinks.length.toString() + " ";
-        snwTitleRefCountDisplayCountEl.setAttribute("data-snw-key", mdView.file.basename);
-        snwTitleRefCountDisplayCountEl.setAttribute("data-snw-type", "File");
-        snwTitleRefCountDisplayCountEl.setAttribute("data-snw-link", mdView.file.path);
-        snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
-        snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent) => processHtmlDecorationReferenceEvent(e);
+    if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) 
+        mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
 
-        if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
-            thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
+    let wrapper: HTMLElement = containerViewContent.querySelector(".snw-header-count-wrapper");
+
+    if (!wrapper) {
+        wrapper = document.createElement("div");
+        wrapper.className = "snw-header-count-wrapper";
+        snwTitleRefCountDisplayCountEl = document.createElement("div");
+        snwTitleRefCountDisplayCountEl.className = "snw-header-count"; 
+        wrapper.appendChild(snwTitleRefCountDisplayCountEl);
+        containerViewContent.prepend(wrapper)
+    } else {
+        snwTitleRefCountDisplayCountEl = containerViewContent.querySelector(".snw-header-count");
     }
+
+    snwTitleRefCountDisplayCountEl.innerText = " " + incomingLinks.length.toString() + " ";
+    snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent)=> {
+        e.stopPropagation();
+        processHtmlDecorationReferenceEvent(wrapper)
+    };
+    wrapper.setAttribute("data-snw-key", mdView.file.basename);
+    wrapper.setAttribute("data-snw-type", "File");
+    wrapper.setAttribute("data-snw-link", mdView.file.path);
+    wrapper.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
+    wrapper.onclick = (e : MouseEvent) => {
+        e.stopPropagation();
+        processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+    }
+
+    if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
+        thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
 
 }
