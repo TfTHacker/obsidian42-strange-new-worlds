@@ -35,7 +35,6 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     if(attachCSSClass) element.addClass(attachCSSClass);
 
     element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e);
-    // element.onmouseover = async (e: MouseEvent ) => console.log("mouseover"); 
 
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);

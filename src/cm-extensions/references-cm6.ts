@@ -102,8 +102,6 @@ class InlineReferenceWidget extends WidgetType {
  */
 function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownFileInfo) {
 
-    console.log("calculate")
-    
     if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
         thePlugin.snwAPI.console("calclulateInlineReferences(EditorView, theApp, MarkdownFileInfo", view,theApp,mdView);
     

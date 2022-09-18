@@ -6,13 +6,15 @@ export interface Settings {
 	displayInlineReferences: 		boolean;
 	displayEmbedReferencesInGutter:	boolean;
 	displayLineNumberInSidebar:		boolean;
+	cacheUpdateInMilliseconds:		number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
 	displayIncomingFilesheader: true,
 	displayInlineReferences: true,
 	displayEmbedReferencesInGutter: true,
-	displayLineNumberInSidebar: true
+	displayLineNumberInSidebar: true,
+	cacheUpdateInMilliseconds: 10000
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -75,7 +77,23 @@ export class SettingsTab extends PluginSettingTab {
 					this.thePlugin.settings.displayLineNumberInSidebar = value;
 					await this.thePlugin.saveSettings();
 				});
-			});
+			})
+			
+			containerEl.createEl("h2", { text: "Cache Tuning" });
 
+			new Setting(containerEl)
+			.setName(`How often should the SNW Cache update`)
+			.setDesc(`By default SNW will updates its internal cache every 10 seconds (10,000 milliseconds) when there is some change in the vualt.
+					  Increase the time to slighlty improve performance or decrease it to improve refresh of vault information.
+					  Currently set to: ${this.thePlugin.settings.cacheUpdateInMilliseconds} milliseconds. (Requires Obsidian Restart)`	)
+			.addSlider(slider => slider
+				.setLimits(500, 30000 , 100)
+				.setValue(this.thePlugin.settings.cacheUpdateInMilliseconds)
+				.onChange(async (value) => {
+					this.thePlugin.settings.cacheUpdateInMilliseconds = value;
+					await this.thePlugin.saveSettings();
+				})
+				.setDynamicTooltip()
+			)
 	}
 }

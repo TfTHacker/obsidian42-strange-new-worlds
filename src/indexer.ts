@@ -82,7 +82,7 @@ export function getCurrentPage(file: TFile): TransformedCache {
     if(cacheCurrentPages.has(file.path)) {
         const cachedPage = cacheCurrentPages.get(file.path);
         // Check if references have been updated since last cache update, and if cache is old
-        if( (lastUpdateToReferences < cachedPage.createDate) && ((cachedPage.createDate+5000) > Date.now()) ) {
+        if( (lastUpdateToReferences < cachedPage.createDate) && ((cachedPage.createDate+thePlugin.settings.cacheUpdateInMilliseconds) > Date.now()) ) {
             return cachedPage;
         }
     }

@@ -37,6 +37,9 @@ export default class ThePlugin extends Plugin {
 
             this.addSettingTab(new SettingsTab(this.app, this));
 
+            //initial index building
+            this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (this.app.workspace as any).registerHoverLinkSource(this.appID, {
                 display: this.appName,
@@ -45,23 +48,24 @@ export default class ThePlugin extends Plugin {
 
             this.snwAPI.settings = this.settings;
 
-            if(this.settings.displayInlineReferences ) {
-                this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
-                this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx, this));
-            }
-            if(this.settings.displayEmbedReferencesInGutter){
-                this.registerEditorExtension(ReferenceGutterExtension );
-            }
             this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));
-            this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
+            
             this.app.workspace.on("layout-change", async () => {
                 setHeaderWithReferenceCounts(this);
             });
 
+            if(this.settings.displayInlineReferences ) {
+                this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
+                this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx, this));
+            }
+
+            if(this.settings.displayEmbedReferencesInGutter){
+                this.registerEditorExtension(ReferenceGutterExtension);
+            }
+
             const indexDebounce = debounce(() => {
                 buildLinksAndReferences()
-            }, 5000, true);
-    
+            }, 1000, true);
         }
 
         // managing state for debugging purpsoes

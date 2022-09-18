@@ -43,8 +43,6 @@ const ReferenceGutterExtension = gutter({
     class: "snw-gutter-ref",
     lineMarker(editorView: EditorView, line: BlockInfo) {
 
-        console.log("Gutter in use")
-
         if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
             thePlugin.snwAPI.console("ReferenceGutterExtension(EditorView, BlockInfo)", editorView, line )
 
