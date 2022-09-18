@@ -1,6 +1,6 @@
-import {debounce, Plugin} from "obsidian";
+import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
 import InlineReferenceExtension, {setPluginVariableForCM6EditorExtension} from "./cm-extensions/references-cm6";
-import {buildLinksAndReferences} from "./indexer";
+import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
 import markdownPreviewProcessor from "./cm-extensions/references-preview";
 import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
 import setHeaderWithReferenceCounts from "./headerImageCount";
@@ -18,13 +18,10 @@ export default class ThePlugin extends Plugin {
     lastSelectedReferenceType : string;
     lastSelectedReferenceLink : string;
     snwAPI: SnwAPI;
+    markdownPostProcessorSNW: MarkdownPostProcessor = null;
 
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
-
-        const indexDebounce = debounce(() => {
-            buildLinksAndReferences(this.app)
-        }, 3000, true);
 
         const initializeEnvironment = async () => {
             await this.loadSettings();
@@ -33,19 +30,10 @@ export default class ThePlugin extends Plugin {
             // @ts-ignore
             globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
+            setPluginVariableForIndexer(this);
             setPluginVariableForCM6EditorExtension(this);
             setPluginVariableForHtmlDecorations(this);
             setPluginVariableForCM6Gutter(this);
-
-            this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
-            this.registerEditorExtension(ReferenceGutterExtension );
-            this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
-            this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx, this));
-            this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));
-
-            this.app.workspace.on("layout-change", async () => {
-                setHeaderWithReferenceCounts(this);
-            });
 
             this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -54,10 +42,26 @@ export default class ThePlugin extends Plugin {
                 display: this.appName,
                 defaultMod: true,
             });
-            
 
-            this.snwAPI.settings = this.settings
+            this.snwAPI.settings = this.settings;
 
+            if(this.settings.displayInlineReferences ) {
+                this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
+                this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx, this));
+            }
+            if(this.settings.displayEmbedReferencesInGutter){
+                this.registerEditorExtension(ReferenceGutterExtension );
+            }
+            this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));
+            this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
+            this.app.workspace.on("layout-change", async () => {
+                setHeaderWithReferenceCounts(this);
+            });
+
+            const indexDebounce = debounce(() => {
+                buildLinksAndReferences()
+            }, 5000, true);
+    
         }
 
         // managing state for debugging purpsoes
@@ -89,10 +93,14 @@ export default class ThePlugin extends Plugin {
     }
 
     onunload(): void {
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.app.workspace as any).unregisterHoverLinkSource(this.appID);
         console.log("unloading " + this.appName)
+        try {
+            this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (this.app.workspace as any).unregisterHoverLinkSource(this.appID);
+
+        } catch (error) { /* don't do anything */ }
     }
 
     async loadSettings(): Promise<void> { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) }

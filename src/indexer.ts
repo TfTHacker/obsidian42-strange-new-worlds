@@ -1,10 +1,23 @@
-import { App, CachedMetadata, HeadingCache, stripHeading, TFile, Pos} from "obsidian";
-import {Link, ListItem, Section, TransformedCache} from "./types";
+import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos} from "obsidian";
+import ThePlugin from "./main";
+import {Link, TransformedCache} from "./types";
+// import {Link, ListItem, Section, TransformedCache} from "./types";
+
 
 let references: {[x:string]:Link[]};
+let lastUpdateToReferences = 0;
+let thePlugin: ThePlugin;
 
-export function buildLinksAndReferences(app: App): void {
-    const refs = app.fileManager.getAllLinkResolutions().reduce((acc : {
+export function setPluginVariableForIndexer(plugin: ThePlugin) {
+    thePlugin = plugin;
+}
+
+export function getReferencesCache() {
+    return references;
+}
+
+export function buildLinksAndReferences(): void {
+    const refs = thePlugin.app.fileManager.getAllLinkResolutions().reduce((acc : {
         [x : string]: Link[] 
     }, link : Link) : {
         [x : string]: Link[]
@@ -14,7 +27,7 @@ export function buildLinksAndReferences(app: App): void {
             const keyArr = key.split("/");
             key = keyArr[keyArr.length - 1];
         }
-        if (!acc[key]) {
+        if (!acc[key]) { 
             acc[key] = [];
         }
         if (acc[key]) {
@@ -22,7 +35,7 @@ export function buildLinksAndReferences(app: App): void {
         }
         return acc;
     }, {});
-    const allLinks = Object.entries(app.metadataCache.getLinks()).reduce((acc, [key, links]) => {
+    const allLinks = Object.entries(thePlugin.app.metadataCache.getLinks()).reduce((acc, [key, links]) => {
         links.forEach((link : {
             link: string;
             original: string;
@@ -35,9 +48,9 @@ export function buildLinksAndReferences(app: App): void {
                         displayText: link.link,
                         position: link.position
                     },
-                    resolvedFile: app.vault.getAbstractFileByPath(key) as TFile,
+                    resolvedFile: thePlugin.app.vault.getAbstractFileByPath(key) as TFile,
                     resolvedPaths: [link.link],
-                    sourceFile: app.vault.getAbstractFileByPath(key) as TFile
+                    sourceFile: thePlugin.app.vault.getAbstractFileByPath(key) as TFile
                 };
                 acc.push(newLink);
             }
@@ -46,11 +59,7 @@ export function buildLinksAndReferences(app: App): void {
     }, []);
     allLinks.forEach((link : Link) => {
         if (link.sourceFile) {
-            const key = `${
-                link.sourceFile.basename
-            }${
-                link.reference.link
-            }`;
+            const key = `${link.sourceFile.basename}${link.reference.link}`;
             if (! refs[key]) {
                 refs[key] = [];
             }
@@ -60,27 +69,34 @@ export function buildLinksAndReferences(app: App): void {
         }
     });
 
-    // update incoming link references
-
-
     references = refs;
+    lastUpdateToReferences = Date.now();
 }
 
-export function getReferencesCache() {
-    return references;
-}
 
-export function getCurrentPage(file: TFile, app: App): TransformedCache {
+// following MAP works as a cache for the getCurrentPage call. Based on time elapsed since last update, it just returns a cached transformedCache object
+const cacheCurrentPages = new Map<string,TransformedCache>();
+
+export function getCurrentPage(file: TFile): TransformedCache {
+
+    if(cacheCurrentPages.has(file.path)) {
+        const cachedPage = cacheCurrentPages.get(file.path);
+        // Check if references have been updated since last cache update, and if cache is old
+        if( (lastUpdateToReferences < cachedPage.createDate) && ((cachedPage.createDate+5000) > Date.now()) ) {
+            return cachedPage;
+        }
+    }
+
     const transformedCache: TransformedCache = {};
-    const cachedMetaData = app.metadataCache.getFileCache(file);
+    const cachedMetaData = thePlugin.app.metadataCache.getFileCache(file);
     if (! cachedMetaData) {
         return transformedCache;
     }
 
     if (! references) {
-        buildLinksAndReferences(app);
+        buildLinksAndReferences();
     }
-    const headings: string[] = Object.values(app.metadataCache.metadataCache).reduce((acc : string[], file : CachedMetadata) => {
+    const headings: string[] = Object.values(thePlugin.app.metadataCache.metadataCache).reduce((acc : string[], file : CachedMetadata) => {
         const headings = file.headings;
         if (headings) {
             headings.forEach((heading : HeadingCache) => {
@@ -95,11 +111,7 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
             pos: block.position,
             page: file.basename,
             type: "block",
-            references: references[`${
-                    file.basename
-                }#^${
-                    block.id
-                }`] || []
+            references: references[`${file.basename}#^${block.id}`] || []
         }));
     }
     if (cachedMetaData?.headings) {
@@ -111,19 +123,14 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
             original: "#".repeat(header.level) + " " + header.heading,
             key: stripHeading(header.heading),
             pos: header.position,
-
             page: file.basename,
             type: "heading",
-            references: references[`${
-                    file.basename
-                }#${
-                    stripHeading(header.heading)
-                }`] || []
+            references: references[`${file.basename}#${stripHeading(header.heading)}`] || []
         }));
     }
-    if (cachedMetaData?.sections) {
-        transformedCache.sections = createListSections(cachedMetaData);
-    }
+    // if (cachedMetaData?.sections) {
+    //     transformedCache.sections = createListSections(cachedMetaData);
+    // }
     if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
             if (link.link.includes("/")) {
@@ -150,18 +157,14 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
                     link.original = heading ? heading : undefined;
                 }
                 if (link.key.startsWith("#^") || link.key.startsWith("#")) {
-                    link.key = `${
-                        link.page
-                    }${
-                        link.key
-                    }`;
+                    link.key = `${link.page}${link.key}`;
                     link.references = references[link.key] || [];
                 }
                 return link;
             });
             // remove duplicate links
-            if (transformedCache.links) 
-                transformedCache.linksWithoutDuplicates = transformedCache.links.filter((link, index, self) => index === self.findIndex((t) => (t.key === link.key)))
+            // if (transformedCache.links) 
+            //     transformedCache.linksWithoutDuplicates = transformedCache.links.filter((link, index, self) => index === self.findIndex((t) => (t.key === link.key)))
             
         }
     }
@@ -189,21 +192,21 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
                 }
 
                 if (embed.key.startsWith("#^") || embed.key.startsWith("#")) {
-                    embed.key = `${
-                        file.basename
-                    }${
-                        embed.key
-                    }`;
+                    embed.key = `${file.basename}${embed.key}`;
                     embed.references = references[embed.key] || [];
                 }
                 return embed;
             });
             // remove duplicate blocks
-            if (transformedCache.embeds) 
-                transformedCache.embedsWithDuplicates = transformedCache.embeds.filter((embed, index, self) => index === self.findIndex((t) => (t.key === embed.key)))
+            // if (transformedCache.embeds) 
+            //     transformedCache.embedsWithDuplicates = transformedCache.embeds.filter((embed, index, self) => index === self.findIndex((t) => (t.key === embed.key)))
 
         }
     }
+
+    transformedCache.createDate = Date.now();
+    cacheCurrentPages.set(file.path, transformedCache);
+
     return transformedCache;
 }
 
@@ -215,35 +218,35 @@ export function getCurrentPage(file: TFile, app: App): TransformedCache {
  * @param   {ListItemCache[]}               listItems
  *
  * @return  {Section[]}                        Array of sections with additional items key
- */
+//  */
 
-function createListSections(cache: CachedMetadata): Section[] {
-    if (cache.listItems) {
-        return cache.sections.map((section) => {
-                const items: ListItem[] = [];
-                if (section.type === "list") {
-                    cache.listItems.forEach((item : ListItem) => {
-                            if (item.position.start.line >= section.position.start.line && item.position.start.line<= section.position.end.line
-                    ) {
-                        const id = cache.embeds?.find(
-                            (embed) => embed.position.start.line === item.position.start.line)  ?. link || cache.links ?. find((link) => link.position.start.line === item.position.start.line) ?. link || "";
+// function createListSections(cache: CachedMetadata): Section[] {
+//     if (cache.listItems) {
+//         return cache.sections.map((section) => {
+//                 const items: ListItem[] = [];
+//                 if (section.type === "list") {
+//                     cache.listItems.forEach((item : ListItem) => {
+//                             if (item.position.start.line >= section.position.start.line && item.position.start.line<= section.position.end.line
+//                     ) {
+//                         const id = cache.embeds?.find(
+//                             (embed) => embed.position.start.line === item.position.start.line)  ?. link || cache.links ?. find((link) => link.position.start.line === item.position.start.line) ?. link || "";
                             
-                            items.push({
-                                key: id,
-                                pos: item.position,
-                                ...item
-                            });
-                        }}
-                );
-                const sectionWithItems = {
-                    items,
-                    ...section
-                };
-                return sectionWithItems;
-            }
-            return section;
-        }
-    );
-}
+//                             items.push({
+//                                 key: id,
+//                                 pos: item.position,
+//                                 ...item
+//                             });
+//                         }}
+//                 );
+//                 const sectionWithItems = {
+//                     items,
+//                     ...section
+//                 };
+//                 return sectionWithItems;
+//             }
+//             return section;
+//         }
+//     );
+// }
 
-return cache.sections;}
+// return cache.sections;}

@@ -17,7 +17,7 @@ import {TransformedCachedItem} from "../types";
  */
 export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext, thePlugin : ThePlugin) {
 
-    if(!thePlugin.settings.displayInlineReferences) return;
+    console.log("processor")
 
     if(thePlugin.snwAPI.enableDebugging.PreviewRendering)
         thePlugin.snwAPI.console("markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext", el, ctx, ctx.getSectionInfo(el))
@@ -27,9 +27,9 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     if(app.metadataCache.getFileCache(currentFile)?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
     
     const currentFilePath = currentFile.path;
-    const transformedCache = getCurrentPage(currentFile, thePlugin.app);
+    const transformedCache = getCurrentPage(currentFile);
 
-    if (transformedCache?.blocks || transformedCache.embedsWithDuplicates || transformedCache.headings || transformedCache.linksWithoutDuplicates) {
+    if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
         const sectionInfo = ctx.getSectionInfo(el);
 
         if (transformedCache?.blocks) {
@@ -62,7 +62,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
         if (transformedCache?.embeds) {
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
-                for (const value of transformedCache.embedsWithDuplicates) {
+                for (const value of transformedCache.embeds) {
                     if (value.references.length > 1 && embedKey.endsWith(value.key)) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         element.after(referenceElement);
@@ -84,10 +84,10 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 }
         }
 
-        if (transformedCache?.linksWithoutDuplicates) {
+        if (transformedCache?.links) {
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
-                for (const value of transformedCache.linksWithoutDuplicates) {
+                for (const value of transformedCache.links) {
                     if (value.references.length > 1 && (value.key === link || value.original.includes(link))) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         element.after(referenceElement);

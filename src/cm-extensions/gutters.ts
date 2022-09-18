@@ -43,7 +43,7 @@ const ReferenceGutterExtension = gutter({
     class: "snw-gutter-ref",
     lineMarker(editorView: EditorView, line: BlockInfo) {
 
-        if(!thePlugin.settings.displayEmbedReferencesInGutter) return;
+        console.log("Gutter in use")
 
         if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
             thePlugin.snwAPI.console("ReferenceGutterExtension(EditorView, BlockInfo)", editorView, line )
@@ -53,13 +53,12 @@ const ReferenceGutterExtension = gutter({
         if(!mdView.file) return;
 
         const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
-        // console.log(embedsFromMetaDataCache)
 
         if(embedsFromMetaDataCache?.length>0) {
             const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
             for (const embed of embedsFromMetaDataCache) {
                 if(embed.position.start.line +1 === lineNumberInFile) {
-                    const transformedCache = getCurrentPage(mdView.file, mdView.app);
+                    const transformedCache = getCurrentPage(mdView.file);
                     if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
                         thePlugin.snwAPI.console("ReferenceGutterExtension transformedCache", transformedCache );
                     for (const ref of transformedCache.embeds) {
@@ -80,13 +79,7 @@ const ReferenceGutterExtension = gutter({
             }
         }
     }, 
-    initialSpacer: () => emptyMarker,
-    domEventHandlers: {
-        click(view, line, event) {
-            console.log('click')
-            return true;
-            }
-    }
+    initialSpacer: () => emptyMarker
 })
 
 export default ReferenceGutterExtension;

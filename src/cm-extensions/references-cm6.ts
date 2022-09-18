@@ -101,51 +101,52 @@ class InlineReferenceWidget extends WidgetType {
  * @return {*} 
  */
 function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownFileInfo) {
+
+    console.log("calculate")
+    
     if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
         thePlugin.snwAPI.console("calclulateInlineReferences(EditorView, theApp, MarkdownFileInfo", view,theApp,mdView);
     
     const rangeSetBuilder = new RangeSetBuilder<Decoration>();
 
-    if(thePlugin?.settings.displayInlineReferences) {
+    if(mdView?.file===undefined) return rangeSetBuilder.finish();
 
-        if(mdView?.file===undefined) return rangeSetBuilder.finish();
+    const CurrentFile = mdView.file.path;
+    const referenceLocations: ReferenceLocation[] = [];
+    const transformedCache = getCurrentPage(mdView.file);
+    const viewPort = view.viewport; 
 
-        const CurrentFile = mdView.file.path;
-        const referenceLocations: ReferenceLocation[] = [];
-        const transformedCache = getCurrentPage(mdView.file, theApp);
-        const viewPort = view.viewport; 
-    
-        const processReferences = (references: TransformedCachedItem[]) => {
-            references.forEach(ref=>{
-                if( ref.references.length > 1 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
-                    referenceLocations.push({
-                        type: ref.type,
-                        count: ref.references.length,
-                        pos: ref.pos.end.offset, 
-                        key: ref.key,
-                        link: ref.references[0].reference.link,
-                        arialLabel: generateArialLabel(CurrentFile, ref),
-                        attachClass: null
-                    });
-                }
-            });
-        }
-    
-        if(transformedCache.blocks)     processReferences(transformedCache.blocks);
-        if(transformedCache.embeds)     processReferences(transformedCache.embeds);
-        if(transformedCache.headings)   processReferences(transformedCache.headings);
-        if(transformedCache.links)      processReferences(transformedCache.links);
-    
-        referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
-            rangeSetBuilder.add(
-                r.pos, r.pos,
-                Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
-            );        
+    const processReferences = (references: TransformedCachedItem[]) => {
+        references.forEach(ref=>{
+            if( ref.references.length > 1 && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
+                referenceLocations.push({
+                    type: ref.type,
+                    count: ref.references.length,
+                    pos: ref.pos.end.offset, 
+                    key: ref.key,
+                    link: ref.references[0].reference.link,
+                    arialLabel: generateArialLabel(CurrentFile, ref),
+                    attachClass: null
+                });
+            }
         });
-    
-        if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-            thePlugin.snwAPI.console("calclulateInlineReferences - referenceLocations", referenceLocations)
     }
+
+    if(transformedCache.blocks)     processReferences(transformedCache.blocks);
+    if(transformedCache.embeds)     processReferences(transformedCache.embeds);
+    if(transformedCache.headings)   processReferences(transformedCache.headings);
+    if(transformedCache.links)      processReferences(transformedCache.links);
+
+    referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
+        rangeSetBuilder.add(
+            r.pos, r.pos,
+            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
+        );        
+    });
+
+    if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
+        thePlugin.snwAPI.console("calclulateInlineReferences - referenceLocations", referenceLocations)
+
 
     return rangeSetBuilder.finish(); 
 
