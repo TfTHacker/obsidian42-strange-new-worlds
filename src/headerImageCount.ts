@@ -3,7 +3,8 @@
 import {MarkdownView, WorkspaceLeaf} from "obsidian";
 import {Link} from "./types";
 import ThePlugin from "./main";
-import {processHtmlDecorationReferenceEvent} from "./htmlDecorations";
+import {processHtmlDecorationReferenceEvent} from "./cm-extensions/htmlDecorations";
+import { getReferencesCache, getSnwAllLinksResolutions } from "./indexer";
 
 
 /**
@@ -34,18 +35,28 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
     
-    const allLinks: Link[] = thePlugin.app.fileManager.getAllLinkResolutions();
+    const allLinks: Link[] = getSnwAllLinksResolutions(); //thePlugin.app.fileManager.getAllLinkResolutions();
     const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
-
-    const containerTitleDiv: HTMLDivElement = mdView.containerEl.querySelector(".view-content");
-    const fileList = (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,20).join("\n")
-
+    
+    // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
     if (incomingLinks.length === 0) {
         if (mdView.containerEl.querySelector(".snw-header-count-wrapper")) 
             mdView.containerEl.querySelector(".snw-header-count-wrapper").remove();
         return
     }
 
+    const fileList = (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,20).join("\n")
+    const snwTitleRefCountDisplayCountEl: HTMLElement = mdView.containerEl.querySelector(".snw-header-count-wrapper");
+    
+    // header count is already displayed, just update information.
+    if (snwTitleRefCountDisplayCountEl) {
+        snwTitleRefCountDisplayCountEl.innerText =  " " + incomingLinks.length.toString() + " ";
+        snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
+        return
+    }
+    
+    const containerTitleDiv: HTMLDivElement = mdView.containerEl.querySelector(".view-content");
+    
     if (containerTitleDiv) {
         let snwTitleRefCountDisplayCountEl: HTMLElement;
         let wrapper: HTMLElement = mdView.containerEl.querySelector(".snw-header-count-wrapper");

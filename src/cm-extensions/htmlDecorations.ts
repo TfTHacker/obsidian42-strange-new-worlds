@@ -1,4 +1,4 @@
-import ThePlugin from "./main";
+import ThePlugin from "../main";
 
 let thePlugin: ThePlugin;
 

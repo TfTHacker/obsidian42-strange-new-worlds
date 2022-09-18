@@ -5,6 +5,7 @@ import {Link, TransformedCache} from "./types";
 
 
 let references: {[x:string]:Link[]};
+let allLinkRsolutions: Link[];
 let lastUpdateToReferences = 0;
 let thePlugin: ThePlugin;
 
@@ -16,8 +17,13 @@ export function getReferencesCache() {
     return references;
 }
 
+export function getSnwAllLinksResolutions(){
+    return allLinkRsolutions;
+}
+
 export function buildLinksAndReferences(): void {
-    const refs = thePlugin.app.fileManager.getAllLinkResolutions().reduce((acc : {
+    allLinkRsolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
+    const refs = allLinkRsolutions.reduce((acc : {
         [x : string]: Link[] 
     }, link : Link) : {
         [x : string]: Link[]

@@ -1,5 +1,5 @@
 import {MarkdownPostProcessorContext} from "obsidian";
-import {htmlDecorationForReferencesElement} from "../htmlDecorations";
+import {htmlDecorationForReferencesElement} from "./htmlDecorations";
 import {getCurrentPage} from "../indexer";
 import ThePlugin from "../main";
 import {TransformedCachedItem} from "../types";

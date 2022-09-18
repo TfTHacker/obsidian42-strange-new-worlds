@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting, ToggleComponent } from 'obsidian';
-import ThePlugin from './main';
+import ThePlugin from '../main';
 
 export interface Settings {
 	displayIncomingFilesheader: 	boolean;

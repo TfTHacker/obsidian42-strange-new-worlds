@@ -2,12 +2,12 @@ import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "
 import InlineReferenceExtension, {setPluginVariableForCM6EditorExtension} from "./cm-extensions/references-cm6";
 import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
 import markdownPreviewProcessor from "./cm-extensions/references-preview";
-import {SidePaneView, VIEW_TYPE_SNW} from "./sidepane";
+import {SidePaneView, VIEW_TYPE_SNW} from "./ux/sidepane";
 import setHeaderWithReferenceCounts from "./headerImageCount";
-import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./settingsTab";
+import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
 import SnwAPI from "./snwApi";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
-import { setPluginVariableForHtmlDecorations } from "./htmlDecorations";
+import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
 
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;

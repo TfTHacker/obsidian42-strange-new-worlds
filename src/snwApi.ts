@@ -1,6 +1,6 @@
 import { getCurrentPage } from "./indexer";
 import ThePlugin from "./main";
-import { Settings } from "./settingsTab";
+import { Settings } from "./ux/settingsTab";
 
 
 /**

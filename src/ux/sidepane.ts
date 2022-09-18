@@ -1,9 +1,9 @@
 // Sidepane used by SNW for displaying references
 
 import {CachedMetadata, ItemView, MarkdownView, WorkspaceLeaf} from "obsidian";
-import {getReferencesCache} from "./indexer";
-import {Link} from "./types";
-import ThePlugin from "./main";
+import {getReferencesCache} from "../indexer";
+import {Link} from "../types";
+import ThePlugin from "../main";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
 

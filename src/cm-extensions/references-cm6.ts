@@ -5,7 +5,7 @@ import {App, editorInfoField, MarkdownFileInfo, } from "obsidian";
 import {getCurrentPage} from "src/indexer";
 import ThePlugin from "../main";
 import {ReferenceLocation, TransformedCachedItem} from "../types";
-import {htmlDecorationForReferencesElement} from "../htmlDecorations";
+import {htmlDecorationForReferencesElement} from "./htmlDecorations";
 import {generateArialLabel} from "./references-preview";
 
 let thePlugin: ThePlugin;
