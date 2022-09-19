@@ -38,7 +38,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             } catch (error) { /* nothing to do here */ }
             
             for (const value of transformedCache.blocks) {
-                if ( value.references.length > 1 && 
+                if ( value.references.length > 0 && 
                      (value.pos.start.line >= sectionInfo?.lineStart && value.pos.end.line <= sectionInfo?.lineEnd) &&
                      !isThisAnEmbed ) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
