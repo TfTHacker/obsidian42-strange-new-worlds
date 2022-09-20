@@ -89,7 +89,7 @@ function processHeader(mdView: MarkdownView) {
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-link", mdView.file.path);
     if(fileList!="")
-        wrapper.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
+        wrapper.ariaLabel = fileList + "\n----\nSNW - CLICK for details";
     wrapper.onclick = (e : MouseEvent) => {
         e.stopPropagation();
         processHtmlDecorationReferenceEvent(e.target as HTMLElement);

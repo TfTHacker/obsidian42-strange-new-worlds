@@ -1,7 +1,7 @@
 import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
 import InlineReferenceExtension, {setPluginVariableForCM6EditorExtension} from "./cm-extensions/references-cm6";
 import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
-import markdownPreviewProcessor from "./cm-extensions/references-preview";
+import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
 import {SidePaneView, VIEW_TYPE_SNW} from "./ux/sidepane";
 import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ux/headerRefCount";
 import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
@@ -35,6 +35,7 @@ export default class ThePlugin extends Plugin {
             setPluginVariableForHtmlDecorations(this);
             setPluginVariableForCM6Gutter(this);
             setPluginVariableForHeaderRefCount(this);
+            setPluginVariableForMarkdownPreviewProcessor(this);
 
             this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -57,7 +58,7 @@ export default class ThePlugin extends Plugin {
 
             if(this.settings.displayInlineReferences ) {
                 this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
-                this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx, this));
+                this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
             }
 
             if(this.settings.displayEmbedReferencesInGutter){

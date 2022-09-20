@@ -31,7 +31,8 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-type", referenceType);
     element.setAttribute("data-snw-link", link);
-    element.ariaLabel = ariaLabel;
+    if(ariaLabel!="")
+        element.ariaLabel = ariaLabel;
     if(attachCSSClass) element.addClass(attachCSSClass);
 
     element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);

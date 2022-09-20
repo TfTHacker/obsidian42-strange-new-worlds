@@ -4,6 +4,14 @@ import {getCurrentPage} from "../indexer";
 import ThePlugin from "../main";
 import {TransformedCachedItem} from "../types";
 
+
+let thePlugin: ThePlugin;
+
+export function setPluginVariableForMarkdownPreviewProcessor(plugin: ThePlugin) {
+    thePlugin = plugin;
+}
+
+
 /**
  * Function called by main.registerMarkdownPostProcessor - this function renders the html when in preview mode
  *
@@ -15,7 +23,7 @@ import {TransformedCachedItem} from "../types";
  * @param {ThePlugin} thePlugin
  * @return {*} 
  */
-export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext, thePlugin : ThePlugin) {
+export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext) {
 
     if(thePlugin.snwAPI.enableDebugging.PreviewRendering)
         thePlugin.snwAPI.console("markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext", el, ctx, ctx.getSectionInfo(el))
@@ -107,9 +115,12 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
  * @return {*} 
  */
 export function generateArialLabel(filePath: string, refs: TransformedCachedItem) {
-    const results = refs.references.filter(r=>filePath!=r.sourceFile.path).map(r=>r.sourceFile.path.replace(".md", ""));
+    if(thePlugin.settings.displayNumberOfFilesInTooltip===0) return "";
+    const results = refs.references
+                    .map(r=>r.sourceFile.path.replace(".md", ""))
+                    .splice(0, thePlugin.settings.displayNumberOfFilesInTooltip);
     if(results.length>0)
-        return results.join("\n") + "\n-----\n-> CLICK for more details";
+        return results.join("\n") + "\n-----\nSNW - CLICK for details";
     else
         return "";
 }
