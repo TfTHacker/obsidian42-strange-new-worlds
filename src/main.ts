@@ -3,7 +3,7 @@ import InlineReferenceExtension, {setPluginVariableForCM6EditorExtension} from "
 import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
 import markdownPreviewProcessor from "./cm-extensions/references-preview";
 import {SidePaneView, VIEW_TYPE_SNW} from "./ux/sidepane";
-import setHeaderWithReferenceCounts from "./headerImageCount";
+import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ux/headerRefCount";
 import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
 import SnwAPI from "./snwApi";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
@@ -34,6 +34,7 @@ export default class ThePlugin extends Plugin {
             setPluginVariableForCM6EditorExtension(this);
             setPluginVariableForHtmlDecorations(this);
             setPluginVariableForCM6Gutter(this);
+            setPluginVariableForHeaderRefCount(this);
 
             this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -51,7 +52,7 @@ export default class ThePlugin extends Plugin {
             this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));
             
             this.app.workspace.on("layout-change", async () => {
-                setHeaderWithReferenceCounts(this);
+                setHeaderWithReferenceCounts();
             });
 
             if(this.settings.displayInlineReferences ) {

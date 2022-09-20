@@ -1,36 +1,41 @@
 // Displays in the header of open documents the count of incoming links
 
 import {MarkdownView, WorkspaceLeaf} from "obsidian";
-import {Link} from "./types";
-import ThePlugin from "./main";
-import {processHtmlDecorationReferenceEvent} from "./cm-extensions/htmlDecorations";
-import {getSnwAllLinksResolutions} from "./indexer";
+import {Link} from "../types";
+import ThePlugin from "../main";
+import {processHtmlDecorationReferenceEvent} from "../cm-extensions/htmlDecorations";
+import {getSnwAllLinksResolutions} from "../indexer";
+
+
+let thePlugin: ThePlugin;
+
+export function setPluginVariableForHeaderRefCount(plugin: ThePlugin) {
+    thePlugin = plugin;
+}
 
 
 /**
  * Iterates all open documents to see if they are markdown file, and if so callsed processHeader
  *
  * @export
- * @param {ThePlugin} thePlugin
  */
-export default function setHeaderWithReferenceCounts(thePlugin: ThePlugin) {
+export default function setHeaderWithReferenceCounts() {
     if(thePlugin.settings.displayIncomingFilesheader===false) return;
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.setHeaderWithReferenceCounts(thePlugin)", ThePlugin);
     
     thePlugin.app.workspace.iterateAllLeaves((leaf : WorkspaceLeaf) => {
         if (leaf.view.getViewType() === "markdown") 
-            processHeader(thePlugin, leaf.view as MarkdownView);
+            processHeader(leaf.view as MarkdownView);
     })
 }
 
 /**
  * Analyzes the page and if there is incoming links displays a header message
  *
- * @param {ThePlugin} thePlugin
  * @param {MarkdownView} mdView
  */
-function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
+function processHeader(mdView: MarkdownView) {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
     
@@ -44,13 +49,16 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
         return
     }
 
-    const fileList = (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,20).join("\n")
+    const toolTipItemCount = thePlugin.settings.displayNumberOfFilesInTooltip;
+    const fileList = (toolTipItemCount!=0 && incomingLinks.length>0) ?
+                     (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,toolTipItemCount).join("\n") : "";
     let snwTitleRefCountDisplayCountEl: HTMLElement = mdView.contentEl.querySelector(".snw-header-count");
 
     // header count is already displayed, just update information.
     if( snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdView.file.basename ) {
         snwTitleRefCountDisplayCountEl.innerText =  " " + incomingLinks.length.toString() + " ";
-        snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
+        if(fileList!="")
+            snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
         return
     }
 
@@ -80,7 +88,8 @@ function processHeader(thePlugin: ThePlugin, mdView: MarkdownView) {
     wrapper.setAttribute("data-snw-key", mdView.file.basename);
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-link", mdView.file.path);
-    wrapper.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
+    if(fileList!="")
+        wrapper.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
     wrapper.onclick = (e : MouseEvent) => {
         e.stopPropagation();
         processHtmlDecorationReferenceEvent(e.target as HTMLElement);
