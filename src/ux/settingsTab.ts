@@ -2,17 +2,19 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import ThePlugin from "../main";
 
 export interface Settings {
-	displayIncomingFilesheader: 	boolean;
-	displayInlineReferences: 		boolean;
-	displayEmbedReferencesInGutter:	boolean;
-	displayLineNumberInSidebar:		boolean;
-	displayNumberOfFilesInTooltip:	number;
-	cacheUpdateInMilliseconds:		number;
+	displayIncomingFilesheader: 		boolean;
+	displayInlineReferencesLivePreview: boolean;
+	displayInlineReferencesMarkdown: 	boolean;
+	displayEmbedReferencesInGutter:		boolean;
+	displayLineNumberInSidebar:			boolean;
+	displayNumberOfFilesInTooltip:		number;
+	cacheUpdateInMilliseconds:			number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
 	displayIncomingFilesheader: true,
-	displayInlineReferences: true,
+	displayInlineReferencesLivePreview: true,
+	displayInlineReferencesMarkdown: true,
 	displayEmbedReferencesInGutter: true,
 	displayLineNumberInSidebar: true,
 	displayNumberOfFilesInTooltip: 10,
@@ -40,32 +42,46 @@ export class SettingsTab extends PluginSettingTab {
 				cb.setValue(this.thePlugin.settings.displayIncomingFilesheader);
 				cb.onChange(async (value: boolean) => {
 					this.thePlugin.settings.displayIncomingFilesheader = value;
+					this.thePlugin.toggleStateHeaderCount();
 					await this.thePlugin.saveSettings();
 				});
 			});
 
 		new Setting(containerEl)
-			.setName("References Inline Documents")
-			.setDesc("Display inline of the text of documents all reference counts for links, blocks and embeds. (Requires Obsidian Restart)")
+			.setName("Show SNW indicators in Live Previev Editor")
+			.setDesc("While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds.")
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.displayInlineReferences);
+				cb.setValue(this.thePlugin.settings.displayInlineReferencesLivePreview);
 				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.displayInlineReferences = value;
+					this.thePlugin.settings.displayInlineReferencesLivePreview = value;
+					this.thePlugin.toggleStateSNWLivePreview();
 					await this.thePlugin.saveSettings();
 				});
 			});
 
+		new Setting(containerEl)
+			.setName("Show SNW indicators in Reading view ")
+			.setDesc("While in Reading View of a document, display inline of the text of documents all reference counts for links, blocks and embeds.")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.displayInlineReferencesMarkdown);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.displayInlineReferencesMarkdown = value;
+					this.thePlugin.toggleStateSNWMarkdownPreview();
+					await this.thePlugin.saveSettings();
+				});
+			});			
 
 		new Setting(containerEl)
-			.setName("Embed references in Gutter in Live Preview Mode  (Requires Obsidian Restart)")
+			.setName("Embed references in Gutter in Live Preview Mode")
 			.setDesc(`Displays a count of references in the gutter while in live preview. This is done only in a
 					  special scenario. It has to do with the way Obsidian renders embeds, example: ![[link]] when  
 					  they are on its own line. Strange New Worlds cannot embed the count in this scenario, so a hint is 
-					  displayed in the gutter. It is a hack, but at least we get some information.  (Requires Obsidian Restart)`	)
+					  displayed in the gutter. It is a hack, but at least we get some information.`	)
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.thePlugin.settings.displayEmbedReferencesInGutter);
 				cb.onChange(async (value: boolean) => {
 					this.thePlugin.settings.displayEmbedReferencesInGutter = value;
+					this.thePlugin.toggleStateSNWGutters();
 					await this.thePlugin.saveSettings();
 				});
 			});
@@ -95,7 +111,7 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			})
 			
-			containerEl.createEl("h2", { text: "Cache Tuning" });
+		containerEl.createEl("h2", { text: "Cache Tuning" });
 
 		new Setting(containerEl)
 			.setName(`How often should the SNW Cache update`)

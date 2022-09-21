@@ -8,6 +8,7 @@ import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
 import SnwAPI from "./snwApi";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
 import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
+import { Extension } from "@codemirror/state";
 
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;
@@ -19,7 +20,8 @@ export default class ThePlugin extends Plugin {
     lastSelectedReferenceLink : string;
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
-
+    editorExtensions: Extension[] = [];
+    
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
 
@@ -51,23 +53,20 @@ export default class ThePlugin extends Plugin {
             this.snwAPI.settings = this.settings;
 
             this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));
+
+            this.registerEditorExtension(this.editorExtensions);
             
-            this.app.workspace.on("layout-change", async () => {
-                setHeaderWithReferenceCounts();
-            });
-
-            if(this.settings.displayInlineReferences ) {
-                this.registerEditorExtension([InlineReferenceExtension]); // enable the codemirror extensions
-                this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
-            }
-
-            if(this.settings.displayEmbedReferencesInGutter){
-                this.registerEditorExtension(ReferenceGutterExtension);
-            }
+            this.toggleStateHeaderCount();
+            this.toggleStateSNWMarkdownPreview();
+            this.toggleStateSNWLivePreview();
+            this.toggleStateSNWGutters();
 
             const indexDebounce = debounce(() => {
                 buildLinksAndReferences()
             }, 1000, true);
+
+            // initial build of references
+            buildLinksAndReferences();
         }
 
         // managing state for debugging purpsoes
@@ -89,6 +88,10 @@ export default class ThePlugin extends Plugin {
         });
     }
 
+    async layoutChangeEvent() { 
+        setHeaderWithReferenceCounts();
+    }
+
     async activateView(key : string, refType : string, link : string) {
         this.lastSelectedReferenceKey = key;
         this.lastSelectedReferenceType = refType;
@@ -97,6 +100,54 @@ export default class ThePlugin extends Plugin {
         await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
         this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
     }
+
+    toggleStateHeaderCount(): void {
+        const state = this.settings.displayIncomingFilesheader;
+        if(state===true)
+            this.app.workspace.on("layout-change", this.layoutChangeEvent );
+        else 
+            this.app.workspace.off("layout-change", this.layoutChangeEvent );
+    }
+
+    toggleStateSNWMarkdownPreview(): void {
+        const state = this.settings.displayInlineReferencesMarkdown;
+        if(state==true && this.markdownPostProcessorSNW===null) {
+            this.markdownPostProcessorSNW = this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
+        } else {
+            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
+            this.markdownPostProcessorSNW=null;
+        }
+    }
+
+    toggleStateSNWLivePreview(): void {
+        this.updateCMExtensionState("inline-ref", this.settings.displayInlineReferencesLivePreview, InlineReferenceExtension);
+    }
+
+    toggleStateSNWGutters(): void {
+        this.updateCMExtensionState("gutter", this.settings.displayEmbedReferencesInGutter, ReferenceGutterExtension);
+    }
+
+    updateCMExtensionState(extensionIdentifier: string, extensionState: boolean, extension: Extension ) {
+        if(extensionState==true) {
+            this.editorExtensions.push(extension);
+            // @ts-ignore
+            this.editorExtensions[this.editorExtensions.length-1].snwID = extensionIdentifier;
+        } else {
+            for (let i = 0; i < this.editorExtensions.length; i++) {
+                const ext = this.editorExtensions[i];
+                // @ts-ignore
+                if(ext.snwID === extensionIdentifier) {
+                    this.editorExtensions.splice(i,1);
+                    break;
+                }
+            }
+        }
+        this.app.workspace.updateOptions();
+    }
+
+    async loadSettings(): Promise<void> { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) }
+
+	async saveSettings(): Promise<void> { await this.saveData(this.settings) }
 
     onunload(): void {
         console.log("unloading " + this.appName)
@@ -109,7 +160,4 @@ export default class ThePlugin extends Plugin {
         } catch (error) { /* don't do anything */ }
     }
 
-    async loadSettings(): Promise<void> { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()) }
-
-	async saveSettings(): Promise<void> { await this.saveData(this.settings) }
 }

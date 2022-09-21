@@ -20,7 +20,6 @@ export function setPluginVariableForHeaderRefCount(plugin: ThePlugin) {
  * @export
  */
 export default function setHeaderWithReferenceCounts() {
-    if(thePlugin.settings.displayIncomingFilesheader===false) return;
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.setHeaderWithReferenceCounts(thePlugin)", ThePlugin);
     
@@ -39,7 +38,7 @@ function processHeader(mdView: MarkdownView) {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
     
-    const allLinks: Link[] = getSnwAllLinksResolutions(); //thePlugin.app.fileManager.getAllLinkResolutions();
+    const allLinks: Link[] = getSnwAllLinksResolutions(); 
     const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
     
     // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
