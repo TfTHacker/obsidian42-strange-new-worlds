@@ -56,8 +56,8 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                     }
                     try {
                         if (!blockElement.hasClass("snw-block-preview")) {
-                            blockElement.append(referenceElement);
                             referenceElement.addClass("snw-block-preview");
+                            blockElement.append(referenceElement);
                             break;
                         } 
                     } catch (error) { /* nothing to do here */ }
@@ -71,21 +71,22 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 for (const value of transformedCache.embeds) {
                     if (value.references.length > 1 && embedKey.endsWith(value.key)) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
-                        element.after(referenceElement);
                         referenceElement.addClass('snw-embed-preview');
+                        element.after(referenceElement);
                         break;
                     }
                 }
             });
         }
 
-        if (transformedCache?.headings && el.querySelector("[data-heading]")) {
-            const headerKey = el.querySelector("[data-heading]").textContent;
+        const headerKey = el.querySelector("[data-heading]");
+        if (transformedCache?.headings && headerKey) {
+            const textContext = headerKey.textContent
             for (const value of transformedCache.headings) 
-                if (value.references.length > 1 && value.key === headerKey) {
+                if (value.references.length > 1 && value.key === textContext) {
                     const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
-                    el.querySelector("h1").insertAdjacentElement("beforeend", referenceElement);
                     referenceElement.addClass("snw-heading-preview");
+                    el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
                     break;
                 }
         }
@@ -96,8 +97,8 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 for (const value of transformedCache.links) {
                     if (value.references.length > 1 && (value.key === link || value.original.includes(link))) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
-                        element.after(referenceElement);
                         referenceElement.addClass('snw-link-preview');
+                        element.after(referenceElement);
                         break;
                     }
                 }

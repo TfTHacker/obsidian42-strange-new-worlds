@@ -1,53 +1,17 @@
-import {WidgetType, EditorView, Decoration} from "@codemirror/view";
-import {ViewUpdate, ViewPlugin, DecorationSet} from "@codemirror/view";
-import {RangeSetBuilder} from "@codemirror/state";
-import {App, editorInfoField, MarkdownFileInfo, } from "obsidian";
-import {getCurrentPage} from "src/indexer";
-import ThePlugin from "../main";
-import {ReferenceLocation, TransformedCachedItem} from "../types";
-import {htmlDecorationForReferencesElement} from "./htmlDecorations";
-import {generateArialLabel} from "./references-preview";
+import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType} from "@codemirror/view";
+import { editorInfoField } from "obsidian";
+import { getCurrentPage } from "src/indexer";
+import { generateArialLabel } from "./references-preview";
+import { TransformedCachedItem } from "../types";
+import { htmlDecorationForReferencesElement } from "./htmlDecorations";
 
-let thePlugin: ThePlugin;
-
-export function setPluginVariableForCM6EditorExtension(plugin: ThePlugin) {
-    thePlugin = plugin;
-}
 
 /** 
  * Codemirror extension - hook into the CM editor
  * 
  * CM will call update as the doc updates. 
  * 
- * calclulateInlineReferences is the key. It finds the references in the file and then returns
- * the info needed by CM to process and display found matches
  */
-const InlineReferenceExtension = ViewPlugin.fromClass(class {
-    app: App;
-    mdView: MarkdownFileInfo
-    decorations : DecorationSet;
-
-    constructor(view: EditorView) { 
-        this.mdView = view.state.field( editorInfoField )
-        this.app = this.mdView.app;
-        this.decorations = calclulateInlineReferences(view, this.app, this.mdView);
-
-        if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-            thePlugin.snwAPI.console("InlineReferenceExtension constructor(EditorView)", view)
-
-    }    
-
-    update(update : ViewUpdate) { 
-        if(update.docChanged || update.viewportChanged)  {
-            this.decorations = calclulateInlineReferences(update.view, this.app, this.mdView);
-            if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-                thePlugin.snwAPI.console("InlineReferenceExtension update(ViewUpdate, deocrations)", update, this.decorations)
-        }
-    }
-}, {
-    decorations: v => v.decorations  
-}) // END InlineReferenceExtension
-
 
 
 /**
@@ -56,14 +20,92 @@ const InlineReferenceExtension = ViewPlugin.fromClass(class {
  * @class InlineReferenceWidget
  * @extends {WidgetType}
  */
-class InlineReferenceWidget extends WidgetType {
+export const InlineReferenceExtension = ViewPlugin.fromClass(class {
+
+    decorator: MatchDecorator; 
+    decorations: DecorationSet = Decoration.none;
+
+    constructor(public view: EditorView) {
+        this.decorator = new MatchDecorator({
+            regexp: /!\[\[(.+)\]\]|\[\[(.+)\]\]|(\s\^)(\w+)$|^#+\s.+/g,
+            decorate: (add, from, to, match, view) => {                
+                const mdView = view.state.field( editorInfoField );
+                const firstCharacterMatch = match[0].charAt(0);
+                let key = "";
+                const transformedCache = getCurrentPage(mdView.file);               
+                let transformedCachedItem: TransformedCachedItem[] = null;
+                let wdgt: InlineReferenceWidget = null;
+
+                if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
+                    key = match[0].replace(" ^","");
+                    transformedCachedItem = transformedCache.blocks;
+                } else if(firstCharacterMatch==="!" && transformedCache?.embeds.length>0) { //embeds
+                    key = match[0].replace("![[","").replace("]]","");
+                    transformedCachedItem = transformedCache.embeds;
+                } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
+                    key = match[0].replace("[[","").replace("]]","");
+                    transformedCachedItem = transformedCache.links
+                } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //link
+                    // @ts-ignore
+                    key = match[0].replaceAll("#","").substring(1);
+                    transformedCachedItem = transformedCache.headings
+                }
+                if(key!="") {
+
+                    wdgt = constructWidgetForInlineReference(key, transformedCachedItem, mdView.file.path);
+                    if(wdgt!=null)
+                            add(to, to, Decoration.widget({widget: wdgt, side: 1}));    
+                }
+            },
+        })
+
+        this.decorations = this.decorator.createDeco(view);
+    }
+
+    update(update: ViewUpdate) {
+        if (update.docChanged || update.viewportChanged ) 
+            this.decorations = this.decorator.updateDeco(update, this.decorations);
+    }
+
+}, {
+    decorations: v => v.decorations  
+}) 
+
+
+
+/**
+ * Helper function for preparting the Widget for displaying the reference count
+ *
+ * @param {string} key  - Unique reference key
+ * @param {TransformedCachedItem[]} references - list of references 
+ * @param {string} filePath - file path for file being modified
+ * @return {*}  {InlineReferenceWidget}
+ */
+const constructWidgetForInlineReference = (key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
+    for (let i = 0; i < references.length; i++) {
+        const ref = references[i];
+        if(ref.keyFullPath===key)
+            if(ref?.references.length>0)
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].reference.link, generateArialLabel(filePath, ref), null);
+            else
+                return null;
+    }
+}
+
+
+/**
+ * CM widget for renderinged matched ranges of references. This allows us to provide our UX for matches.
+ *
+ * @class InlineReferenceWidget
+ * @extends {WidgetType}
+ */
+ export class InlineReferenceWidget extends WidgetType {
     referenceCount: number;
     referenceType: string;
     key: string;    //a unique identifer for the reference
     link: string;
     arialLabel: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
-    thePlugin: ThePlugin;
 
     constructor(refCount: number, cssclass: string, key:string, link: string, arialLabel: string, addCSSClass: string ) {
         super();
@@ -75,9 +117,9 @@ class InlineReferenceWidget extends WidgetType {
         this.addCssClass = addCSSClass;
     }
 
-    eq(other: InlineReferenceWidget) { 
-        return other.referenceCount == this.referenceCount; 
-    }
+    // eq(other: InlineReferenceWidget) { 
+    //     return other.referenceCount == this.referenceCount; 
+    // }
 
     toDOM() {
         return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel, this.addCssClass);
@@ -87,69 +129,3 @@ class InlineReferenceWidget extends WidgetType {
 
     ignoreEvent() { return false }
 } // END InlineReferenceWidget
-
-
-/**
- * Welcome to the crown jewels.
- * 
- * Locates inline references, and tells CM editor where they are, 
- * and provides additional meta data for later use through out the plugin
- *
- * @param {EditorView} view
- * @param {App} theApp
- * @param {MarkdownFileInfo} mdView
- * @return {*} 
- */
-function calclulateInlineReferences(view: EditorView, theApp: App, mdView: MarkdownFileInfo) {
-
-    if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-        thePlugin.snwAPI.console("calclulateInlineReferences(EditorView, theApp, MarkdownFileInfo", view,theApp,mdView);
-    
-    const rangeSetBuilder = new RangeSetBuilder<Decoration>();
-
-    if(mdView?.file===undefined) return rangeSetBuilder.finish();
-
-    const CurrentFile = mdView.file.path;
-    const referenceLocations: ReferenceLocation[] = [];
-    const transformedCache = getCurrentPage(mdView.file);
-    const viewPort = view.viewport; 
-
-    const processReferences = (references: TransformedCachedItem[]) => {
-        references.forEach(ref=>{
-            const refCountMinimum = ref.type === "block" ? 0 : 1; //if a block, show it even if just one reference
-            if( ref.references.length > refCountMinimum && (viewPort.from <= ref.pos.start.offset && viewPort.to >= ref.pos.end.offset) ) {
-                referenceLocations.push({
-                    type: ref.type,
-                    count: ref.references.length,
-                    pos: ref.pos.end.offset, 
-                    key: ref.key,
-                    link: ref.references[0].reference.link,
-                    arialLabel: generateArialLabel(CurrentFile, ref),
-                    attachClass: null
-                });
-            }
-        });
-    }
-
-    if(transformedCache.blocks)     processReferences(transformedCache.blocks);
-    if(transformedCache.embeds)     processReferences(transformedCache.embeds);
-    if(transformedCache.headings)   processReferences(transformedCache.headings);
-    if(transformedCache.links)      processReferences(transformedCache.links);
-
-    referenceLocations.sort((a,b)=>a.pos-b.pos).forEach((r)=>{
-        rangeSetBuilder.add(
-            r.pos, r.pos,
-            Decoration.widget({widget: new InlineReferenceWidget(r.count, r.type, r.key, r.link, r.arialLabel, r.attachClass), side: 1})
-        );        
-    });
-
-    if(thePlugin.snwAPI.enableDebugging?.CM6Extension) 
-        thePlugin.snwAPI.console("calclulateInlineReferences - referenceLocations", referenceLocations)
-
-
-    return rangeSetBuilder.finish(); 
-
-} // END calclulateInlineReferences
-
-
-export default InlineReferenceExtension;

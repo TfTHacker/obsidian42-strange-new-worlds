@@ -45,12 +45,13 @@ export interface Link {
 }
 
 export interface TransformedCachedItem {
-    key: string
-    pos: Pos
-    page: string
-    type: string
-    references: Link[]
-    original?: string 
+    key: string;
+    keyFullPath: string; //full path to referenc
+    pos: Pos;
+    page: string;
+    type: string;
+    references: Link[];
+    original?: string;
 }
 
 export interface TransformedCache {

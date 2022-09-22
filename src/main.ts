@@ -1,14 +1,14 @@
-import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
-import InlineReferenceExtension, {setPluginVariableForCM6EditorExtension} from "./cm-extensions/references-cm6";
-import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
-import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
-import {SidePaneView, VIEW_TYPE_SNW} from "./ux/sidepane";
-import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ux/headerRefCount";
-import {SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
-import SnwAPI from "./snwApi";
-import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
-import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
 import { Extension } from "@codemirror/state";
+import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
+import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
+import { InlineReferenceExtension } from "./cm-extensions/references-cm6";
+import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
+import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
+import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
+import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ux/headerRefCount";
+import { SidePaneView, VIEW_TYPE_SNW } from "./ux/sidepane";
+import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
+import SnwAPI from "./snwApi";
 
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;
@@ -28,12 +28,12 @@ export default class ThePlugin extends Plugin {
         const initializeEnvironment = async () => {
             await this.loadSettings();
 
+
             this.snwAPI = new SnwAPI(this);            
             // @ts-ignore
             globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
             setPluginVariableForIndexer(this);
-            setPluginVariableForCM6EditorExtension(this);
             setPluginVariableForHtmlDecorations(this);
             setPluginVariableForCM6Gutter(this);
             setPluginVariableForHeaderRefCount(this);
