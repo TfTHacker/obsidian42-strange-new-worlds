@@ -1,7 +1,7 @@
 import { Extension } from "@codemirror/state";
 import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
 import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
-import { InlineReferenceExtension } from "./cm-extensions/references-cm6";
+import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./cm-extensions/references-cm6";
 import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
@@ -28,7 +28,6 @@ export default class ThePlugin extends Plugin {
         const initializeEnvironment = async () => {
             await this.loadSettings();
 
-
             this.snwAPI = new SnwAPI(this);            
             // @ts-ignore
             globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
@@ -38,6 +37,7 @@ export default class ThePlugin extends Plugin {
             setPluginVariableForCM6Gutter(this);
             setPluginVariableForHeaderRefCount(this);
             setPluginVariableForMarkdownPreviewProcessor(this);
+            setPluginVariableForCM6InlineReferences(this);
 
             this.addSettingTab(new SettingsTab(this.app, this));
 

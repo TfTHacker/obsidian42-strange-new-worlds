@@ -9,16 +9,24 @@ export interface Settings {
 	displayLineNumberInSidebar:			boolean;
 	displayNumberOfFilesInTooltip:		number;
 	cacheUpdateInMilliseconds:			number;
+	enableRenderingBlockId:				boolean;
+	enableRenderingLinks:				boolean;
+	enableRenderingHeaders:				boolean;
+	enableRenderingEmbeds:				boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-	displayIncomingFilesheader: true,
+	displayIncomingFilesheader: 		true,
 	displayInlineReferencesLivePreview: true,
-	displayInlineReferencesMarkdown: true,
-	displayEmbedReferencesInGutter: true,
-	displayLineNumberInSidebar: true,
-	displayNumberOfFilesInTooltip: 10,
-	cacheUpdateInMilliseconds: 10000
+	displayInlineReferencesMarkdown: 	true,
+	displayEmbedReferencesInGutter: 	true,
+	displayLineNumberInSidebar: 		true,
+	displayNumberOfFilesInTooltip: 		10,
+	cacheUpdateInMilliseconds: 			10000,
+	enableRenderingBlockId: 			true,
+	enableRenderingLinks: 				true,
+	enableRenderingHeaders: 			true,
+	enableRenderingEmbeds: 				true
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -33,7 +41,7 @@ export class SettingsTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Display elements" });
+		containerEl.createEl("h2", { text: "View Modes" });
 
 		new Setting(containerEl)
 			.setName("Incoming Links Header Count")
@@ -85,6 +93,51 @@ export class SettingsTab extends PluginSettingTab {
 					await this.thePlugin.saveSettings();
 				});
 			});
+
+		containerEl.createEl("h2", { text: "Enable Reference Types"});
+		containerEl.createEl("sup", { text: "(requires reopening documents to take effect)" });
+
+		new Setting(containerEl)
+			.setName("Block ID")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingBlockId);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingBlockId = value;
+					await this.thePlugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("Embeds")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingEmbeds);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingEmbeds = value;
+					await this.thePlugin.saveSettings();
+				});
+			});			
+
+		new Setting(containerEl)
+			.setName("Links")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingLinks);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingLinks = value;
+					await this.thePlugin.saveSettings();
+				});
+			});			
+
+		new Setting(containerEl)
+			.setName("Headers")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingHeaders);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingHeaders = value;
+					await this.thePlugin.saveSettings();
+				});
+			});					
+
+		containerEl.createEl("h2", { text: "Other Settings" });
 
 		new Setting(containerEl)
 			.setName("Number of files listed in tooltip")

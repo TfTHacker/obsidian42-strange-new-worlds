@@ -11,7 +11,6 @@ export function setPluginVariableForMarkdownPreviewProcessor(plugin: ThePlugin) 
     thePlugin = plugin;
 }
 
-
 /**
  * Function called by main.registerMarkdownPostProcessor - this function renders the html when in preview mode
  *
@@ -38,7 +37,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
         const sectionInfo = ctx.getSectionInfo(el);
 
-        if (transformedCache?.blocks) {
+        if (thePlugin.settings.enableRenderingBlockId && transformedCache?.blocks) {
             let isThisAnEmbed = false;
             try { // we don't want to proccess embeds
                 // @ts-ignore
@@ -65,7 +64,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             }
         }
 
-        if (transformedCache?.embeds) {
+        if (thePlugin.settings.enableRenderingEmbeds && transformedCache?.embeds) {
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embeds) {
@@ -79,19 +78,21 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             });
         }
 
-        const headerKey = el.querySelector("[data-heading]");
-        if (transformedCache?.headings && headerKey) {
-            const textContext = headerKey.textContent
-            for (const value of transformedCache.headings) 
-                if (value.references.length > 1 && value.key === textContext) {
-                    const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
-                    referenceElement.addClass("snw-heading-preview");
-                    el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
-                    break;
-                }
+        if(thePlugin.settings.enableRenderingHeaders) {
+            const headerKey = el.querySelector("[data-heading]");
+            if (transformedCache?.headings && headerKey) {
+                const textContext = headerKey.textContent
+                for (const value of transformedCache.headings) 
+                    if (value.references.length > 1 && value.key === textContext) {
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
+                        referenceElement.addClass("snw-heading-preview");
+                        el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
+                        break;
+                    }
+            }
         }
 
-        if (transformedCache?.links) {
+        if(thePlugin.settings.enableRenderingLinks && transformedCache?.links) {
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.links) {

@@ -4,6 +4,13 @@ import { getCurrentPage } from "src/indexer";
 import { generateArialLabel } from "./references-preview";
 import { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
+import ThePlugin from "src/main";
+
+let thePlugin: ThePlugin;
+
+export function setPluginVariableForCM6InlineReferences(plugin: ThePlugin) {
+    thePlugin = plugin;
+}
 
 
 /** 
@@ -24,10 +31,23 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 
     decorator: MatchDecorator; 
     decorations: DecorationSet = Decoration.none;
+    regxPattern = "";
 
     constructor(public view: EditorView) {
+        if(thePlugin.settings.enableRenderingBlockId) 
+            this.regxPattern = "(\\s\\^)(\\w+)$"; 
+        if(thePlugin.settings.enableRenderingLinks) 
+            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "\\[\\[(.+)\\]\\]";
+        if(thePlugin.settings.enableRenderingEmbeds) 
+            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "!\\[\\[(.+)\\]\\]";  
+        if(thePlugin.settings.enableRenderingHeaders)
+            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "^#+\\s.+";
+        
+        //if there is no regex pattern, then don't go further
+        if(this.regxPattern==="") return;
+
         this.decorator = new MatchDecorator({
-            regexp: /!\[\[(.+)\]\]|\[\[(.+)\]\]|(\s\^)(\w+)$|^#+\s.+/g,
+            regexp: new RegExp(this.regxPattern,"g"),
             decorate: (add, from, to, match, view) => {                
                 const mdView = view.state.field( editorInfoField );
                 const firstCharacterMatch = match[0].charAt(0);
@@ -51,7 +71,6 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                     transformedCachedItem = transformedCache.headings
                 }
                 if(key!="") {
-
                     wdgt = constructWidgetForInlineReference(key, transformedCachedItem, mdView.file.path);
                     if(wdgt!=null)
                             add(to, to, Decoration.widget({widget: wdgt, side: 1}));    
@@ -59,11 +78,12 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
             },
         })
 
-        this.decorations = this.decorator.createDeco(view);
+        if(this.regxPattern!="")
+            this.decorations = this.decorator.createDeco(view);
     }
 
     update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged ) 
+        if ( this.regxPattern!="" && (update.docChanged || update.viewportChanged)  ) 
             this.decorations = this.decorator.updateDeco(update, this.decorations);
     }
 
