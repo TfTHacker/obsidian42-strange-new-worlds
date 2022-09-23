@@ -37,9 +37,9 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
         if(thePlugin.settings.enableRenderingBlockId) 
             this.regxPattern = "(\\s\\^)(\\w+)$"; 
         if(thePlugin.settings.enableRenderingLinks) 
-            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "\\[\\[(.+)\\]\\]";
+            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "\\[\\[(.*?)\\]\\]";
         if(thePlugin.settings.enableRenderingEmbeds) 
-            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "!\\[\\[(.+)\\]\\]";  
+            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "!\\[\\[(.*?)\\]\\]";  
         if(thePlugin.settings.enableRenderingHeaders)
             this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "^#+\\s.+";
         
@@ -47,8 +47,8 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
         if(this.regxPattern==="") return;
 
         this.decorator = new MatchDecorator({
-            regexp: new RegExp(this.regxPattern,"g"),
-            decorate: (add, from, to, match, view) => {                
+            regexp: new RegExp(this.regxPattern, "g"),
+            decorate: (add, from, to, match, view) => {         
                 const mdView = view.state.field( editorInfoField );
                 const firstCharacterMatch = match[0].charAt(0);
                 let key = "";
@@ -83,8 +83,9 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
     }
 
     update(update: ViewUpdate) {
-        if ( this.regxPattern!="" && (update.docChanged || update.viewportChanged)  ) 
+        if ( this.regxPattern!="" && (update.docChanged || update.viewportChanged)  ) {
             this.decorations = this.decorator.updateDeco(update, this.decorations);
+        }
     }
 
 }, {
