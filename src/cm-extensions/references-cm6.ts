@@ -34,13 +34,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
     regxPattern = "";
 
     constructor(public view: EditorView) {
-        if(thePlugin.settings.enableRenderingBlockId) 
+        if(thePlugin.settings.enableRenderingBlockIdInLivePreview) 
             this.regxPattern = "(\\s\\^)(\\w+)$"; 
-        if(thePlugin.settings.enableRenderingLinks) 
-            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "\\[\\[(.*?)\\]\\]";
-        if(thePlugin.settings.enableRenderingEmbeds) 
+        if(thePlugin.settings.enableRenderingLinksInLivePreview) 
+            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "(?<=[^!]|^)\\[\\[(.*?)\\]\\]";
+        if(thePlugin.settings.enableRenderingEmbedsInLivePreview)
             this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "!\\[\\[(.*?)\\]\\]";  
-        if(thePlugin.settings.enableRenderingHeaders)
+        if(thePlugin.settings.enableRenderingHeadersInLivePreview)
             this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "^#+\\s.+";
         
         //if there is no regex pattern, then don't go further

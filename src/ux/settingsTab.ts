@@ -9,10 +9,14 @@ export interface Settings {
 	displayLineNumberInSidebar:			boolean;
 	displayNumberOfFilesInTooltip:		number;
 	cacheUpdateInMilliseconds:			number;
-	enableRenderingBlockId:				boolean;
-	enableRenderingLinks:				boolean;
-	enableRenderingHeaders:				boolean;
-	enableRenderingEmbeds:				boolean;
+	enableRenderingBlockIdInMarkdown:	boolean;
+	enableRenderingLinksInMarkdown:		boolean;
+	enableRenderingHeadersInMarkdown:	boolean;
+	enableRenderingEmbedsInMarkdown:	boolean;
+	enableRenderingBlockIdInLivePreview:boolean;
+	enableRenderingLinksInLivePreview:	boolean;
+	enableRenderingHeadersInLivePreview:boolean;
+	enableRenderingEmbedsInLivePreview:	boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -23,10 +27,14 @@ export const DEFAULT_SETTINGS: Settings = {
 	displayLineNumberInSidebar: 		true,
 	displayNumberOfFilesInTooltip: 		10,
 	cacheUpdateInMilliseconds: 			10000,
-	enableRenderingBlockId: 			true,
-	enableRenderingLinks: 				true,
-	enableRenderingHeaders: 			true,
-	enableRenderingEmbeds: 				true
+	enableRenderingBlockIdInMarkdown: 	true,
+	enableRenderingLinksInMarkdown: 	true,
+	enableRenderingHeadersInMarkdown: 	true,
+	enableRenderingEmbedsInMarkdown: 	true,
+	enableRenderingBlockIdInLivePreview:true,
+	enableRenderingLinksInLivePreview: 	true,
+	enableRenderingHeadersInLivePreview:true,
+	enableRenderingEmbedsInLivePreview: true
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -94,48 +102,112 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});
 
-		containerEl.createEl("h2", { text: "Enable Reference Types"});
+
+
+
+
+		containerEl.createEl("h2", { text: "Enable Reference Types in Reading mode"});
 		containerEl.createEl("sup", { text: "(requires reopening documents to take effect)" });
 
 		new Setting(containerEl)
 			.setName("Block ID")
+			.setDesc("Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.")
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.enableRenderingBlockId);
+				cb.setValue(this.thePlugin.settings.enableRenderingBlockIdInMarkdown);
 				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.enableRenderingBlockId = value;
+					this.thePlugin.settings.enableRenderingBlockIdInMarkdown = value;
 					await this.thePlugin.saveSettings();
 				});
 			});
 
 		new Setting(containerEl)
 			.setName("Embeds")
+			.setDesc("Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].")
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.enableRenderingEmbeds);
+				cb.setValue(this.thePlugin.settings.enableRenderingEmbedsInMarkdown);
 				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.enableRenderingEmbeds = value;
+					this.thePlugin.settings.enableRenderingEmbedsInMarkdown = value;
 					await this.thePlugin.saveSettings();
 				});
 			});			
 
 		new Setting(containerEl)
 			.setName("Links")
+			.setDesc("Identifies links in a document. For example: [[PageName]].")
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.enableRenderingLinks);
+				cb.setValue(this.thePlugin.settings.enableRenderingLinksInMarkdown);
 				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.enableRenderingLinks = value;
+					this.thePlugin.settings.enableRenderingLinksInMarkdown = value;
 					await this.thePlugin.saveSettings();
 				});
 			});			
 
 		new Setting(containerEl)
 			.setName("Headers")
+			.setDesc("Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.")
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.enableRenderingHeaders);
+				cb.setValue(this.thePlugin.settings.enableRenderingHeadersInMarkdown);
 				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.enableRenderingHeaders = value;
+					this.thePlugin.settings.enableRenderingHeadersInMarkdown = value;
 					await this.thePlugin.saveSettings();
 				});
 			});					
+
+
+
+
+
+		containerEl.createEl("h2", { text: "Enable Reference Types in Live Preview Mode"});
+		containerEl.createEl("sup", { text: "(requires reopening documents to take effect)" });
+	
+		new Setting(containerEl)
+			.setName("Block ID")
+			.setDesc("Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingBlockIdInLivePreview);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingBlockIdInLivePreview = value;
+					await this.thePlugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("Embeds")
+			.setDesc("Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingEmbedsInLivePreview);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingEmbedsInLivePreview = value;
+					await this.thePlugin.saveSettings();
+				});
+			});			
+
+		new Setting(containerEl)
+			.setName("Links")
+			.setDesc("Identifies links in a document. For example: [[PageName]].")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingLinksInLivePreview);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingLinksInLivePreview = value;
+					await this.thePlugin.saveSettings();
+				});
+			});			
+
+		new Setting(containerEl)
+			.setName("Headers")
+			.setDesc("Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableRenderingHeadersInLivePreview);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableRenderingHeadersInLivePreview = value;
+					await this.thePlugin.saveSettings();
+				});
+			});		
+
+
+
+
+
 
 		containerEl.createEl("h2", { text: "Other Settings" });
 

@@ -37,7 +37,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
         const sectionInfo = ctx.getSectionInfo(el);
 
-        if (thePlugin.settings.enableRenderingBlockId && transformedCache?.blocks) {
+        if (thePlugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
             let isThisAnEmbed = false;
             try { // we don't want to proccess embeds
                 // @ts-ignore
@@ -64,7 +64,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             }
         }
 
-        if (thePlugin.settings.enableRenderingEmbeds && transformedCache?.embeds) {
+        if (thePlugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embeds) {
@@ -78,7 +78,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             });
         }
 
-        if(thePlugin.settings.enableRenderingHeaders) {
+        if(thePlugin.settings.enableRenderingHeadersInMarkdown) {
             const headerKey = el.querySelector("[data-heading]");
             if (transformedCache?.headings && headerKey) {
                 const textContext = headerKey.textContent
@@ -92,7 +92,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             }
         }
 
-        if(thePlugin.settings.enableRenderingLinks && transformedCache?.links) {
+        if(thePlugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.links) {
