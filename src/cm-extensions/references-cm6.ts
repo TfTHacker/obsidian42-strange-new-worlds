@@ -59,7 +59,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
                     key = match[0].replace(" ^","");
                     transformedCachedItem = transformedCache.blocks;
-                } else if(firstCharacterMatch==="!" && transformedCache?.embeds.length>0) { //embeds
+                } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
                     key = match[0].replace("![[","").replace("]]","");
                     transformedCachedItem = transformedCache.embeds;
                 } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
