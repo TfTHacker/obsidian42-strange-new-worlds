@@ -42,35 +42,55 @@
     margin-left: 3px;
 }
 
-
-.snw-popup-container {
-    background-color: lightgreen; 
+/* Popover container */
+.snw-popover-container {
+    overflow: hidden;
+    min-height: 100px;
+    max-height: 400px;
+    width: 300px;
+    border: 1px solid black;
     overflow-y: scroll; 
-    max-height:400px; 
-    width:400px;
 }
 
-.snw-popup-header {
-    background-color: lightblue;
-    z-index: 1000;
+/* Shared reference area CSS */
+
+.snw-ref-title {
+    background-color: lightblue !important;
+    height: 20px;
+    width: 100%;
     position: absolute;
     top: 0px;
-    width:400px;
 }
 
-.snw-popup-file {
+.snw-ref-area {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    overflow-y: scroll; 
     background-color: yellow;
+    border: 1px solid red;     
 }
 
-.snw-popup-anchor {
-
+.snw-ref-item-container {
+    background-color: bisque !important;
 }
 
-.snw-popup-markdown-rendering {
-    background-color: lightgrey;
+.snw-ref-item-file {
+    background-color: darkcyan !important;
+}
+
+.snw-ref-item-file-link {
+    color: deeppink;
+}
+
+.snw-ref-item-info {
+    background-color: black;
+    color: aliceblue;
 }
 
 
+/* Sidepane */
 
 .snw-sidepane-container {
     height: 100%;

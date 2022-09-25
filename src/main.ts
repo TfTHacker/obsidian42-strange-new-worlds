@@ -9,6 +9,7 @@ import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from
 import { SidePaneView, VIEW_TYPE_SNW } from "./ux/sidepane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
 import SnwAPI from "./snwApi";
+import { setPluginVariableForUIC } from "./components/uic-commander";
 
 
 export default class ThePlugin extends Plugin {
@@ -41,6 +42,7 @@ export default class ThePlugin extends Plugin {
             setPluginVariableForHeaderRefCount(this);
             setPluginVariableForMarkdownPreviewProcessor(this);
             setPluginVariableForCM6InlineReferences(this);
+            setPluginVariableForUIC(this);
 
             this.addSettingTab(new SettingsTab(this.app, this));
 

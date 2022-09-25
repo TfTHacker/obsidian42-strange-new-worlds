@@ -22,3 +22,12 @@ Keep in mind that the Live preview editor is using Codemirror, and we need code 
 - registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
 
 
+
+# CSS Structure
+## Popovers
+- Parent container for popovers for reference counts
+  - snw-popover-container
+- Parent container for sidepane
+  - snw-sp-container
+- Reference area (this is shared components used by popover and sidepane)
+  - snw-ref-area is container for references, including title at top and all refernce info thereafter
