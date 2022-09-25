@@ -10,6 +10,7 @@ import { SidePaneView, VIEW_TYPE_SNW } from "./ux/sidepane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
 import SnwAPI from "./snwApi";
 
+
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;
     appName = "Obsidian42 - Strange New Worlds";
@@ -25,6 +26,8 @@ export default class ThePlugin extends Plugin {
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
 
+        
+        
         const initializeEnvironment = async () => {
             await this.loadSettings();
 

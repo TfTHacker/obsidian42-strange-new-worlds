@@ -23,5 +23,8 @@
     "obsidian": "^0.16.3",
     "tslib": "2.4.0",
     "typescript": "4.8.3"
+  },
+  "dependencies": {
+    "tippy.js": "^6.3.7"
   }
 }

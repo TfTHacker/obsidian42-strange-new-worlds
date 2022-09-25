@@ -42,6 +42,36 @@
     margin-left: 3px;
 }
 
+
+.snw-popup-container {
+    background-color: lightgreen; 
+    overflow-y: scroll; 
+    max-height:400px; 
+    width:400px;
+}
+
+.snw-popup-header {
+    background-color: lightblue;
+    z-index: 1000;
+    position: absolute;
+    top: 0px;
+    width:400px;
+}
+
+.snw-popup-file {
+    background-color: yellow;
+}
+
+.snw-popup-anchor {
+
+}
+
+.snw-popup-markdown-rendering {
+    background-color: lightgrey;
+}
+
+
+
 .snw-sidepane-container {
     height: 100%;
 }
