@@ -1,6 +1,6 @@
 //wrapper element for references area. shared between popover and sidepane
 
-import { getReferencesCache } from "src/indexer";
+import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
 import ThePlugin from "src/main";
 import { Link } from "src/types";
 import { getUIC_Ref_Item } from "./uic-ref-item";
@@ -18,21 +18,31 @@ export const getUIC_Ref_Area = async (refType: string, key: string, link: string
     response += await getUIC_Ref_Title_DivStart(link, isPopover); //get title header for this reference ara
     response += await getUIC_ref_title_DivEnd();                  //get the ending html 
     response += `<div class="snw-ref-area">`;
-    response += await htmlForReferences(key, link);
+    response += await htmlForReferences(refType, key, link);
     response += `</div>`;
     return response;
 }
 
 
-const htmlForReferences = async (key: string, link: string): Promise<string> => {
-    let refCache: Link[] = getReferencesCache()[link];
-    if(refCache === undefined) refCache = getReferencesCache()[thePlugin.app.workspace.activeLeaf.view.file.basename + "#^" + key];            
-    const sortedCache = (await sortRefCache(refCache)).slice(0, thePlugin.settings.displayNumberOfFilesInTooltip);    
+const htmlForReferences = async (refType: string, key: string, link: string): Promise<string> => {
+    console.log("htmlForReferences", "type:" + refType, key, link)
+    
     let response = ``;
 
-    for (const ref of sortedCache) {
-        response += await getUIC_Ref_Item(ref);
+    if(refType==="File") {
+        console.log("file")
+        const allLinks: Link[] = getSnwAllLinksResolutions(); 
+        const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===thePlugin.app.workspace.activeLeaf.view.file.path);
+        console.log("incomingLinks", incomingLinks)
+    } else {
+        let refCache: Link[] = getReferencesCache()[link];
+        if(refCache === undefined) refCache = getReferencesCache()[thePlugin.app.workspace.activeLeaf.view.file.basename + "#^" + key];    
+        const sortedCache = (await sortRefCache(refCache)).slice(0, thePlugin.settings.displayNumberOfFilesInTooltip);    
+        for (const ref of sortedCache) {
+            response += await getUIC_Ref_Item(ref);
+        }
     }
+
 
     return response;
 }

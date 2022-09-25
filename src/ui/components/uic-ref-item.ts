@@ -1,6 +1,6 @@
 import { MarkdownRenderer, Pos, TFile } from "obsidian";
 import ThePlugin from "src/main";
-import { Link } from "../types";
+import { Link } from "../../types";
 
 let thePlugin: ThePlugin;
 

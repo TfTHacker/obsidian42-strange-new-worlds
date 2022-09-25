@@ -11,11 +11,11 @@ export function setPluginVariableForUIC(plugin: ThePlugin) {
 
 export const getUIC_PopOver = async (instance: Instance)=>{
     const {refType, key, link} = await getDataElements(instance);
+    console.log("getUIC_PopOver", refType,key,link)
     let output = "";
     output += `<div class="snw-popover-container">`;
     output += await getUIC_Ref_Area(refType, key, link, true);
     output += `</div>`;
-    console.log(output)
     instance.setContent(output)
 }
 

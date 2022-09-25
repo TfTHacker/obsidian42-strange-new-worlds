@@ -5,11 +5,11 @@ import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } fro
 import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
-import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ux/headerRefCount";
-import { SidePaneView, VIEW_TYPE_SNW } from "./ux/sidepane";
-import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ux/settingsTab";
+import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ui/headerRefCount";
+import { SidePaneView, VIEW_TYPE_SNW } from "./ui/sidepane";
+import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
-import { setPluginVariableForUIC } from "./components/uic-commander";
+import { setPluginVariableForUIC } from "./ui/components/uic-commander";
 
 
 export default class ThePlugin extends Plugin {

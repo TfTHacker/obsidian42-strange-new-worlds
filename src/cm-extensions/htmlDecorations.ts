@@ -1,7 +1,7 @@
 import ThePlugin from "../main";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { getUIC_PopOver } from "src/components/uic-commander";
+import { getUIC_PopOver } from "src/ui/components/uic-commander";
 
 let thePlugin: ThePlugin;
 

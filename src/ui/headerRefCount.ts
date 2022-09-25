@@ -5,7 +5,9 @@ import {Link} from "../types";
 import ThePlugin from "../main";
 import {processHtmlDecorationReferenceEvent} from "../cm-extensions/htmlDecorations";
 import {getSnwAllLinksResolutions} from "../indexer";
-
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css'
+import { getUIC_PopOver } from "./components/uic-commander";
 
 let thePlugin: ThePlugin;
 
@@ -48,16 +50,16 @@ function processHeader(mdView: MarkdownView) {
         return
     }
 
-    const toolTipItemCount = thePlugin.settings.displayNumberOfFilesInTooltip;
-    const fileList = (toolTipItemCount!=0 && incomingLinks.length>0) ?
-                     (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,toolTipItemCount).join("\n") : "";
+    // const toolTipItemCount = thePlugin.settings.displayNumberOfFilesInTooltip;
+    // const fileList = (toolTipItemCount!=0 && incomingLinks.length>0) ?
+    //                  (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,toolTipItemCount).join("\n") : "";
     let snwTitleRefCountDisplayCountEl: HTMLElement = mdView.contentEl.querySelector(".snw-header-count");
 
     // header count is already displayed, just update information.
     if( snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdView.file.basename ) {
         snwTitleRefCountDisplayCountEl.innerText =  " " + incomingLinks.length.toString() + " ";
-        if(fileList!="")
-            snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
+        // if(fileList!="")
+        //     snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
         return
     }
 
@@ -87,12 +89,21 @@ function processHeader(mdView: MarkdownView) {
     wrapper.setAttribute("data-snw-key", mdView.file.basename);
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-link", mdView.file.path);
-    if(fileList!="")
-        wrapper.ariaLabel = fileList + "\n----\nSNW - CLICK for details";
+    // if(fileList!="")
+    //     wrapper.ariaLabel = fileList + "\n----\nSNW - CLICK for details";
     wrapper.onclick = (e : MouseEvent) => {
         e.stopPropagation();
         processHtmlDecorationReferenceEvent(e.target as HTMLElement);
     }
+
+    tippy(wrapper, {
+        interactive: true,
+        appendTo: () => document.body,
+        allowHTML: true,
+        onShow(instance) { setTimeout( async () => {
+            await getUIC_PopOver(instance)
+        }, 1); } 
+    });
 
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
