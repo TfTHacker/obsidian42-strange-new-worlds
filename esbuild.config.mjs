@@ -6,11 +6,21 @@ import { ESLint } from "eslint";
 
 const prod = (process.argv[2] === "production");
 
+const copyFiles = ()=> {
+  fs.copyFile("manifest.json", "build/manifest.json", (err) => {if(err) console.log(err)} );
+  fs.copyFile("src/styles.css", "build/styles.css", (err) => {if(err) console.log(err)} );
+}
+
+
 esbuild.build({
     entryPoints: ["src/main.ts"],
     bundle: true,
     format: "cjs",
-    watch: !prod,
+    watch: {
+      onRebuild(error, result) {
+        copyFiles();
+      },
+    },
     target: "es2018",
     logLevel: "info",
     sourcemap: prod ? false : "inline",
@@ -28,10 +38,13 @@ esbuild.build({
       "@codemirror/view",
       ...builtins,
     ],
+}).then(result => {
+  copyFiles();
 }).catch(() => process.exit(1));
 
-fs.copyFile("manifest.json", "build/manifest.json", (err) => {if(err) console.log(err)} );
-fs.copyFile("src/styles.css", "build/styles.css", (err) => {if(err) console.log(err)} );
+
+copyFiles();
+
 
 // eslint won't slow down the build process, just runs after the build finishes
 (async function eslintTest() {

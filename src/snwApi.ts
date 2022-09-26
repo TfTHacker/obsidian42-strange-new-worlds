@@ -12,13 +12,13 @@ import { Settings } from "./ui/settingsTab";
  */
 export default class SnwAPI {
     plugin: ThePlugin;
-    settings: Settings;
+    settings: Settings; 
     enableDebugging = {
-        CM6Extension: false,
+        CM6Extension: false, 
         PreviewRendering: false,
         LinkCountInHeader: false,
         GutterEmbedCounter: false,
-        HtmlDecorationElements: false,
+        HtmlDecorationElements: false, 
         SidePane: false
     }
 

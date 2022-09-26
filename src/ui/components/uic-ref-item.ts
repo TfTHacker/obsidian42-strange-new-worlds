@@ -9,18 +9,14 @@ export function setPluginVariableUIC_RefItem(plugin: ThePlugin) {
 }
 
 export const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
-    console.log(ref)
    let response = `<div class="snw-ref-item-container">
                         <div class="snw-ref-item-file">
-                        <a  class="snw-ref-item-file-link"
-                            snw-data-line-number="${ref.reference.position.start.line}" 
-                            snw-data-file-name="${ref.sourceFile.path}"
-                            data-href="${ref.sourceFile.path}" 
-                            href="${ref.sourceFile.path}">
-                        ${ref.sourceFile.basename}
-                        </a>
+                        From file: <a class="snw-ref-item-file-link"
+                                snw-data-line-number="${ref.reference.position.start.line}" 
+                                snw-data-file-name="${ref.sourceFile.path}"
+                                data-href="${ref.sourceFile.path}" 
+                                href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a>
                       </div>`;
-        response += `<div>`
         response += `<div class="snw-ref-item-info">`
         response += await grabChunkOfFile(ref.sourceFile, ref.reference.position);        
         response += `</div>`; // END of snw-ref-item-info
@@ -49,8 +45,8 @@ const grabChunkOfFile = async (file: TFile, position: Pos): Promise<string> =>{
     const blockContents = fileContents.substring(startPosition, endPosition);
 
     const el = document.createElement("div");
+    el.setAttribute("uic","uic")  //used to track if this is UIC element. 
     await MarkdownRenderer.renderMarkdown(blockContents, el, file.path, thePlugin)
-
 
     return el.innerHTML
 }

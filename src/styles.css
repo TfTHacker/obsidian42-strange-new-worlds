@@ -5,7 +5,6 @@
     border-radius: 3px;
     border: 1px dotted;
     opacity: 0.7;
-    position: relative !important;
     display: inline;
     padding-left: 1px;
 }
@@ -44,49 +43,63 @@
 
 /* Popover container */
 .snw-popover-container {
-    overflow: hidden;
     min-height: 100px;
-    max-height: 400px;
     width: 300px;
-    border: 1px solid black;
-    overflow-y: scroll; 
+    border-radius: 10px;
+    border: 2px solid var(--background-modifier-border);
+    background-color: var(--background-modifier-border) !important;
+    overflow: hidden;
+    z-index: 1000;
 }
+
 
 /* Shared reference area CSS */
 
-.snw-ref-title {
-    background-color: lightblue !important;
-    height: 20px;
-    width: 100%;
-    position: absolute;
-    top: 0px;
-}
-
 .snw-ref-area {
-    margin-top: 30px;
     display: flex;
-    flex-wrap: wrap;
     flex-direction: column;
-    overflow-y: scroll; 
-    background-color: yellow;
-    border: 1px solid red;     
+    overflow-y: scroll;
+    max-height: 300px !important;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
 }
 
-.snw-ref-item-container {
-    background-color: bisque !important;
+.snw-ref-area::-webkit-scrollbar {
+    display: none;
+} 
+
+.snw-ref-title {
+    color: var(--text-muted);
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+}
+
+
+.snw-ref-item-container { 
+    margin-bottom: 2px;
+    border-top: 1px solid var(--background-modifier-border);
 }
 
 .snw-ref-item-file {
-    background-color: darkcyan !important;
+    padding: 5px;
+    min-height: 16pt;
+    background-color: var(--background-primary-alt);
+    border-bottom: 1px solid var(--background-modifier-border);
+    /* background-color: var(--interactive-hover); */
 }
 
 .snw-ref-item-file-link {
-    color: deeppink;
+    padding: 0px;
+    margin: 0px;
 }
 
 .snw-ref-item-info {
-    background-color: black;
-    color: aliceblue;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
 
@@ -106,15 +119,12 @@
     border-radius: 5px;
     border: 1px dotted;
     opacity: 0.5;
+    padding: 3px;
 }
 
 .snw-header-count {
     text-align: center;
-    min-width: 15px !important;
     height: 0px;
-    padding-top: 3px;
-    /* padding: 5px; */
-    /* border: 1px solid red; */
 }
 
 
@@ -154,7 +164,7 @@
 .snw-sidepane-reference-item-to {
     padding-top: 0px;
     font-size: x-small;
-}
+} 
 
 .snw-sidepane-linenumber {
     font-size: 7pt;
@@ -162,7 +172,6 @@
 }
 
 .snw-embed-special {
-    opacity: 1 !important;
     font-size: 8pt;
 }
  

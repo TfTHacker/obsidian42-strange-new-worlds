@@ -24,8 +24,13 @@ export function setPluginVariableForMarkdownPreviewProcessor(plugin: ThePlugin) 
  */
 export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext) {
 
+    // @ts-ignore
+    if(ctx.remainingNestLevel===4) return;  // This is an attempt to prevent processing of embed files
+
+    if(el.hasAttribute("uic")) return; // this is a custom component, don't render SNW inside it.
+
     if(thePlugin.snwAPI.enableDebugging.PreviewRendering)
-        thePlugin.snwAPI.console("markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext", el, ctx, ctx.getSectionInfo(el))
+        thePlugin.snwAPI.console("markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext,ctx.getSectionInfo", el, ctx, ctx.getSectionInfo(el))
 
     const currentFile = thePlugin.app.vault.fileMap[ctx.sourcePath];
     // check for incompatibility with other plugins
@@ -68,7 +73,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embeds) {
-                    if (value.references.length > 1 && embedKey.endsWith(value.key)) {
+                    if (value.references.length > 0 && embedKey.endsWith(value.key)) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         referenceElement.addClass('snw-embed-preview');
                         element.after(referenceElement);
@@ -83,7 +88,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             if (transformedCache?.headings && headerKey) {
                 const textContext = headerKey.textContent
                 for (const value of transformedCache.headings) 
-                    if (value.references.length > 1 && value.key === textContext) {
+                    if (value.references.length > 0 && value.key === textContext) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         referenceElement.addClass("snw-heading-preview");
                         el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
@@ -96,7 +101,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.links) {
-                    if (value.references.length > 1 && (value.key === link || value.original.includes(link))) {
+                    if (value.references.length > 0 && (value.key === link || value.original.includes(link))) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].reference.link, generateArialLabel(currentFilePath, value), "");
                         referenceElement.addClass('snw-link-preview');
                         element.after(referenceElement);

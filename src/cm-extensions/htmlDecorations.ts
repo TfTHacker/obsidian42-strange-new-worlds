@@ -1,7 +1,7 @@
 import ThePlugin from "../main";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { getUIC_PopOver } from "src/ui/components/uic-commander";
+import { getUIC_Hoverview } from "src/ui/components/uic-hover-view";
 
 let thePlugin: ThePlugin;
 
@@ -36,7 +36,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     element.setAttribute("data-snw-link", link);
     if(attachCSSClass) element.addClass(attachCSSClass);
 
-    element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+    // element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
@@ -46,7 +46,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
         appendTo: () => document.body,
         allowHTML: true,
         onShow(instance) { setTimeout( async () => {
-            await getUIC_PopOver(instance)
+            await getUIC_Hoverview(instance)
         }, 1); } 
     });
 

@@ -9,15 +9,15 @@ import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from
 import { SidePaneView, VIEW_TYPE_SNW } from "./ui/sidepane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
-import { setPluginVariableForUIC } from "./ui/components/uic-commander";
+import { setPluginVariableForUIC } from "./ui/components/uic-hover-view";
 
 
 export default class ThePlugin extends Plugin {
     pluginInitialized = false;
-    appName = "Obsidian42 - Strange New Worlds";
-    appID = "obsidian42-strange-new-worlds";
+    appName = "Obsidian42 - Strange New Worlds"; 
+    appID = "obsidian42-strange-new-worlds";  
 	settings: Settings;
-    lastSelectedReferenceKey : string;
+    lastSelectedReferenceKey : string; 
     lastSelectedReferenceType : string;
     lastSelectedReferenceLink : string;
     snwAPI: SnwAPI;

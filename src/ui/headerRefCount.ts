@@ -7,7 +7,7 @@ import {processHtmlDecorationReferenceEvent} from "../cm-extensions/htmlDecorati
 import {getSnwAllLinksResolutions} from "../indexer";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'
-import { getUIC_PopOver } from "./components/uic-commander";
+import { getUIC_Hoverview } from "./components/uic-hover-view";
 
 let thePlugin: ThePlugin;
 
@@ -101,7 +101,7 @@ function processHeader(mdView: MarkdownView) {
         appendTo: () => document.body,
         allowHTML: true,
         onShow(instance) { setTimeout( async () => {
-            await getUIC_PopOver(instance)
+            await getUIC_Hoverview(instance)
         }, 1); } 
     });
 
