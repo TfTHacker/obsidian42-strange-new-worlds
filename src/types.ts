@@ -46,7 +46,6 @@ export interface Link {
 
 export interface TransformedCachedItem {
     key: string;
-    keyFullPath: string; //full path to referenc
     pos: Pos;
     page: string;
     type: string;

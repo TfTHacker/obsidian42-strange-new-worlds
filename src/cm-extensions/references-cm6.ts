@@ -105,9 +105,9 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 const constructWidgetForInlineReference = (key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
-        if(ref.keyFullPath===key)
+        if(ref.key===key)
             if(ref?.references.length>0)
-                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].reference.link, generateArialLabel(filePath, ref), null);
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), generateArialLabel(filePath, ref), null);
             else
                 return null;
     }

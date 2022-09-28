@@ -112,7 +112,6 @@ export function getCurrentPage(file: TFile): TransformedCache {
         const filePath = file.path.replace(".md","");
         transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => ({
             key: filePath + "#^" + block.id,
-            keyFullPath: block.id,
             pos: block.position,
             page: file.basename,
             type: "block",
@@ -123,7 +122,6 @@ export function getCurrentPage(file: TFile): TransformedCache {
         transformedCache.headings = cachedMetaData.headings.map((header: {heading: string; position: Pos; level: number;}) => ({
             original: "#".repeat(header.level) + " " + header.heading,
             key: stripHeading(header.heading),
-            keyFullPath: stripHeading(header.heading),
             pos: header.position,
             page: file.basename,
             type: "heading",
@@ -141,7 +139,6 @@ export function getCurrentPage(file: TFile): TransformedCache {
             // }
             return {
                 key: link.link,
-                keyFullPath: link.original.replace("[[","").replace("]]",""),
                 original: link.original,
                 type: "link",
                 pos: link.position,
@@ -180,7 +177,6 @@ export function getCurrentPage(file: TFile): TransformedCache {
             // }
             return {
                 key: embed.link,
-                keyFullPath: embed.original.replace("![[","").replace("]]",""),
                 page: file.basename,
                 type: "embed",
                 pos: embed.position,
