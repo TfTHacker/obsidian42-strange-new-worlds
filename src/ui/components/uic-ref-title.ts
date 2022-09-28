@@ -1,7 +1,7 @@
 // the title displayed at the top of a uic-ref-area
 
 export const getUIC_Ref_Title_DivStart = async (link: string, refCount: number, isPopover:boolean): Promise<string> => {
-    return `<div class="snw-ref-title">
+    return `<div class="snw-ref-title" snw-ref-title-link="${link}">
             References for: ${link}`;
 }
 

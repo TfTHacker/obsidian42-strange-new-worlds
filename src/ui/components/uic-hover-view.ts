@@ -16,6 +16,15 @@ export const getUIC_Hoverview = async (instance: Instance)=>{
     output += await getUIC_Ref_Area(refType, key, link, true);
     output += `</div>`;
     instance.setContent(output)
+
+    //event bindings
+    setTimeout( async () => {
+        const titleElement: HTMLElement = document.querySelector(".snw-ref-title");
+        titleElement.onclick = async (e: MouseEvent) => {
+            const link = (e.target as HTMLElement).getAttribute("snw-ref-title-link")
+
+        }
+    }, 200);
 }
 
 export const getUIC_SidePane = async ()=>{
