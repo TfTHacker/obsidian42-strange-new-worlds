@@ -23,59 +23,54 @@ export function getSnwAllLinksResolutions(){
 
 export function buildLinksAndReferences(): void {
     allLinkRsolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
-    const refs = allLinkRsolutions.reduce((acc : {
-        [x : string]: Link[] 
-    }, link : Link) : {
-        [x : string]: Link[]
-    } => {
-        let key = link.reference.link;
-        if (key.includes("/")) {
-            const keyArr = key.split("/");
-            key = keyArr[keyArr.length - 1];
-        }
-        if (!acc[key]) { 
+    const refs = allLinkRsolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
+        const key = link.reference.link;
+        // if (key.includes("/")) {
+        //     const keyArr = key.split("/");
+        //     key = keyArr[keyArr.length - 1];
+        // }
+        if (!acc[key]) // test if key exists, if not create it
             acc[key] = [];
-        }
-        if (acc[key]) {
-            acc[key].push(link);
-        }
+        // if (acc[key])
+
+        acc[key].push(link);
         return acc;
     }, {});
-    const allLinks = Object.entries(thePlugin.app.metadataCache.getLinks()).reduce((acc, [key, links]) => {
-        links.forEach((link : {
-            link: string;
-            original: string;
-            position: Pos;
-        }) : void => {
-            if (link.original.startsWith("[[#") || link.original.startsWith("![[#")) {
-                const newLink: Link = {
-                    reference: {
-                        link: link.link,
-                        displayText: link.link,
-                        position: link.position
-                    },
-                    resolvedFile: thePlugin.app.vault.getAbstractFileByPath(key) as TFile,
-                    resolvedPaths: [link.link],
-                    sourceFile: thePlugin.app.vault.getAbstractFileByPath(key) as TFile
-                };
-                acc.push(newLink);
-            }
-        });
-        return acc;
-    }, []);
-    allLinks.forEach((link : Link) => {
-        if (link.sourceFile) {
-            const key = `${link.sourceFile.basename}${link.reference.link}`;
-            if (! refs[key]) {
-                refs[key] = [];
-            }
-            if (refs[key]) {
-                refs[key].push(link);
-            }
-        }
-    });
+    
+    // const allLinks = Object.entries(thePlugin.app.metadataCache.getLinks()).reduce((acc, [key, links]) => {
+    //     links.forEach((link: { link: string; original: string; position: Pos; }) : void => {
+    //         const abstractFilePath = thePlugin.app.vault.getAbstractFileByPath(key) as TFile;
+    //         if (link.original.startsWith("[[#") || link.original.startsWith("![[#")) {
+    //             const newLink: Link = {
+    //                 reference: {
+    //                     link: link.link,
+    //                     displayText: link.link,
+    //                     position: link.position
+    //                 },
+    //                 resolvedFile: abstractFilePath ,
+    //                 resolvedPaths: [link.link],
+    //                 sourceFile: abstractFilePath
+    //             };
+    //             acc.push(newLink);
+    //         }
+    //     });
+    //     return acc;
+    // }, []);
+
+    // allLinks.forEach((link : Link) => {
+    //     if (link.sourceFile) {
+    //         const key = `${link.sourceFile.basename}${link.reference.link}`;
+    //         if (! refs[key]) {
+    //             refs[key] = [];
+    //         }
+    //         if (refs[key]) {
+    //             refs[key].push(link);
+    //         }
+    //     }
+    // });
 
     references = refs;
+    window.refs=references
     lastUpdateToReferences = Date.now();
 }
 
@@ -111,22 +106,21 @@ export function getCurrentPage(file: TFile): TransformedCache {
         }
         return acc;
     }, []);
+
+
     if (cachedMetaData?.blocks) {
+        const filePath = file.path.replace(".md","");
         transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => ({
-            key: block.id,
+            key: filePath + "#^" + block.id,
             keyFullPath: block.id,
             pos: block.position,
             page: file.basename,
             type: "block",
-            references: references[`${file.basename}#^${block.id}`] || []
+            references: references[ filePath + "#^" + block.id ] || []
         }));
     }
     if (cachedMetaData?.headings) {
-        transformedCache.headings = cachedMetaData.headings.map((header : {
-            heading: string;
-            position: Pos;
-            level: number;
-        }) => ({
+        transformedCache.headings = cachedMetaData.headings.map((header: {heading: string; position: Pos; level: number;}) => ({
             original: "#".repeat(header.level) + " " + header.heading,
             key: stripHeading(header.heading),
             keyFullPath: stripHeading(header.heading),
@@ -141,10 +135,10 @@ export function getCurrentPage(file: TFile): TransformedCache {
     // }
     if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
-            if (link.link.includes("/")) {
-                const keyArr = link.link.split("/");
-                link.link = keyArr[keyArr.length - 1];
-            }
+            // if (link.link.includes("/")) {
+            //     const keyArr = link.link.split("/");
+            //     link.link = keyArr[keyArr.length - 1];
+            // }
             return {
                 key: link.link,
                 keyFullPath: link.original.replace("[[","").replace("]]",""),
@@ -157,18 +151,18 @@ export function getCurrentPage(file: TFile): TransformedCache {
         });
         if (transformedCache.links) {
             transformedCache.links = transformedCache.links.map((link) => {
-                if (link.key.includes("/")) {
-                    const keyArr = link.key.split("/");
-                    link.key = keyArr[keyArr.length - 1];
-                }
+                // if (link.key.includes("/")) {
+                //     const keyArr = link.key.split("/");
+                //     link.key = keyArr[keyArr.length - 1];
+                // }
                 if (link.key.includes("#") && !link.key.includes("#^")) {
                     const heading = headings.filter((heading : string) => stripHeading(heading) === link.key.split("#")[1])[0];
                     link.original = heading ? heading : undefined;
                 }
-                if (link.key.startsWith("#^") || link.key.startsWith("#")) {
-                    link.key = `${link.page}${link.key}`;
-                    link.references = references[link.key] || [];
-                }
+                // if (link.key.startsWith("#^") || link.key.startsWith("#")) {
+                //     link.key = `${link.page}${link.key}`;
+                //     link.references = references[link.key] || [];
+                // }
                 return link;
             });
             // remove duplicate links
@@ -180,10 +174,10 @@ export function getCurrentPage(file: TFile): TransformedCache {
 
     if (cachedMetaData?.embeds) {
         transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
-            if (embed.link.includes("/")) {
-                const keyArr = embed.link.split("/");
-                embed.link = keyArr[keyArr.length - 1];
-            }
+            // if (embed.link.includes("/")) {
+            //     const keyArr = embed.link.split("/");
+            //     embed.link = keyArr[keyArr.length - 1];
+            // }
             return {
                 key: embed.link,
                 keyFullPath: embed.original.replace("![[","").replace("]]",""),

@@ -35,7 +35,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 
     constructor(public view: EditorView) {
         if(thePlugin.settings.enableRenderingBlockIdInLivePreview) 
-            this.regxPattern = "(\\s\\^)(\\w+)$"; 
+            this.regxPattern = "(\\s\\^)(\\S+)$"; 
         if(thePlugin.settings.enableRenderingLinksInLivePreview) 
             this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "(?<=[^!]|^)\\[\\[(.*?)\\]\\]";
         if(thePlugin.settings.enableRenderingEmbedsInLivePreview)
