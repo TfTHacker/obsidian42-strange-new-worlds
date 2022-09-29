@@ -13,7 +13,16 @@ export function setPluginVariableUIC_RefArea(plugin: ThePlugin) {
     thePlugin = plugin;
 }
 
-export const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, isHoverView:boolean): Promise<string> => {
+export /**
+ *  Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
+ *
+ * @param {string} refType
+ * @param {string} key
+ * @param {string} filePath
+ * @param {boolean} isHoverView
+ * @return {*}  {Promise<string>}
+ */
+const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, isHoverView:boolean): Promise<string> => {
     
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
 
@@ -27,6 +36,14 @@ export const getUIC_Ref_Area = async (refType: string, key: string, filePath: st
 }
 
 
+/**
+ * Creates a DIV for a colection of reference blocks to be displayed
+ *
+ * @param {string} refType
+ * @param {string} key
+ * @param {string} filePath
+ * @return {*}  {Promise<{response: string, refCount: number}>}
+ */
 const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{response: string, refCount: number}> => {
     
     let responseContent = ``;

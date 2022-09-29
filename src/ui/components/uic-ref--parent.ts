@@ -12,7 +12,13 @@ export function setPluginVariableForUIC(plugin: ThePlugin) {
     setPluginVariableUIC_RefItem(plugin);
 }
 
-export const getUIC_Hoverview = async (instance: Instance)=>{
+
+export /**
+ * Starting point for the hover popup control. Calls into uic-ref-area, then uic-ref-title and uic-ref-item
+ *
+ * @param {Instance} instance   the Tippy instance. Tippy provides the floating container.
+ */
+const getUIC_Hoverview = async (instance: Instance)=>{
     const {refType, key, filePath} = await getDataElements(instance);
     let output = "";
     output += `<div class="snw-popover-container">`;
@@ -34,7 +40,16 @@ export const getUIC_Hoverview = async (instance: Instance)=>{
     }, 300);
 }
 
-export const getUIC_SidePane = async (refType: string, key: string, filePath: string): Promise<string> =>{
+
+export /**
+ *  Loads the references into the side pane, using the same logic as the HoverView 
+ *
+ * @param {string} refType
+ * @param {string} key
+ * @param {string} filePath
+ * @return {*}  {Promise<string>}
+ */
+const getUIC_SidePane = async (refType: string, key: string, filePath: string): Promise<string> =>{
     let output = "";
     output += `<div class="snw-sidepane-container">`;
     output += await getUIC_Ref_Area(refType, key, filePath, false);
@@ -48,6 +63,11 @@ export const getUIC_SidePane = async (refType: string, key: string, filePath: st
 }
 
 
+/**
+ * Creates event handlers for components of the HoverView and sidepane
+ *
+ * @param {boolean} isHoverView
+ */
 const setFileLinkHandlers = async (isHoverView: boolean)=>{
     const linksToFiles: NodeList = document.querySelectorAll(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
     linksToFiles.forEach((node: Element)=>{
@@ -55,14 +75,9 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
             node.setAttribute("snw-has-handler","true"); //prevent the event from being added twice
             node.addEventListener("click", async (e: MouseEvent)=>{
                 e.preventDefault(); 
-                console.log(e)
-                
                 const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
-                console.log("handlerElement",handlerElement)
-
                 const LineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
                 const filePath = handlerElement.getAttribute("snw-data-file-name");
-                console.log("click", LineNu, filePath)
 
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                 
@@ -77,6 +92,7 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
 
                 if(LineNu>-1) {
                     setTimeout(() => {
+                        // jumps to the line of the file where the reference is located
                         thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
                     }, 400);
                 }
@@ -86,6 +102,12 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
 }
 
 
+/**
+ * Utility function to extact key data points from the Tippy instance
+ *
+ * @param {Instance} instance
+ * @return {*}  {Promise<{refType: string; key: string; filePath: string}>}
+ */
 const getDataElements = async (instance: Instance): Promise<{refType: string; key: string; filePath: string}> => {
     const parentElement: ReferenceElement = instance.reference;
     const refType   = parentElement.getAttribute("data-snw-type");

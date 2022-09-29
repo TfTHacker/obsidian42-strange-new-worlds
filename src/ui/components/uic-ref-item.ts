@@ -8,7 +8,13 @@ export function setPluginVariableUIC_RefItem(plugin: ThePlugin) {
     thePlugin = plugin;
 }
 
-export const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
+export /**
+ * Creats an individual reference item
+ *
+ * @param {Link} ref
+ * @return {*}  {Promise<string>}
+ */
+const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
     let response = "";
         response += `<div class="snw-ref-item-info" 
                           snw-data-line-number="${ref.reference.position.start.line}" 
@@ -20,7 +26,13 @@ export const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
 }
 
 
-
+/**
+ * Grabs a block from a file, then runs it through a markdown render
+ *
+ * @param {TFile} file
+ * @param {Pos} position
+ * @return {*}  {Promise<string>}
+ */
 const grabChunkOfFile = async (file: TFile, position: Pos): Promise<string> =>{
     const fileContents = await thePlugin.app.vault.cachedRead(file)
     const cachedMetaData = thePlugin.app.metadataCache.getFileCache(file);
