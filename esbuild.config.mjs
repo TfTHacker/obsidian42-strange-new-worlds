@@ -18,6 +18,7 @@ esbuild.build({
     format: "cjs",
     watch: {
       onRebuild(error, result) {
+        if(prod==="production") return true;
         copyFiles();
       },
     },

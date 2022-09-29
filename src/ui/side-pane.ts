@@ -30,8 +30,6 @@ export class SidePaneView extends ItemView {
         const key = this.thePlugin.lastSelectedReferenceKey;
         const filePath = this.thePlugin.lastSelectedReferenceFilePath;
 
-        this.thePlugin.snwAPI.enableDebugging.SidePane = true; /// REMOVE REMOVE REMOVE
-
         if(this.thePlugin.snwAPI.enableDebugging.SidePane) {
             this.thePlugin.snwAPI.console("sidepane.open() refType, key, filePath", refType, key, filePath);
             this.thePlugin.snwAPI.console("sidepane.open() getReferencesCache()", getReferencesCache());

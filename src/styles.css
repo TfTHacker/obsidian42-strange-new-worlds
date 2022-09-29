@@ -123,6 +123,8 @@
     padding-right: 5px;
     padding-top: 0px;
     padding-bottom: 0px;
+    border-bottom: 1px solid var(--background-modifier-border) !important;
+
 }
 
 .snw-ref-item-info a {
