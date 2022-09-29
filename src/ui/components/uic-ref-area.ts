@@ -14,7 +14,9 @@ export function setPluginVariableUIC_RefArea(plugin: ThePlugin) {
 }
 
 export const getUIC_Ref_Area = async (refType: string, key: string, link: string, isPopover:boolean): Promise<string> => {
+    
     const refAreaItems = await getRefAreaItems(refType, key, link);
+
     let response = "";
     response += await getUIC_Ref_Title_DivStart(link, refAreaItems.refCount, isPopover); //get title header for this reference ara
     response += await getUIC_ref_title_DivEnd();                  //get the ending html 
@@ -38,7 +40,7 @@ const getRefAreaItems = async (refType: string, key: string, link: string): Prom
             responseContent += await getUIC_Ref_Item(ref);
         }
     } else {
-        let refCache: Link[] = getReferencesCache()[link];
+        let refCache: Link[] = getReferencesCache()[key];
         if(refCache === undefined) refCache = getReferencesCache()[link + "#^" + key];    
         const sortedCache = (await sortRefCache(refCache)).slice(0, thePlugin.settings.displayNumberOfFilesInTooltip);    
         countOfRefs = sortedCache.length;

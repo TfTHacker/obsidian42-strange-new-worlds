@@ -103,8 +103,6 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
  * @return {*}  {InlineReferenceWidget}
  */
 const constructWidgetForInlineReference = (key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
-    console.log("constructWidgetForInlineReference key, filePath", key, filePath)
-    console.log(references)
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
         if(ref.key===key)
@@ -143,9 +141,6 @@ const constructWidgetForInlineReference = (key: string, references: TransformedC
     // }
 
     toDOM() {
-        console.log("ToDOm")
-        console.log(this.referenceCount, this.referenceType, this.key, this.link, this.addCssClass);
-
         return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.addCssClass);
     }
 
