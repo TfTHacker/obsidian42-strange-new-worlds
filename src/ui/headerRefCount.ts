@@ -58,8 +58,6 @@ function processHeader(mdView: MarkdownView) {
     // header count is already displayed, just update information.
     if( snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdView.file.basename ) {
         snwTitleRefCountDisplayCountEl.innerText =  " " + incomingLinks.length.toString() + " ";
-        // if(fileList!="")
-        //     snwTitleRefCountDisplayCountEl.ariaLabel = "Strange New Worlds\n" + fileList + "\n----\n-->Click for more details";
         return
     }
 
@@ -89,8 +87,6 @@ function processHeader(mdView: MarkdownView) {
     wrapper.setAttribute("data-snw-key", mdView.file.basename);
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-link", mdView.file.path);
-    // if(fileList!="")
-    //     wrapper.ariaLabel = fileList + "\n----\nSNW - CLICK for details";
     wrapper.onclick = (e : MouseEvent) => {
         e.stopPropagation();
         processHtmlDecorationReferenceEvent(e.target as HTMLElement);

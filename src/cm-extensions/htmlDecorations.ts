@@ -20,13 +20,12 @@ export function setPluginVariableForHtmlDecorations(plugin: ThePlugin) {
  * @param {string} referenceType    The type of references (block, embed, link, header)
  * @param {string} key              Unique key used to identify this reference based on its type
  * @param {string} link             The link for the unique key
- * @param {string} ariaLabel        the help tip shown when mouse hovers over the box
  * @param {string} attachCSSClass   if special class is need for the elment
  * @return {*}  {HTMLElement}
  */
-export function htmlDecorationForReferencesElement(count: number, referenceType: string, key: string, link: string, ariaLabel: string, attachCSSClass: string): HTMLElement {
+export function htmlDecorationForReferencesElement(count: number, referenceType: string, key: string, link: string, attachCSSClass: string): HTMLElement {
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, link, arialLabel)", thePlugin, count,referenceType,key,link,ariaLabel);
+        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, link)", thePlugin, count,referenceType,key,link);
 
     const element = document.createElement("div")
     element.className = "snw-reference snw-" + referenceType;

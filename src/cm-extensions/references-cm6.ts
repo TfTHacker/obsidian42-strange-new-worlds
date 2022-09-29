@@ -1,7 +1,6 @@
 import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType} from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { getCurrentPage } from "src/indexer";
-import { generateArialLabel } from "./references-preview";
 import { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
 import ThePlugin from "src/main";
@@ -70,6 +69,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                     key = match[0].replaceAll("#","").substring(1);
                     transformedCachedItem = transformedCache.headings
                 }
+
                 if(key!="") {
                     wdgt = constructWidgetForInlineReference(key, transformedCachedItem, mdView.file.path);
                     if(wdgt!=null)
@@ -103,11 +103,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
  * @return {*}  {InlineReferenceWidget}
  */
 const constructWidgetForInlineReference = (key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
+    console.log("constructWidgetForInlineReference key, filePath", key, filePath)
+    console.log(references)
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
         if(ref.key===key)
             if(ref?.references.length>0)
-                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), generateArialLabel(filePath, ref), null);
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null);
             else
                 return null;
     }
@@ -125,16 +127,14 @@ const constructWidgetForInlineReference = (key: string, references: TransformedC
     referenceType: string;
     key: string;    //a unique identifer for the reference
     link: string;
-    arialLabel: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
 
-    constructor(refCount: number, cssclass: string, key:string, link: string, arialLabel: string, addCSSClass: string ) {
+    constructor(refCount: number, cssclass: string, key:string, link: string, addCSSClass: string ) {
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
         this.key = key;
         this.link = link;
-        this.arialLabel = arialLabel;
         this.addCssClass = addCSSClass;
     }
 
@@ -143,7 +143,10 @@ const constructWidgetForInlineReference = (key: string, references: TransformedC
     // }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel, this.addCssClass);
+        console.log("ToDOm")
+        console.log(this.referenceCount, this.referenceType, this.key, this.link, this.addCssClass);
+
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.addCssClass);
     }
 
     destroy() {}

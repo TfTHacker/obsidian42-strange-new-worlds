@@ -29,7 +29,6 @@ export interface ReferenceLocation {
     count: number;
     key: string; //identifier for the reference
     link: string; // full link to reference
-    arialLabel: string; 
     attachClass: string; // allows a custom class to be attached when processing cm6 references
 } 
 

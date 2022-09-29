@@ -4,7 +4,6 @@ import { editorInfoField } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/cm-extensions/htmlDecorations";
 import { getCurrentPage } from "src/indexer";
 import ThePlugin from "src/main";
-import {generateArialLabel} from "./references-preview";
 
 let thePlugin: ThePlugin;
 
@@ -17,21 +16,19 @@ const referenceGutterMarker = class extends GutterMarker {
     referenceType: string;
     key: string;    //a unique identifer for the reference
     link: string;
-    arialLabel: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
 
-    constructor(refCount: number, cssclass: string, key:string, link: string, arialLabel: string, addCSSClass: string){
+    constructor(refCount: number, cssclass: string, key:string, link: string, addCSSClass: string){
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
         this.key = key;
         this.link = link;
-        this.arialLabel = arialLabel;
         this.addCssClass = addCSSClass;
     }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.arialLabel, this.addCssClass);
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.link, this.addCssClass);
     }
 }
 
@@ -66,10 +63,9 @@ const ReferenceGutterExtension = gutter({
                             if(refOriginalLink.substring(0,1)!="!") 
                                 refOriginalLink = "!" + refOriginalLink;
                             if( editorView.state.doc.lineAt(line.from).text.trim() ===  refOriginalLink) {
-                                const arialLabel = generateArialLabel(mdView.file.path, ref);
                                 if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
-                                    thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, arialLabel, "snw-embed-special" );
-                                return new referenceGutterMarker(ref.references.length, "embed", ref.key, ref.key, arialLabel, "snw-embed-special");
+                                    thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, "snw-embed-special" );
+                                return new referenceGutterMarker(ref.references.length, "embed", ref.key, ref.key, "snw-embed-special");
                             }
                         }
                     }
