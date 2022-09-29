@@ -59,12 +59,12 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 const filePath = (e.target as HTMLElement).getAttribute("snw-data-file-name");
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
 
-                if(e.shiftKey)  
-                    thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
-                else if(e.ctrlKey || e.metaKey)  
-                    thePlugin.app.workspace.getLeaf("window").openFile(fileT);
-                else if(e.altKey)
+                if((e.ctrlKey || e.metaKey) && e.altKey)  
                     thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT);
+                else if(e.ctrlKey || e.metaKey)  
+                    thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
+                else if(e.altKey)
+                    thePlugin.app.workspace.getLeaf("window").openFile(fileT);
                 else 
                     thePlugin.app.workspace.getLeaf(false).openFile(fileT);
 
