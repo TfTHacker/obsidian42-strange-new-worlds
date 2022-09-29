@@ -56,7 +56,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 let wdgt: InlineReferenceWidget = null;
 
                 if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
-                    key = match[0].replace(" ^","");
+                    key = mdView.file.path.replace(".md","") + match[0].replace(" ^","#^"); //change this to match the references cache
                     transformedCachedItem = transformedCache.blocks;
                 } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
                     key = match[0].replace("![[","").replace("]]","");
