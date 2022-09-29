@@ -47,36 +47,23 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     }
 
     // get the unique file names for files in thie refeernces
-    // const uniqueFileKeys = new Set();
-    // linksToLoop.forEach(element => uniqueFileKeys.add(element.sourceFile.path.replace(".md","")));
-
-    // console.log( uniqueFileKeys)
-
-    // let uniqueFileLinks: Link[] = [];
-
     const uniqueFileKeys: Link[] = Array.from(new Set(linksToLoop.map(a => a.sourceFile.path)))
             .map(file_path => { return linksToLoop.find(a => a.sourceFile.path === file_path)}
         );
 
-    console.log("uniqueFileLinks",uniqueFileKeys)
-
     for (const file_path of uniqueFileKeys ) {
-        console.log(file_path.sourceFile.path)
             responseContent += `<div class="snw-ref-item-container">
-                                <div class="snw-ref-item-file">
-                                From file: <a class="snw-ref-item-file-link"
-                                        snw-data-line-number="${file_path.reference.position.start.line}" 
+                                     <div class="snw-ref-item-file"
+                                        snw-data-line-number="${-1}" 
                                         snw-data-file-name="${file_path.sourceFile.path}"
                                         data-href="${file_path.sourceFile.path}" 
-                                        href="${file_path.sourceFile.path}">${file_path.sourceFile.basename}</a>
-                                </div>`
+                                        href="${file_path.sourceFile.path}">${file_path.sourceFile.basename}</div>`;
             for (const ref of linksToLoop) {
                 if(file_path.sourceFile.path===ref.sourceFile.path) {
                     responseContent += await getUIC_Ref_Item(ref);
                 }
             }
             responseContent += `</div>`;
-  
     }
 
 

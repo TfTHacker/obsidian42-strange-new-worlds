@@ -2,7 +2,7 @@
 
 export const getUIC_Ref_Title_DivStart = async (key: string, filePath: string, refCount: number, isPopover:boolean): Promise<string> => {
     const titleClass = isPopover ? "snw-ref-title-popover" : "snw-ref-title-side-pane";
-    return `<div class="${titleClass}" snw-ref-title-key="${key}" snw-ref-title-filepath="${filePath}">
+    return `<div class="${titleClass}" snw-ref-title-key="${key}" snw-data-file-name="${filePath}">
             References for: ${key}`;
 }
 

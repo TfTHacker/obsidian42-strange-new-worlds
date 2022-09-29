@@ -9,19 +9,13 @@ export function setPluginVariableUIC_RefItem(plugin: ThePlugin) {
 }
 
 export const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
-//    let response = `<div class="snw-ref-item-container">
-//                         <div class="snw-ref-item-file">
-//                         From file: <a class="snw-ref-item-file-link"
-//                                 snw-data-line-number="${ref.reference.position.start.line}" 
-//                                 snw-data-file-name="${ref.sourceFile.path}"
-//                                 data-href="${ref.sourceFile.path}" 
-//                                 href="${ref.sourceFile.path}">${ref.sourceFile.basename}</a>
-//                       </div>`;
     let response = "";
-        response += `<div class="snw-ref-item-info">`
-        response += await grabChunkOfFile(ref.sourceFile, ref.reference.position);        
+        response += `<div class="snw-ref-item-info" 
+                          snw-data-line-number="${ref.reference.position.start.line}" 
+                          snw-data-file-name="${ref.sourceFile.path}"
+                          data-href="${ref   .sourceFile.path}">`;
+        response += await grabChunkOfFile(ref.sourceFile, ref.reference.position);
         response += `</div>`; // END of snw-ref-item-info
-        // response += `</div>`; // END of snw-ref-item-container
         return response;
 }
 

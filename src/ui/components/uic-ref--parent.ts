@@ -49,16 +49,23 @@ export const getUIC_SidePane = async (refType: string, key: string, filePath: st
 
 
 const setFileLinkHandlers = async (isHoverView: boolean)=>{
-    const linksToFiles: NodeList = document.querySelectorAll(".snw-ref-item-file-link");
+    const linksToFiles: NodeList = document.querySelectorAll(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
     linksToFiles.forEach((node: Element)=>{
         if(!node.getAttribute("snw-has-handler")){
             node.setAttribute("snw-has-handler","true"); //prevent the event from being added twice
             node.addEventListener("click", async (e: MouseEvent)=>{
                 e.preventDefault(); 
-                const LineNu = Number((e.target as HTMLElement).getAttribute("snw-data-line-number"));
-                const filePath = (e.target as HTMLElement).getAttribute("snw-data-file-name");
-                const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
+                console.log(e)
+                
+                const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
+                console.log("handlerElement",handlerElement)
 
+                const LineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
+                const filePath = handlerElement.getAttribute("snw-data-file-name");
+                console.log("click", LineNu, filePath)
+
+                const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
+                
                 if((e.ctrlKey || e.metaKey) && e.altKey)  
                     thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT);
                 else if(e.ctrlKey || e.metaKey)  
@@ -68,9 +75,11 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 else 
                     thePlugin.app.workspace.getLeaf(false).openFile(fileT);
 
-                setTimeout(() => {
-                    thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
-                }, 200);
+                if(LineNu>-1) {
+                    setTimeout(() => {
+                        thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
+                    }, 400);
+                }
             })
         }
     })
