@@ -7,7 +7,7 @@ import {processHtmlDecorationReferenceEvent} from "../cm-extensions/htmlDecorati
 import {getSnwAllLinksResolutions} from "../indexer";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'
-import { getUIC_Hoverview } from "./components/uic-hover-view";
+import { getUIC_Hoverview } from "./components/uic-ref--parent";
 
 let thePlugin: ThePlugin;
 

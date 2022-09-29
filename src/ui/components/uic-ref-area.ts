@@ -13,12 +13,12 @@ export function setPluginVariableUIC_RefArea(plugin: ThePlugin) {
     thePlugin = plugin;
 }
 
-export const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, isPopover:boolean): Promise<string> => {
+export const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, isHoverView:boolean): Promise<string> => {
     
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
 
     let response = "";
-    response += await getUIC_Ref_Title_DivStart(key, filePath, refAreaItems.refCount, isPopover); //get title header for this reference ara
+    response += await getUIC_Ref_Title_DivStart(key, filePath, refAreaItems.refCount, isHoverView); //get title header for this reference ara
     response += await getUIC_ref_title_DivEnd();                  //get the ending html 
     response += `<div class="snw-ref-area">`;
     response += refAreaItems.response;

@@ -6,10 +6,10 @@ import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorat
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
 import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ui/headerRefCount";
-import { SidePaneView, VIEW_TYPE_SNW } from "./ui/sidepane";
+import { SidePaneView, VIEW_TYPE_SNW } from "./ui/side-pane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
-import { setPluginVariableForUIC } from "./ui/components/uic-hover-view";
+import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
 
 
 export default class ThePlugin extends Plugin {
@@ -17,17 +17,15 @@ export default class ThePlugin extends Plugin {
     appName = "Obsidian42 - Strange New Worlds"; 
     appID = "obsidian42-strange-new-worlds";  
 	settings: Settings;
-    lastSelectedReferenceKey : string; 
     lastSelectedReferenceType : string;
-    lastSelectedReferenceLink : string;
+    lastSelectedReferenceKey : string; 
+    lastSelectedReferenceFilePath : string;
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
-
-        
         
         const initializeEnvironment = async () => {
             await this.loadSettings();
@@ -97,10 +95,10 @@ export default class ThePlugin extends Plugin {
         setHeaderWithReferenceCounts();
     }
 
-    async activateView(key : string, refType : string, link : string) {
+    async activateView(refType: string, key: string, filePath: string) {
         this.lastSelectedReferenceKey = key;
         this.lastSelectedReferenceType = refType;
-        this.lastSelectedReferenceLink = link;
+        this.lastSelectedReferenceFilePath = filePath;
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
         await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
         this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);

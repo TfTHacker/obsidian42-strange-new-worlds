@@ -1,7 +1,7 @@
 import ThePlugin from "../main";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { getUIC_Hoverview } from "src/ui/components/uic-hover-view";
+import { getUIC_Hoverview } from "src/ui/components/uic-ref--parent";
 
 let thePlugin: ThePlugin;
 
@@ -30,12 +30,12 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     const element = document.createElement("div")
     element.className = "snw-reference snw-" + referenceType;
     element.innerText= " " + count.toString() + " ";
-    element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-type", referenceType);
-    element.setAttribute("data-snw-filePath", filePath);
+    element.setAttribute("data-snw-key", key);
+    element.setAttribute("data-snw-filepath", filePath);
     if(attachCSSClass) element.addClass(attachCSSClass);
 
-    // element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+    element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
@@ -53,13 +53,13 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
 }
 
 export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
-    const key = target.getAttribute("data-snw-key");
     const refType = target.getAttribute("data-snw-type");
+    const key = target.getAttribute("data-snw-key");
     const filePath = target.getAttribute("data-snw-filepath")
 
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, key, refType, filePath", target,key,refType, filePath);
 
-    thePlugin.activateView(key, refType, filePath);
+    thePlugin.activateView(refType, key, filePath);
 
 }
