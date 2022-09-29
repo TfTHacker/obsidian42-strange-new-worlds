@@ -13,12 +13,12 @@ export function setPluginVariableUIC_RefArea(plugin: ThePlugin) {
     thePlugin = plugin;
 }
 
-export const getUIC_Ref_Area = async (refType: string, key: string, link: string, isPopover:boolean): Promise<string> => {
+export const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, isPopover:boolean): Promise<string> => {
     
-    const refAreaItems = await getRefAreaItems(refType, key, link);
+    const refAreaItems = await getRefAreaItems(refType, key, filePath);
 
     let response = "";
-    response += await getUIC_Ref_Title_DivStart(link, refAreaItems.refCount, isPopover); //get title header for this reference ara
+    response += await getUIC_Ref_Title_DivStart(key, filePath, refAreaItems.refCount, isPopover); //get title header for this reference ara
     response += await getUIC_ref_title_DivEnd();                  //get the ending html 
     response += `<div class="snw-ref-area">`;
     response += refAreaItems.response;
@@ -27,21 +27,21 @@ export const getUIC_Ref_Area = async (refType: string, key: string, link: string
 }
 
 
-const getRefAreaItems = async (refType: string, key: string, link: string): Promise<{response: string, refCount: number}> => {
+const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{response: string, refCount: number}> => {
     
     let responseContent = ``;
     let countOfRefs = 0;
 
     if(refType==="File") {
         const allLinks: Link[] = getSnwAllLinksResolutions(); 
-        const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===link);
+        const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===filePath);
         countOfRefs = incomingLinks.length;
         for (const ref of incomingLinks) {
             responseContent += await getUIC_Ref_Item(ref);
         }
     } else {
         let refCache: Link[] = getReferencesCache()[key];
-        if(refCache === undefined) refCache = getReferencesCache()[link + "#^" + key];    
+        if(refCache === undefined) refCache = getReferencesCache()[filePath + "#^" + key];    
         const sortedCache = (await sortRefCache(refCache)).slice(0, thePlugin.settings.displayNumberOfFilesInTooltip);    
         countOfRefs = sortedCache.length;
         for (const ref of sortedCache) {

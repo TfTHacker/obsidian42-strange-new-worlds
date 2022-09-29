@@ -10,10 +10,10 @@ export function setPluginVariableForUIC(plugin: ThePlugin) {
 }
 
 export const getUIC_Hoverview = async (instance: Instance)=>{
-    const {refType, key, link} = await getDataElements(instance);
+    const {refType, key, filePath} = await getDataElements(instance);
     let output = "";
     output += `<div class="snw-popover-container">`;
-    output += await getUIC_Ref_Area(refType, key, link, true);
+    output += await getUIC_Ref_Area(refType, key, filePath, true);
     output += `</div>`;
     instance.setContent(output)
 
@@ -21,8 +21,8 @@ export const getUIC_Hoverview = async (instance: Instance)=>{
     setTimeout( async () => {
         const titleElement: HTMLElement = document.querySelector(".snw-ref-title");
         titleElement.onclick = async (e: MouseEvent) => {
-            // const link = (e.target as HTMLElement).getAttribute("snw-ref-title-link")
-
+            const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
+            const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
         }
     }, 200);
 }
@@ -31,10 +31,10 @@ export const getUIC_SidePane = async ()=>{
     
 }
 
-const getDataElements = async (instance: Instance): Promise<{refType: string; key: string; link: string}> => {
+const getDataElements = async (instance: Instance): Promise<{refType: string; key: string; filePath: string}> => {
     const parentElement: ReferenceElement = instance.reference;
     const refType   = parentElement.getAttribute("data-snw-type");
     const key       = parentElement.getAttribute("data-snw-key");
-    const link      = parentElement.getAttribute("data-snw-link")
-    return { refType: refType, key: key, link: link};
+    const path      = parentElement.getAttribute("data-snw-filepath")
+    return { refType: refType, key: key, filePath: path};
 }

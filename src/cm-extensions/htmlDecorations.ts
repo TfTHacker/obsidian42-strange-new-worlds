@@ -19,20 +19,20 @@ export function setPluginVariableForHtmlDecorations(plugin: ThePlugin) {
  * @param {number} count            Number to show in the box
  * @param {string} referenceType    The type of references (block, embed, link, header)
  * @param {string} key              Unique key used to identify this reference based on its type
- * @param {string} link             The link for the unique key
+ * @param {string} filePath         File path in file in vault
  * @param {string} attachCSSClass   if special class is need for the elment
  * @return {*}  {HTMLElement}
  */
-export function htmlDecorationForReferencesElement(count: number, referenceType: string, key: string, link: string, attachCSSClass: string): HTMLElement {
+export function htmlDecorationForReferencesElement(count: number, referenceType: string, key: string, filePath: string, attachCSSClass: string): HTMLElement {
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, link)", thePlugin, count,referenceType,key,link);
+        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, filePath)", thePlugin, count,referenceType,key,filePath);
 
     const element = document.createElement("div")
     element.className = "snw-reference snw-" + referenceType;
     element.innerText= " " + count.toString() + " ";
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-type", referenceType);
-    element.setAttribute("data-snw-link", link);
+    element.setAttribute("data-snw-filePath", filePath);
     if(attachCSSClass) element.addClass(attachCSSClass);
 
     // element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
@@ -55,11 +55,11 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
 export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
     const key = target.getAttribute("data-snw-key");
     const refType = target.getAttribute("data-snw-type");
-    const link = target.getAttribute("data-snw-link")
+    const filePath = target.getAttribute("data-snw-filepath")
 
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, key, refType, link", target,key,refType,link );
+        thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, key, refType, filePath", target,key,refType, filePath);
 
-    thePlugin.activateView(key, refType, link);
+    thePlugin.activateView(key, refType, filePath);
 
 }

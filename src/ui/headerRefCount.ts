@@ -86,7 +86,7 @@ function processHeader(mdView: MarkdownView) {
     };
     wrapper.setAttribute("data-snw-key", mdView.file.basename);
     wrapper.setAttribute("data-snw-type", "File");
-    wrapper.setAttribute("data-snw-link", mdView.file.path);
+    wrapper.setAttribute("data-snw-filepath", mdView.file.path);
     wrapper.onclick = (e : MouseEvent) => {
         e.stopPropagation();
         processHtmlDecorationReferenceEvent(e.target as HTMLElement);
