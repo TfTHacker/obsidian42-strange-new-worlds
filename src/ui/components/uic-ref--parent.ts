@@ -77,7 +77,7 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
             node.addEventListener("click", async (e: MouseEvent)=>{
                 e.preventDefault(); 
                 const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
-                const LineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
+                let lineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
                 const filePath = handlerElement.getAttribute("snw-data-file-name");
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                 
@@ -90,10 +90,31 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 else 
                     thePlugin.app.workspace.getLeaf(false).openFile(fileT);
 
-                if(LineNu>0) {
+                // for file titles, the embed handling for titles related to block id's and headers is hard to calculate, so its more efficient to do it here
+                const titleKey = handlerElement.getAttribute("snw-ref-title-key");
+                if(titleKey){
+                    console.log("key " + titleKey, "filepath " + filePath)
+                    if(titleKey.contains("#^")) { // links to a block id
+                        const destinationBlocks = Object.entries((thePlugin.app.metadataCache.getFileCache(fileT)?.blocks));
+                        if(destinationBlocks){
+                            const blockID = titleKey.match(/#\^(.+)$/g)[0].replace("#^","").toLowerCase();
+                            const l = destinationBlocks.find(b=> b[0]===blockID);
+                            lineNu = l[1].position.start.line;    
+                        }
+                    } else if(titleKey.contains("#")) { // possibly links to a header
+                        const destinationHeadings = (thePlugin.app.metadataCache.getFileCache(fileT)?.headings);
+                        if(destinationHeadings){
+                            const headingKey = titleKey.match(/#(.+)/g)[0].replace("#","");
+                            const l = destinationHeadings.find(h=> h.heading===headingKey);
+                            lineNu = l.position.start.line;
+                        }
+                    }
+                }
+
+                if(lineNu>0) {
                     setTimeout(() => {
                         // jumps to the line of the file where the reference is located
-                        thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
+                        thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: lineNu });
                     }, 400);
                 }
             })
@@ -112,7 +133,7 @@ const getDataElements = async (instance: Instance): Promise<{refType: string; ke
     const parentElement: ReferenceElement = instance.reference;
     const refType   = parentElement.getAttribute("data-snw-type");
     const key       = parentElement.getAttribute("data-snw-key");
-    const path      = parentElement.getAttribute("data-snw-filepath")
-    const lineNu   = parentElement.getAttribute("snw-data-line-number")
-    return { refType: refType, key: key, filePath: path, lineNu: lineNu};
+    const path      = parentElement.getAttribute("data-snw-filepath");
+    const lineNum   = Number(parentElement.getAttribute("snw-data-line-number")); 
+    return { refType: refType, key: key, filePath: path, lineNu: lineNum};
 }
