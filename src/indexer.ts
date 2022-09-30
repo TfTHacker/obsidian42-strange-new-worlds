@@ -121,11 +121,12 @@ export function getCurrentPage(file: TFile): TransformedCache {
     if (cachedMetaData?.headings) {
         transformedCache.headings = cachedMetaData.headings.map((header: {heading: string; position: Pos; level: number;}) => ({
             original: "#".repeat(header.level) + " " + header.heading,
-            key: stripHeading(header.heading),
+            key: `${file.path.replace(".md","")}#${stripHeading(header.heading)}`, 
+            headerMatch: stripHeading(header.heading),
             pos: header.position,
             page: file.basename,
             type: "heading",
-            references: references[`${file.basename}#${stripHeading(header.heading)}`] || []
+            references: references[`${file.path.replace(".md","")}#${stripHeading(header.heading)}`] || []
         }));
     }
     // if (cachedMetaData?.sections) {
@@ -204,6 +205,8 @@ export function getCurrentPage(file: TFile): TransformedCache {
         }
     }
 
+
+    transformedCache.cacheMetaData = cachedMetaData;
     transformedCache.createDate = Date.now();
     cacheCurrentPages.set(file.path, transformedCache);
 

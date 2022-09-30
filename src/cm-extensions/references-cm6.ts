@@ -50,6 +50,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
             decorate: (add, from, to, match, view) => {         
                 const mdView = view.state.field( editorInfoField );
                 const firstCharacterMatch = match[0].charAt(0);
+                let refType = "";
                 let key = "";
                 const transformedCache = getCurrentPage(mdView.file);               
                 let transformedCachedItem: TransformedCachedItem[] = null;
@@ -58,20 +59,24 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
                     key = mdView.file.path.replace(".md","") + match[0].replace(" ^","#^"); //change this to match the references cache
                     transformedCachedItem = transformedCache.blocks;
+                    refType = "block";
                 } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
                     key = match[0].replace("![[","").replace("]]","");
                     transformedCachedItem = transformedCache.embeds;
+                    refType = "embed";
                 } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
                     key = match[0].replace("[[","").replace("]]","");
                     transformedCachedItem = transformedCache.links
+                    refType = "link";
                 } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //link
                     // @ts-ignore
                     key = match[0].replaceAll("#","").substring(1);
                     transformedCachedItem = transformedCache.headings
+                    refType = "heading";
                 }
 
                 if(key!="") {
-                    wdgt = constructWidgetForInlineReference(key, transformedCachedItem, mdView.file.path);
+                    wdgt = constructWidgetForInlineReference(refType, key, transformedCachedItem, mdView.file.path);
                     if(wdgt!=null)
                             add(to, to, Decoration.widget({widget: wdgt, side: 1}));    
                 }
@@ -102,10 +107,11 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
  * @param {string} filePath - file path for file being modified
  * @return {*}  {InlineReferenceWidget}
  */
-const constructWidgetForInlineReference = (key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
+const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
-        if(ref.key===key)
+        const matchKey = refType==="heading" ? ref.headerMatch : ref.key;
+        if(matchKey===key)
             if(ref?.references.length>0)
                 return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null);
             else

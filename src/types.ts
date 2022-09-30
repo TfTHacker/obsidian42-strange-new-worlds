@@ -1,4 +1,4 @@
-import { ListItemCache, Pos, TFile} from "obsidian";
+import { CachedMetadata, ListItemCache, Pos, TFile} from "obsidian";
 declare module "obsidian" {
     interface FileManager {
         getAllLinkResolutions: () => Link[]
@@ -50,6 +50,7 @@ export interface TransformedCachedItem {
     type: string;
     references: Link[];
     original?: string;
+    headerMatch?: string; //used for matching headers
 }
 
 export interface TransformedCache {
@@ -58,6 +59,7 @@ export interface TransformedCache {
     headings?: TransformedCachedItem[]
     embeds?: TransformedCachedItem[]
     createDate?: number;   //date when cache was generated with Date.now()
+    cacheMetaData?: CachedMetadata;
     // linksWithoutDuplicates?: TransformedCachedItem[]
     // embedsWithDuplicates?: TransformedCachedItem[]
     // sections?: SectionCache[]

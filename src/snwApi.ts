@@ -52,7 +52,7 @@ export default class SnwAPI {
         return {
             TFile: currentFile,
             metadataCache: app.metadataCache.getFileCache(currentFile),
-            SnwTransformedCache: getCurrentPage(currentFile, this.plugin.app),
+            SnwTransformedCache: getCurrentPage(currentFile),
         } 
     }
 }

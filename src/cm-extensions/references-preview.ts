@@ -85,13 +85,14 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             const headerKey = el.querySelector("[data-heading]");
             if (transformedCache?.headings && headerKey) {
                 const textContext = headerKey.textContent
-                for (const value of transformedCache.headings) 
-                    if (value.references.length > 0 && value.key === textContext) {
+                for (const value of transformedCache.headings)  {
+                    if (value.references.length > 0 && value.headerMatch === textContext) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, "");
                         referenceElement.addClass("snw-heading-preview");
                         el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
                         break;
                     }
+                }
             }
         }
 
