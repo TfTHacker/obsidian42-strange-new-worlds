@@ -19,10 +19,10 @@ export /**
  * @param {Instance} instance   the Tippy instance. Tippy provides the floating container.
  */
 const getUIC_Hoverview = async (instance: Instance)=>{
-    const {refType, key, filePath} = await getDataElements(instance);
+    const {refType, key, filePath, lineNu} = await getDataElements(instance);
     let output = "";
     output += `<div class="snw-popover-container">`;
-    output += await getUIC_Ref_Area(refType, key, filePath, true);
+    output += await getUIC_Ref_Area(refType, key, filePath, lineNu, true);
     output += `</div>`;
     instance.setContent(output)
 
@@ -34,7 +34,8 @@ const getUIC_Hoverview = async (instance: Instance)=>{
             const refType = (e.target as HTMLElement).getAttribute("snw-ref-title-type")
             const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
             const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
-            thePlugin.activateView(refType, key, path);
+            const lineNu = (e.target as HTMLElement).getAttribute("snw-data-line-number")
+            thePlugin.activateView(refType, key, path, Number(lineNu));
         }
         await setFileLinkHandlers(true);
     }, 300);
@@ -49,10 +50,10 @@ export /**
  * @param {string} filePath
  * @return {*}  {Promise<string>}
  */
-const getUIC_SidePane = async (refType: string, key: string, filePath: string): Promise<string> =>{
+const getUIC_SidePane = async (refType: string, key: string, filePath: string, lineNu: number): Promise<string> =>{
     let output = "";
     output += `<div class="snw-sidepane-container">`;
-    output += await getUIC_Ref_Area(refType, key, filePath, false);
+    output += await getUIC_Ref_Area(refType, key, filePath, lineNu, false);
     output += `</div>`;
 
     setTimeout( async () => {
@@ -79,6 +80,9 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 const LineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
                 const filePath = handlerElement.getAttribute("snw-data-file-name");
 
+                console.log("line", LineNu)
+                console.log("filePath", filePath)
+
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                 
                 if((e.ctrlKey || e.metaKey) && e.altKey)  
@@ -90,7 +94,7 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 else 
                     thePlugin.app.workspace.getLeaf(false).openFile(fileT);
 
-                if(LineNu>-1) {
+                if(LineNu>0) {
                     setTimeout(() => {
                         // jumps to the line of the file where the reference is located
                         thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: LineNu });
@@ -108,10 +112,11 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
  * @param {Instance} instance
  * @return {*}  {Promise<{refType: string; key: string; filePath: string}>}
  */
-const getDataElements = async (instance: Instance): Promise<{refType: string; key: string; filePath: string}> => {
+const getDataElements = async (instance: Instance): Promise<{refType: string; key: string; filePath: string, lineNu: number}> => {
     const parentElement: ReferenceElement = instance.reference;
     const refType   = parentElement.getAttribute("data-snw-type");
     const key       = parentElement.getAttribute("data-snw-key");
     const path      = parentElement.getAttribute("data-snw-filepath")
-    return { refType: refType, key: key, filePath: path};
+    const lineNu   = parentElement.getAttribute("snw-data-line-number")
+    return { refType: refType, key: key, filePath: path, lineNu: lineNu};
 }

@@ -1,6 +1,6 @@
 // the title displayed at the top of a uic-ref-area
 
-export /**
+/**
  * Title in HoverView or sidepane
  *
  * @param {string} key
@@ -9,12 +9,8 @@ export /**
  * @param {boolean} isPopover
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Title_DivStart = async (key: string, filePath: string, refCount: number, isPopover:boolean): Promise<string> => {
+export const getUIC_Ref_Title_Div = async (key: string, filePath: string, refCount: number, lineNu: number, isPopover:boolean): Promise<string> => {
     const titleClass = isPopover ? "snw-ref-title-popover" : "snw-ref-title-side-pane";
-    return `<div class="${titleClass}" snw-ref-title-key="${key}" snw-data-file-name="${filePath}">${key}`;
-}
-
-
-export const getUIC_ref_title_DivEnd = async (): Promise<string> => {
-    return "</div>";
+    console.log("title", key,filePath,refCount,lineNu,isPopover)
+    return `<div class="${titleClass}" snw-ref-title-key="${key}" snw-data-file-name="${filePath}" snw-data-line-number="${lineNu}">${key}</div>`;
 }

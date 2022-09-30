@@ -20,6 +20,7 @@ export default class ThePlugin extends Plugin {
     lastSelectedReferenceType : string;
     lastSelectedReferenceKey : string; 
     lastSelectedReferenceFilePath : string;
+    lastSelectedLineNumber: number;
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
@@ -95,10 +96,11 @@ export default class ThePlugin extends Plugin {
         setHeaderWithReferenceCounts();
     }
 
-    async activateView(refType: string, key: string, filePath: string) {
+    async activateView(refType: string, key: string, filePath: string, lineNu: number) {
         this.lastSelectedReferenceKey = key;
         this.lastSelectedReferenceType = refType;
         this.lastSelectedReferenceFilePath = filePath;
+        this.lastSelectedLineNumber = lineNu;
         this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
         await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
         this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);

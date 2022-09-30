@@ -18,10 +18,10 @@ const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
     let response = "";
         response += `<div class="snw-ref-item-info" 
                           snw-data-line-number="${ref.reference.position.start.line}" 
-                          snw-data-file-name="${ref.sourceFile.path}"
-                          data-href="${ref   .sourceFile.path}">`;
+                          snw-data-file-name="${ref.sourceFile.path.replace(".md","")}"
+                          data-href="${ref.sourceFile.path.replace(".md","")}">`;
         response += await grabChunkOfFile(ref.sourceFile, ref.reference.position);
-        response += `</div>`; // END of snw-ref-item-info
+        response += `</div>`; 
         return response;
 }
 

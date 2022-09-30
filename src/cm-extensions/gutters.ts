@@ -28,7 +28,7 @@ const referenceGutterMarker = class extends GutterMarker {
     }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.filePath, this.addCssClass);
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.filePath, this.addCssClass, 0);
     }
 }
 

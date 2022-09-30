@@ -4,7 +4,7 @@ import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
 import ThePlugin from "src/main";
 import { Link } from "src/types";
 import { getUIC_Ref_Item } from "./uic-ref-item";
-import { getUIC_ref_title_DivEnd, getUIC_Ref_Title_DivStart } from "./uic-ref-title";
+import { getUIC_Ref_Title_Div } from "./uic-ref-title";
 
 
 let thePlugin: ThePlugin;
@@ -22,13 +22,12 @@ export /**
  * @param {boolean} isHoverView
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, isHoverView:boolean): Promise<string> => {
+const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<string> => {
     
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
 
     let response = "";
-    response += await getUIC_Ref_Title_DivStart(key, filePath, refAreaItems.refCount, isHoverView); //get title header for this reference ara
-    response += await getUIC_ref_title_DivEnd();                  //get the ending html 
+    response += await getUIC_Ref_Title_Div(key, filePath, refAreaItems.refCount, lineNu, isHoverView); //get title header for this reference ara
     response += `<div class="snw-ref-area">`;
     response += refAreaItems.response;
     response += `</div>`;
@@ -72,7 +71,7 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
             responseContent += `<div class="snw-ref-item-container">
                                      <div class="snw-ref-item-file"
                                         snw-data-line-number="${-1}" 
-                                        snw-data-file-name="${file_path.sourceFile.path}"
+                                        snw-data-file-name="${file_path.sourceFile.path.replace(".md","")}"
                                         data-href="${file_path.sourceFile.path}" 
                                         href="${file_path.sourceFile.path}">${file_path.sourceFile.basename}</div>`;
             for (const ref of linksToLoop) {

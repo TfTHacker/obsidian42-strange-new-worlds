@@ -51,7 +51,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 if ( value.references.length > 0 && 
                      (value.pos.start.line >= sectionInfo?.lineStart && value.pos.end.line <= sectionInfo?.lineEnd) &&
                      !isThisAnEmbed ) {
-                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].reference.link, "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                     let blockElement: HTMLElement = el.querySelector('p')
                     if (!blockElement) {
                         blockElement = el.querySelector("li");
@@ -72,7 +72,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embeds) {
                     if (value.references.length > 0 && embedKey.endsWith(value.key)) {
-                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].reference.link, "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass('snw-embed-preview');
                         element.after(referenceElement);
                         break;
@@ -87,7 +87,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 const textContext = headerKey.textContent
                 for (const value of transformedCache.headings)  {
                     if (value.references.length > 0 && value.headerMatch === textContext) {
-                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].reference.link, "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass("snw-heading-preview");
                         el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
                         break;
@@ -101,7 +101,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.links) {
                     if (value.references.length > 0 && (value.key === link || value.original.includes(link))) {
-                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].reference.link, "");
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass('snw-link-preview');
                         element.after(referenceElement);
                         break;

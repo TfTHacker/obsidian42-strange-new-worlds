@@ -113,7 +113,7 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
         const matchKey = refType==="heading" ? ref.headerMatch : ref.key;
         if(matchKey===key)
             if(ref?.references.length>0)
-                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null);
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null, ref.pos.start.line);
             else
                 return null;
     }
@@ -132,14 +132,16 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
     key: string;    //a unique identifer for the reference
     filePath: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
+    lineNu: number; //number of line within the file
 
-    constructor(refCount: number, cssclass: string, key:string, filePath: string, addCSSClass: string ) {
+    constructor(refCount: number, cssclass: string, key:string, filePath: string, addCSSClass: string, lineNu: number ) {
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
         this.key = key;
         this.filePath = filePath;
         this.addCssClass = addCSSClass;
+        this.lineNu = lineNu;
     }
 
     // eq(other: InlineReferenceWidget) { 
@@ -147,7 +149,7 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
     // }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.filePath, this.addCssClass);
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.filePath, this.addCssClass, this.lineNu);
     }
 
     destroy() {}
