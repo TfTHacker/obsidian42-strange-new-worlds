@@ -100,7 +100,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.links) {
-                    if (value.references.length > 0 && (value.key === link || value.original.includes(link))) {
+                    if (value.references.length > 0 && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass('snw-link-preview');
                         element.after(referenceElement);

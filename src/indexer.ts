@@ -24,53 +24,29 @@ export function getSnwAllLinksResolutions(){
 export function buildLinksAndReferences(): void {
     allLinkRsolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
     const refs = allLinkRsolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
-        const key = link.reference.link;
-        // if (key.includes("/")) {
-        //     const keyArr = key.split("/");
-        //     key = keyArr[keyArr.length - 1];
-        // }
-        if (!acc[key]) // test if key exists, if not create it
-            acc[key] = [];
-        // if (acc[key])
+        
+        let keyBasedOnLink = "";
+        let keyBasedOnFullPath = ""
 
-        acc[key].push(link);
+        keyBasedOnLink = link.reference.link;
+        keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
+
+        if(!acc[keyBasedOnLink]) { 
+            acc[keyBasedOnLink] = [];
+        }
+        acc[keyBasedOnLink].push(link);
+
+        if(!acc[keyBasedOnFullPath]) {
+            acc[keyBasedOnFullPath] = [];
+        }
+        acc[keyBasedOnFullPath].push(link)
+
         return acc;
     }, {});
-    
-    // const allLinks = Object.entries(thePlugin.app.metadataCache.getLinks()).reduce((acc, [key, links]) => {
-    //     links.forEach((link: { link: string; original: string; position: Pos; }) : void => {
-    //         const abstractFilePath = thePlugin.app.vault.getAbstractFileByPath(key) as TFile;
-    //         if (link.original.startsWith("[[#") || link.original.startsWith("![[#")) {
-    //             const newLink: Link = {
-    //                 reference: {
-    //                     link: link.link,
-    //                     displayText: link.link,
-    //                     position: link.position
-    //                 },
-    //                 resolvedFile: abstractFilePath ,
-    //                 resolvedPaths: [link.link],
-    //                 sourceFile: abstractFilePath
-    //             };
-    //             acc.push(newLink);
-    //         }
-    //     });
-    //     return acc;
-    // }, []);
-
-    // allLinks.forEach((link : Link) => {
-    //     if (link.sourceFile) {
-    //         const key = `${link.sourceFile.basename}${link.reference.link}`;
-    //         if (! refs[key]) {
-    //             refs[key] = [];
-    //         }
-    //         if (refs[key]) {
-    //             refs[key].push(link);
-    //         }
-    //     }
-    // });
 
     references = refs;
-    window.refs=references
+    // @ts-ignore
+    window.snwRefs = references;
     lastUpdateToReferences = Date.now();
 }
 
@@ -121,23 +97,19 @@ export function getCurrentPage(file: TFile): TransformedCache {
     if (cachedMetaData?.headings) {
         transformedCache.headings = cachedMetaData.headings.map((header: {heading: string; position: Pos; level: number;}) => ({
             original: "#".repeat(header.level) + " " + header.heading,
-            key: `${file.path.replace(".md","")}#${stripHeading(header.heading)}`, 
-            headerMatch: stripHeading(header.heading),
+            key: `${file.path.replace(".md","")}#${header.heading}`, 
+            headerMatch: header.heading,
+            headerMatch2: file.basename + "#".repeat(header.level) + header.heading,
             pos: header.position,
             page: file.basename,
             type: "heading",
-            references: references[`${file.path.replace(".md","")}#${stripHeading(header.heading)}`] || []
+            references: references[`${file.path.replace(".md","")}${"#".repeat(header.level) + header.heading}`] || 
+                        references[`${file.basename}${"#".repeat(header.level) + (header.heading)}`] || []
         }));
     }
-    // if (cachedMetaData?.sections) {
-    //     transformedCache.sections = createListSections(cachedMetaData);
-    // }
+
     if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
-            // if (link.link.includes("/")) {
-            //     const keyArr = link.link.split("/");
-            //     link.link = keyArr[keyArr.length - 1];
-            // }
             return {
                 key: link.link,
                 original: link.original,

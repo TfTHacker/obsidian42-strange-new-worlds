@@ -57,7 +57,7 @@ const ReferenceGutterExtension = gutter({
                     if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
                         thePlugin.snwAPI.console("ReferenceGutterExtension transformedCache", transformedCache );
                     for (const ref of transformedCache.embeds) {
-                        if(ref?.references.length>1 && ref?.pos.start.line+1 === lineNumberInFile) {
+                        if(ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
                             // @ts-ignore
                             let refOriginalLink = ref.references[0].reference.original;
                             if(refOriginalLink.substring(0,1)!="!") 
