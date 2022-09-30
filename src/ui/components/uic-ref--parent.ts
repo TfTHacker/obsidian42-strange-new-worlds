@@ -79,10 +79,6 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
                 const LineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
                 const filePath = handlerElement.getAttribute("snw-data-file-name");
-
-                console.log("line", LineNu)
-                console.log("filePath", filePath)
-
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                 
                 if((e.ctrlKey || e.metaKey) && e.altKey)  
