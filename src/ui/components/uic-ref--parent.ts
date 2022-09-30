@@ -93,7 +93,6 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                 // for file titles, the embed handling for titles related to block id's and headers is hard to calculate, so its more efficient to do it here
                 const titleKey = handlerElement.getAttribute("snw-ref-title-key");
                 if(titleKey){
-                    console.log("key " + titleKey, "filepath " + filePath)
                     if(titleKey.contains("#^")) { // links to a block id
                         const destinationBlocks = Object.entries((thePlugin.app.metadataCache.getFileCache(fileT)?.blocks));
                         if(destinationBlocks){
