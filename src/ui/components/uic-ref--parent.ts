@@ -74,6 +74,7 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
     linksToFiles.forEach((node: Element)=>{
         if(!node.getAttribute("snw-has-handler")){
             node.setAttribute("snw-has-handler","true"); //prevent the event from being added twice
+            // CLICK event
             node.addEventListener("click", async (e: MouseEvent)=>{
                 e.preventDefault(); 
                 const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
@@ -117,6 +118,26 @@ const setFileLinkHandlers = async (isHoverView: boolean)=>{
                     }, 400);
                 }
             })
+            // mouseover event
+            // @ts-ignore
+            if(thePlugin.app.internalPlugins.plugins['page-preview'].enabled===true) {
+                node.addEventListener('mouseover', (e: PointerEvent) => {
+                    e.preventDefault();
+                    // @ts-ignore
+                    const hoverMetaKeyRequired = app.internalPlugins.plugins['page-preview'].instance.overrides['obsidian42-strange-new-worlds']==false ? false : true;
+                    if( hoverMetaKeyRequired===false || (hoverMetaKeyRequired===true && (e.ctrlKey || e.metaKey)) ) {
+                        const target = e.target as HTMLElement;
+                        const previewLocation = { scroll: Number(target.getAttribute("snw-data-line-number")) };
+                        const filePath  = target.getAttribute("snw-data-file-name");
+                        if(filePath) {
+                            // parameter signature for link-hover parent: HoverParent, targetEl: HTMLElement, linkText: string, sourcePath: string, eState: EphemeralState
+                            app.workspace.trigger( "link-hover", {}, target, filePath, "", previewLocation);   
+                        }
+                    }
+                });    
+            }
+
+            
         }
     })
 }

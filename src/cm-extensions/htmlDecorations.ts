@@ -29,11 +29,11 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
 
     const element = document.createElement("div")
     element.className = "snw-reference snw-" + referenceType;
-    element.innerText= " " + count.toString() + " ";
+    element.innerText= count.toString();
     element.setAttribute("data-snw-type", referenceType);
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-filepath", filePath);
-    element.setAttribute("snw-data-line-number", lineNu)
+    element.setAttribute("snw-data-line-number", lineNu.toString());
     if(attachCSSClass) element.addClass(attachCSSClass);
 
     element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
@@ -63,6 +63,6 @@ export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) =
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, key, refType, filePath", target,key,refType, filePath);
 
-    thePlugin.activateView(refType, key, filePath, lineNu);
+    thePlugin.activateView(refType, key, filePath, Number(lineNu));
 
 }
