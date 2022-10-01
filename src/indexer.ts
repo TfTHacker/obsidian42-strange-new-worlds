@@ -99,12 +99,12 @@ export function getCurrentPage(file: TFile): TransformedCache {
             original: "#".repeat(header.level) + " " + header.heading,
             key: `${file.path.replace(".md","")}#${header.heading}`, 
             headerMatch: header.heading,
-            headerMatch2: file.basename + "#".repeat(header.level) + header.heading,
+            headerMatch2: file.basename + "#" + header.heading,
             pos: header.position,
             page: file.basename,
             type: "heading",
-            references: references[`${file.path.replace(".md","")}${"#".repeat(header.level) + header.heading}`] || 
-                        references[`${file.basename}${"#".repeat(header.level) + (header.heading)}`] || []
+            references: references[`${file.path.replace(".md","")}#${header.heading}`] || 
+                        references[`${file.basename}$#${(header.heading)}`] || []
         }));
     }
 
