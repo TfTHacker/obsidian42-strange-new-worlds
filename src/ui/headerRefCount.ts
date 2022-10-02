@@ -44,15 +44,12 @@ function processHeader(mdView: MarkdownView) {
     const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
     
     // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
-    if (incomingLinks.length === 0) {
+    if (incomingLinks.length < thePlugin.settings.minimumRefCountThreshold) {
         if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) 
-            mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
-        return
+        mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
+        return;
     }
-
-    // const toolTipItemCount = thePlugin.settings.displayNumberOfFilesInTooltip;
-    // const fileList = (toolTipItemCount!=0 && incomingLinks.length>0) ?
-    //                  (incomingLinks.map(link => link.sourceFile.path.replace(".md", ""))).slice(0,toolTipItemCount).join("\n") : "";
+        
     let snwTitleRefCountDisplayCountEl: HTMLElement = mdView.contentEl.querySelector(".snw-header-count");
 
     // header count is already displayed, just update information.

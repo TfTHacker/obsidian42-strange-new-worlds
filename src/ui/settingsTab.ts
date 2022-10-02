@@ -2,12 +2,11 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import ThePlugin from "../main";
 
 export interface Settings {
+	minimumRefCountThreshold:			number;
 	displayIncomingFilesheader: 		boolean;
 	displayInlineReferencesLivePreview: boolean;
 	displayInlineReferencesMarkdown: 	boolean;
 	displayEmbedReferencesInGutter:		boolean;
-	displayLineNumberInSidebar:			boolean;
-	displayNumberOfFilesInTooltip:		number;
 	cacheUpdateInMilliseconds:			number;
 	enableRenderingBlockIdInMarkdown:	boolean;
 	enableRenderingLinksInMarkdown:		boolean;
@@ -20,13 +19,12 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
+	minimumRefCountThreshold:			1,
 	displayIncomingFilesheader: 		true,
 	displayInlineReferencesLivePreview: true,
 	displayInlineReferencesMarkdown: 	true,
 	displayEmbedReferencesInGutter: 	true,
-	displayLineNumberInSidebar: 		true,
-	displayNumberOfFilesInTooltip: 		10,
-	cacheUpdateInMilliseconds: 			10000,
+	cacheUpdateInMilliseconds: 			500,
 	enableRenderingBlockIdInMarkdown: 	true,
 	enableRenderingLinksInMarkdown: 	true,
 	enableRenderingHeadersInMarkdown: 	true,
@@ -64,7 +62,7 @@ export class SettingsTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("Show SNW indicators in Live Previev Editor")
+			.setName("Show SNW indicators in Live Preview Editor")
 			.setDesc("While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.thePlugin.settings.displayInlineReferencesLivePreview);
@@ -212,36 +210,25 @@ export class SettingsTab extends PluginSettingTab {
 		containerEl.createEl("h2", { text: "Other Settings" });
 
 		new Setting(containerEl)
-			.setName("Number of files listed in tooltip")
-			.setDesc(`The block reference count shows a tooltip with files for the block reference. This settting controls the count of files listed.
-					  Set this to 0 for no tooltip. Currently set to: ${this.thePlugin.settings.displayNumberOfFilesInTooltip} files.`)
+			.setName("Minimal file count threshold")
+			.setDesc(`This setting defines how many references there needs to be for the reference count box to appear. Default is one reference.
+					 Currently set to: ${this.thePlugin.settings.minimumRefCountThreshold} refernences.`)
 			.addSlider(slider => slider
-				.setLimits(0, 30 , 1)
-				.setValue(this.thePlugin.settings.displayNumberOfFilesInTooltip)
+				.setLimits(1, 20 , 1)
+				.setValue(this.thePlugin.settings.minimumRefCountThreshold)
 				.onChange(async (value) => {
-					this.thePlugin.settings.displayNumberOfFilesInTooltip = value;
+					this.thePlugin.settings.minimumRefCountThreshold = value;
 					await this.thePlugin.saveSettings();
 				})
 				.setDynamicTooltip()
 			)
 
-		new Setting(containerEl)
-			.setName("Show line number for file in sidepane")
-			.setDesc("Displays a line number from the document in the sidepane.")
-			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.displayLineNumberInSidebar);
-				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.displayLineNumberInSidebar = value;
-					await this.thePlugin.saveSettings();
-				});
-			})
-			
 		containerEl.createEl("h2", { text: "Cache Tuning" });
 
 		new Setting(containerEl)
 			.setName(`How often should the SNW Cache update`)
-			.setDesc(`By default SNW will updates its internal cache every 10 seconds (10,000 milliseconds) when there is some change in the vualt.
-					  Increase the time to slighlty improve performance or decrease it to improve refresh of vault information.
+			.setDesc(`By default SNW will updates its internal cache every half a second (500 milliseconds) when there is some change in the vualt.
+					  Increase the time to slighlty improve performance on less performant devices or decrease it to improve refresh of vault information.
 					  Currently set to: ${this.thePlugin.settings.cacheUpdateInMilliseconds} milliseconds. (Requires Obsidian Restart)`	)
 			.addSlider(slider => slider
 				.setLimits(500, 30000 , 100)

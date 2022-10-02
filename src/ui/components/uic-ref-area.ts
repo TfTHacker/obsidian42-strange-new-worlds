@@ -1,17 +1,11 @@
 //wrapper element for references area. shared between popover and sidepane
 
 import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
-import ThePlugin from "src/main";
 import { Link } from "src/types";
 import { getUIC_Ref_Item } from "./uic-ref-item";
 import { getUIC_Ref_Title_Div } from "./uic-ref-title";
 
 
-let thePlugin: ThePlugin;
-
-export function setPluginVariableUIC_RefArea(plugin: ThePlugin) {
-    thePlugin = plugin;
-}
 
 export /**
  *  Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
@@ -57,7 +51,7 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     } else {
         let refCache: Link[] = getReferencesCache()[key];
         if(refCache === undefined) refCache = getReferencesCache()[filePath + "#^" + key];    
-        const sortedCache = (await sortRefCache(refCache)).slice(0, thePlugin.settings.displayNumberOfFilesInTooltip);    
+        const sortedCache = await sortRefCache(refCache);    
         countOfRefs = sortedCache.length;
         linksToLoop = sortedCache;
     }

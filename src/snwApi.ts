@@ -1,4 +1,4 @@
-import { getCurrentPage } from "./indexer";
+import { getSNWCacheByFile } from "./indexer";
 import ThePlugin from "./main";
 import { Settings } from "./ui/settingsTab";
 
@@ -52,7 +52,7 @@ export default class SnwAPI {
         return {
             TFile: currentFile,
             metadataCache: app.metadataCache.getFileCache(currentFile),
-            SnwTransformedCache: getCurrentPage(currentFile),
+            SnwTransformedCache: getSNWCacheByFile(currentFile),
         } 
     }
 }

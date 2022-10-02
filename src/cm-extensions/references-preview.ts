@@ -1,6 +1,6 @@
 import {MarkdownPostProcessorContext} from "obsidian";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
-import {getCurrentPage} from "../indexer";
+import {getSNWCacheByFile} from "../indexer";
 import ThePlugin from "../main";
 
 
@@ -35,7 +35,9 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     // check for incompatibility with other plugins
     if(app.metadataCache.getFileCache(currentFile)?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
     
-    const transformedCache = getCurrentPage(currentFile);
+    const transformedCache = getSNWCacheByFile(currentFile);
+
+    const minRefCountThreshold = thePlugin.settings.minimumRefCountThreshold;
 
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
         const sectionInfo = ctx.getSectionInfo(el);
@@ -48,10 +50,10 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             } catch (error) { /* nothing to do here */ }
             
             for (const value of transformedCache.blocks) {
-                if ( value.references.length > 0 && 
+                if ( value.references.length >= minRefCountThreshold && 
                      (value.pos.start.line >= sectionInfo?.lineStart && value.pos.end.line <= sectionInfo?.lineEnd) &&
                      !isThisAnEmbed ) {
-                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
+                    const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                     let blockElement: HTMLElement = el.querySelector('p')
                     if (!blockElement) {
                         blockElement = el.querySelector("li");
@@ -71,7 +73,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             el.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                 const embedKey = element.getAttribute('src');
                 for (const value of transformedCache.embeds) {
-                    if (value.references.length > 0 && embedKey.endsWith(value.key)) {
+                    if (value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass('snw-embed-preview');
                         element.after(referenceElement);
@@ -84,9 +86,9 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
         if(thePlugin.settings.enableRenderingHeadersInMarkdown) {
             const headerKey = el.querySelector("[data-heading]");
             if (transformedCache?.headings && headerKey) {
-                const textContext = headerKey.textContent
+                const textContext = headerKey.getAttribute("data-heading")
                 for (const value of transformedCache.headings)  {
-                    if (value.references.length > 0 && value.headerMatch === textContext) {
+                    if (value.references.length >= minRefCountThreshold && value.headerMatch === textContext) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass("snw-heading-preview");
                         el.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
@@ -100,7 +102,7 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
             el.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                 const link = element.getAttribute('data-href');
                 for (const value of transformedCache.links) {
-                    if (value.references.length > 0 && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
+                    if (value.references.length >= minRefCountThreshold && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                         referenceElement.addClass('snw-link-preview');
                         element.after(referenceElement);

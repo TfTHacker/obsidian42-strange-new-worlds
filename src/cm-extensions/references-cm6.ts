@@ -1,6 +1,6 @@
 import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType} from "@codemirror/view";
 import { editorInfoField } from "obsidian";
-import { getCurrentPage } from "src/indexer";
+import { getSNWCacheByFile } from "src/indexer";
 import { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
 import ThePlugin from "src/main";
@@ -52,7 +52,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 const firstCharacterMatch = match[0].charAt(0);
                 let refType = "";
                 let key = "";
-                const transformedCache = getCurrentPage(mdView.file);               
+                const transformedCache = getSNWCacheByFile(mdView.file);               
                 let transformedCachedItem: TransformedCachedItem[] = null;
                 let wdgt: InlineReferenceWidget = null;
 
@@ -74,7 +74,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                     transformedCachedItem = transformedCache.headings
                     refType = "heading";
                 }
-
+                
+                if((refType==="embed" || refType==="link")  &&  key.contains("|")) // check for aliased references
+                    key = key.substring(0, key.search(/\|/));
+    
                 if(key!="") {
                     wdgt = constructWidgetForInlineReference(refType, key, transformedCachedItem, mdView.file.path);
                     if(wdgt!=null)
@@ -110,12 +113,17 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
-        const matchKey = refType==="heading" ? ref.headerMatch : ref.key;
-        if(matchKey===key)
-            if(ref?.references.length>0)
+        let matchKey = ref.key;
+        if(refType==="heading") {
+            matchKey = ref.headerMatch; // headers require special comparison
+            key = key.replace(/^\s+|\s+$/g,''); // should be not leading spaces
+        }
+        if(matchKey===key) {
+            if(ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
                 return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null, ref.pos.start.line);
             else
                 return null;
+        }
     }
 }
 

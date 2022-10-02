@@ -1,14 +1,13 @@
 import { MarkdownView } from 'obsidian';
 import ThePlugin from 'src/main';
 import { Instance, ReferenceElement } from 'tippy.js';
-import { getUIC_Ref_Area, setPluginVariableUIC_RefArea } from "./uic-ref-area";
+import { getUIC_Ref_Area } from "./uic-ref-area";
 import { setPluginVariableUIC_RefItem } from './uic-ref-item';
 
 let thePlugin: ThePlugin = null;
 
 export function setPluginVariableForUIC(plugin: ThePlugin) {
     thePlugin = plugin;
-    setPluginVariableUIC_RefArea(plugin);
     setPluginVariableUIC_RefItem(plugin);
 }
 
@@ -29,15 +28,17 @@ const getUIC_Hoverview = async (instance: Instance)=>{
     //event bindings
     setTimeout( async () => {
         const titleElement: HTMLElement = document.querySelector(".snw-ref-title-popover");
-        titleElement.onclick = async (e: MouseEvent) => {
-            //open view into side pane
-            const refType = (e.target as HTMLElement).getAttribute("snw-ref-title-type")
-            const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
-            const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
-            const lineNu = (e.target as HTMLElement).getAttribute("snw-data-line-number")
-            thePlugin.activateView(refType, key, path, Number(lineNu));
+        if(titleElement) {
+            titleElement.onclick = async (e: MouseEvent) => {
+                //open view into side pane
+                const refType = (e.target as HTMLElement).getAttribute("snw-ref-title-type")
+                const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
+                const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
+                const lineNu = (e.target as HTMLElement).getAttribute("snw-data-line-number")
+                thePlugin.activateView(refType, key, path, Number(lineNu));
+            }
+            await setFileLinkHandlers(true);    
         }
-        await setFileLinkHandlers(true);
     }, 300);
 }
 

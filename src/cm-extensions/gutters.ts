@@ -2,7 +2,7 @@ import {gutter, GutterMarker, } from "@codemirror/view";
 import { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/cm-extensions/htmlDecorations";
-import { getCurrentPage } from "src/indexer";
+import { getSNWCacheByFile } from "src/indexer";
 import ThePlugin from "src/main";
 
 let thePlugin: ThePlugin;
@@ -49,17 +49,18 @@ const ReferenceGutterExtension = gutter({
 
         const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
 
-        if(embedsFromMetaDataCache?.length>0) {
+        if(embedsFromMetaDataCache?.length >= thePlugin.settings.minimumRefCountThreshold) {
             const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
             for (const embed of embedsFromMetaDataCache) {
                 if(embed.position.start.line +1 === lineNumberInFile) {
-                    const transformedCache = getCurrentPage(mdView.file);
-                    if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
-                        thePlugin.snwAPI.console("ReferenceGutterExtension transformedCache", transformedCache );
+                    const transformedCache = getSNWCacheByFile(mdView.file);
+                    if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) thePlugin.snwAPI.console("ReferenceGutterExtension transformedCache", transformedCache );
                     for (const ref of transformedCache.embeds) {
                         if(ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
                             // @ts-ignore
                             let refOriginalLink = ref.references[0].reference.original;
+                            if(refOriginalLink.contains("|")) // likely has an alias embedded which needs to be removed for proper matching
+                                refOriginalLink = refOriginalLink.substring(0, refOriginalLink.search(/\|/)) + "]]";
                             if(refOriginalLink.substring(0,1)!="!") 
                                 refOriginalLink = "!" + refOriginalLink;
                             if( editorView.state.doc.lineAt(line.from).text.trim() ===  refOriginalLink) {
