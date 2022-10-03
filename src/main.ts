@@ -24,6 +24,7 @@ export default class ThePlugin extends Plugin {
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
+    sidebarSNW: SidePaneView;
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
@@ -56,7 +57,14 @@ export default class ThePlugin extends Plugin {
 
             this.snwAPI.settings = this.settings;
 
-            this.registerView(VIEW_TYPE_SNW, (leaf) => new SidePaneView(leaf, this));
+            this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+
+            this.registerView(VIEW_TYPE_SNW, (leaf) => {
+                this.sidebarSNW = new SidePaneView(leaf, this)
+                return this.sidebarSNW;
+            });
+
+            await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
 
             this.registerEditorExtension(this.editorExtensions);
             
@@ -101,9 +109,13 @@ export default class ThePlugin extends Plugin {
         this.lastSelectedReferenceType = refType;
         this.lastSelectedReferenceFilePath = filePath;
         this.lastSelectedLineNumber = lineNu;
-        this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
-        await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
-        this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
+        // this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+        // await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
+        this.app.workspace.rightSplit.expand();
+        await this.sidebarSNW.updateView();
+        setTimeout(() => {
+            this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
+        }, 100);
     }
 
     toggleStateHeaderCount(): void {

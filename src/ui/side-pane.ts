@@ -26,6 +26,10 @@ export class SidePaneView extends ItemView {
         const container: HTMLElement = this.containerEl;
         container.empty();
         container.innerHTML = `<span class="snw-sidepane-loading">Discovering new worlds...</span>`;
+    }
+
+    async updateView() {
+        const container: HTMLElement = this.containerEl;
         const refType = this.thePlugin.lastSelectedReferenceType;
         const key = this.thePlugin.lastSelectedReferenceKey;
         const filePath = this.thePlugin.lastSelectedReferenceFilePath;
@@ -35,9 +39,7 @@ export class SidePaneView extends ItemView {
             this.thePlugin.snwAPI.console("sidepane.open() refType, key, filePath", refType, key, filePath);
             this.thePlugin.snwAPI.console("sidepane.open() getReferencesCache()", getReferencesCache());
         }
-
         container.innerHTML = await getUIC_SidePane(refType, key, filePath, lineNu);
-        
     }
 
     async onClose() { // Nothing to clean up.
