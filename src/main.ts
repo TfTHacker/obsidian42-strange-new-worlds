@@ -24,6 +24,7 @@ export default class ThePlugin extends Plugin {
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
     sidebarPaneSNW: SideBarPaneView;
+    environmentInitialized = false;
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
@@ -40,8 +41,8 @@ export default class ThePlugin extends Plugin {
         // @ts-ignore
         globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
-        // initial build of references
-        buildLinksAndReferences();
+        // // initial build of references
+        // buildLinksAndReferences();
         
         await this.loadSettings();
         this.addSettingTab(new SettingsTab(this.app, this));
@@ -69,7 +70,6 @@ export default class ThePlugin extends Plugin {
 
         this.registerEditorExtension(this.editorExtensions);
         
-
         this.toggleStateHeaderCount();
         this.toggleStateSNWMarkdownPreview();
         this.toggleStateSNWLivePreview();
@@ -82,6 +82,8 @@ export default class ThePlugin extends Plugin {
                 if( !this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length ) {
                     await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
                 }
+                this.app.metadataCache.trigger("snw:onlayoutready");
+                setTimeout(()=>this.environmentInitialized=true, 5000); // Used to make everything is initialized.
             });
         });
     }
