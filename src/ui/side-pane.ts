@@ -7,7 +7,7 @@ import { getUIC_SidePane } from "./components/uic-ref--parent";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
 
-export class SidePaneView extends ItemView {
+export class SideBarPaneView extends ItemView {
     contentEl: HTMLElement;
     thePlugin: ThePlugin;
     

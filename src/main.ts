@@ -6,14 +6,13 @@ import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorat
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
 import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ui/headerRefCount";
-import { SidePaneView, VIEW_TYPE_SNW } from "./ui/side-pane";
+import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/side-pane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
 import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
 
 
 export default class ThePlugin extends Plugin {
-    pluginInitialized = false;
     appName = "Obsidian42 - Strange New Worlds"; 
     appID = "obsidian42-strange-new-worlds";  
 	settings: Settings;
@@ -24,77 +23,64 @@ export default class ThePlugin extends Plugin {
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
-    sidebarSNW: SidePaneView;
+    sidebarPaneSNW: SideBarPaneView;
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
+
+        setPluginVariableForIndexer(this);
+        setPluginVariableForHtmlDecorations(this);
+        setPluginVariableForCM6Gutter(this);
+        setPluginVariableForHeaderRefCount(this);
+        setPluginVariableForMarkdownPreviewProcessor(this);
+        setPluginVariableForCM6InlineReferences(this);
+        setPluginVariableForUIC(this);
+
+        this.snwAPI = new SnwAPI(this);            
+        // @ts-ignore
+        globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
+
+        // initial build of references
+        buildLinksAndReferences();
         
-        const initializeEnvironment = async () => {
-            await this.loadSettings();
+        await this.loadSettings();
+        this.addSettingTab(new SettingsTab(this.app, this));
 
-            this.snwAPI = new SnwAPI(this);            
-            // @ts-ignore
-            globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
+        this.registerView(VIEW_TYPE_SNW, (leaf) => {
+            this.sidebarPaneSNW = new SideBarPaneView(leaf, this)
+            return this.sidebarPaneSNW;
+        });
 
-            setPluginVariableForIndexer(this);
-            setPluginVariableForHtmlDecorations(this);
-            setPluginVariableForCM6Gutter(this);
-            setPluginVariableForHeaderRefCount(this);
-            setPluginVariableForMarkdownPreviewProcessor(this);
-            setPluginVariableForCM6InlineReferences(this);
-            setPluginVariableForUIC(this);
 
-            this.addSettingTab(new SettingsTab(this.app, this));
 
-            //initial index building
-            this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
+        //initial index building
+        const indexDebounce = debounce(() => {
+            buildLinksAndReferences()
+        }, 1000, true);
+        this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (this.app.workspace as any).registerHoverLinkSource(this.appID, {
-                display: this.appName,
-                defaultMod: true,
-            });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (this.app.workspace as any).registerHoverLinkSource(this.appID, {
+            display: this.appName,
+            defaultMod: true,
+        });
 
-            this.snwAPI.settings = this.settings;
+        this.snwAPI.settings = this.settings;
 
-            this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+        this.registerEditorExtension(this.editorExtensions);
+        
 
-            this.registerView(VIEW_TYPE_SNW, (leaf) => {
-                this.sidebarSNW = new SidePaneView(leaf, this)
-                return this.sidebarSNW;
-            });
+        this.toggleStateHeaderCount();
+        this.toggleStateSNWMarkdownPreview();
+        this.toggleStateSNWLivePreview();
+        this.toggleStateSNWGutters();
 
-            await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
-
-            this.registerEditorExtension(this.editorExtensions);
-            
-            this.toggleStateHeaderCount();
-            this.toggleStateSNWMarkdownPreview();
-            this.toggleStateSNWLivePreview();
-            this.toggleStateSNWGutters();
-
-            const indexDebounce = debounce(() => {
-                buildLinksAndReferences()
-            }, 1000, true);
-
-            // initial build of references
-            buildLinksAndReferences();
-        }
-
-        // managing state for debugging purpsoes
-        setTimeout(async () => {
-            if (!this.pluginInitialized) {
-                this.pluginInitialized = true;
-                await initializeEnvironment();
-            }
-        }, 4000);
-
-        this.app.workspace.onLayoutReady(() => {
-            const resolved = this.app.metadataCache.on("resolved", () => {
+        this.app.workspace.onLayoutReady( async () => {
+            const resolved = this.app.metadataCache.on("resolved", async () => {
+                buildLinksAndReferences();
                 this.app.metadataCache.offref(resolved);
-                if (!this.pluginInitialized) {
-                    this.pluginInitialized = true;
-                    initializeEnvironment();
+                if( !this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length ) {
+                    await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
                 }
             });
         });
@@ -112,7 +98,7 @@ export default class ThePlugin extends Plugin {
         // this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
         // await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
         this.app.workspace.rightSplit.expand();
-        await this.sidebarSNW.updateView();
+        await this.sidebarPaneSNW.updateView();
         setTimeout(() => {
             this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
         }, 100);
@@ -169,7 +155,7 @@ export default class ThePlugin extends Plugin {
     onunload(): void {
         console.log("unloading " + this.appName)
         try {
-            this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
+            // this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
             MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (this.app.workspace as any).unregisterHoverLinkSource(this.appID);
