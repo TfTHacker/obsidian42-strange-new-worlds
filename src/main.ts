@@ -129,7 +129,7 @@ export default class ThePlugin extends Plugin {
     toggleStateSNWMarkdownPreview(): void {
         const state = this.settings.displayInlineReferencesMarkdown;
         if(state==true && this.markdownPostProcessorSNW===null) {
-            this.markdownPostProcessorSNW = this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
+            this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
         } else {
             MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
             this.markdownPostProcessorSNW=null;
