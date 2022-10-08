@@ -51,6 +51,8 @@ class snwChildComponent extends MarkdownRenderChild {
         this.containerEl = containerEl;
         this.sectionInfo = sectionInfo;
         this.currentFile = currentFile;
+        if(thePlugin.snwAPI.enableDebugging.PreviewRendering)
+            thePlugin.snwAPI.console("snwChildComponent(HTMLElement, MarkdownPostProcessorContext,currentfile", containerEl, sectionInfo, currentFile)
     }
 
     onload(): void {
