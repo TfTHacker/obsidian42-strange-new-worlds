@@ -86,7 +86,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                         from: to,
                         to: to 
                     });
-                    const linksinHeader = match[0].match(/(?<=[^!])\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
+                    //this was not working with mobile from 0.16.4
+                    // so had to convert it to a string
+                    // const linksinHeader = match[0].match(/(?<=[^!])\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
+                    const linksinHeader = match[0].match("/(?<=[^!])\\[\\[(.*?)\\]\\]|!\\[\\[(.*?)\\]\\]/g");
                     if(linksinHeader)
                         for (const l of linksinHeader) {
                             widgetsToAdd.push({

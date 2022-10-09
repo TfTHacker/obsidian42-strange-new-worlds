@@ -57,13 +57,15 @@ class snwChildComponent extends MarkdownRenderChild {
 
     onload(): void {
         this.processMarkdown()
-        if(thePlugin.environmentInitialized===false) {
-            // @ts-ignore
-            thePlugin.registerEvent(thePlugin.app.metadataCache.on("snw:onlayoutready", () => {
-                // after layout at startupis finished, if any documents are open they need to be refreshed
-                this.processMarkdown();
-            }));
-        }
+        // if(thePlugin.environmentInitialized===false) {
+        //     // @ts-ignore
+        //     thePlugin.registerEvent(thePlugin.app.metadataCache.on("snw:onlayoutready", () => {
+        //         // after layout at startupis finished, if any documents are open they need to be refreshed
+        //         //
+        //         // this.processMarkdown();
+        //         // thePlugin.environmentInitialized=true;
+        //     }));
+        // }
     }
 
     processMarkdown(): void {
