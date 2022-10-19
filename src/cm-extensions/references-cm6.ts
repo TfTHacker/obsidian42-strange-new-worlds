@@ -35,12 +35,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
     constructor(public view: EditorView) {        
         if(thePlugin.settings.enableRenderingBlockIdInLivePreview) 
             this.regxPattern = "(\\s\\^)(\\S+)$"; 
-        if(thePlugin.settings.enableRenderingLinksInLivePreview) 
-            this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "(?<=[^!]|^)\\[\\[(.*?)\\]\\]";
         if(thePlugin.settings.enableRenderingEmbedsInLivePreview)
             this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "!\\[\\[(.*?)\\]\\]";  
+        if(thePlugin.settings.enableRenderingLinksInLivePreview) 
+                this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "\\[\\[(.*?)\\]\\]";
         if(thePlugin.settings.enableRenderingHeadersInLivePreview)
             this.regxPattern += (this.regxPattern != "" ? "|" : "") +  "^#+\\s.+";
+
     
         //if there is no regex pattern, then don't go further
         if(this.regxPattern==="") return;
@@ -86,10 +87,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                         from: to,
                         to: to 
                     });
-                    //this was not working with mobile from 0.16.4
+                    // this was not working with mobile from 0.16.4
                     // so had to convert it to a string
-                    // const linksinHeader = match[0].match(/(?<=[^!])\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
-                    const linksinHeader = match[0].match("/(?<=[^!])\\[\\[(.*?)\\]\\]|!\\[\\[(.*?)\\]\\]/g");
+                    const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
+                    // const linksinHeader = match[0].match("/\\[\\[(.*?)\\]\\]/g");
                     if(linksinHeader)
                         for (const l of linksinHeader) {
                             widgetsToAdd.push({
