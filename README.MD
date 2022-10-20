@@ -3,9 +3,13 @@ This plugin helps you to see the connections between the different parts of your
 
 The basic idea is we want to see when links, block references and embeds have associations with other files in the vault. The problem is you have to search, open backlinks and so on to find out what is going on. But there are so many strange new worlds of networked thought to discover in our vault. This plugin attempts to resurface those connections and not be to intrusive (or not too intrusive) in doing so.
 
-https://youtu.be/i08ksJ-nK9c
+Check out this video for an overview of this plugin: 
+
+[![](media/YouTubeIntroVid.png)](https://youtu.be/i08ksJ-nK9c)
 
 The Strange New Worlds plugin is abbreviated as SNW in this documentation.
+
+SNW has been tested to work on mobile device and tablets.
 
 # Lazy networking (linking)
 We are not known to be lazy, but for this plugin we had to be. This plugin leverages the indexing Obsidian does in the background, which is amazing. However, for performance reasons some things don't update right away. So depending on what you are doing, reference coutns sometimes shown by this plugin may be incorrect as you work with links, embeds and blocks. But eventaully they will be correct as the cache updates itself. It is better than nothing, right?
