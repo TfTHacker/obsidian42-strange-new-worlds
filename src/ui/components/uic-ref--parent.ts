@@ -19,11 +19,11 @@ export /**
  */
 const getUIC_Hoverview = async (instance: Instance)=>{
     const {refType, key, filePath, lineNu} = await getDataElements(instance);
-    let output = "";
-    output += `<div class="snw-popover-container">`;
-    output += await getUIC_Ref_Area(refType, key, filePath, lineNu, true);
-    output += `</div>`;
-    instance.setContent(output)
+    const popoverEl = createDiv();
+    popoverEl.addClass("snw-popover-container")
+    popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true));
+
+    instance.setContent(popoverEl);
 
     //event bindings
     setTimeout( async () => {
@@ -51,17 +51,16 @@ export /**
  * @param {string} filePath
  * @return {*}  {Promise<string>}
  */
-const getUIC_SidePane = async (refType: string, key: string, filePath: string, lineNu: number): Promise<string> =>{
-    let output = "";
-    output += `<div class="snw-sidepane-container">`;
-    output += await getUIC_Ref_Area(refType, key, filePath, lineNu, false);
-    output += `</div>`;
+const getUIC_SidePane = async (refType: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> =>{
+    const sidepaneEL = createDiv();
+    sidepaneEL.addClass("snw-sidepane-container");
+    sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false)) )
 
     setTimeout( async () => {
         await setFileLinkHandlers(false);
     }, 500);
 
-    return output;
+    return sidepaneEL
 }
 
 

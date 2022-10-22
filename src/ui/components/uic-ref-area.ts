@@ -6,7 +6,6 @@ import { getUIC_Ref_Item } from "./uic-ref-item";
 import { getUIC_Ref_Title_Div } from "./uic-ref-title";
 
 
-
 export /**
  *  Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
  *
@@ -16,16 +15,19 @@ export /**
  * @param {boolean} isHoverView
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<string> => {
-    
+const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<HTMLElement> => {
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
+    const refAreaContainerEl = createDiv();
+    
+    //get title header for this reference area
+    refAreaContainerEl.append(await getUIC_Ref_Title_Div(key, filePath, refAreaItems.refCount, lineNu, isHoverView)); 
 
-    let response = "";
-    response += await getUIC_Ref_Title_Div(key, filePath, refAreaItems.refCount, lineNu, isHoverView); //get title header for this reference ara
-    response += `<div class="snw-ref-area">`;
-    response += refAreaItems.response;
-    response += `</div>`;
-    return response;
+    const refAreaEl = createDiv();
+    refAreaEl.addClass("snw-ref-area");
+    refAreaEl.append(refAreaItems.response)
+    refAreaContainerEl.append(refAreaEl)
+
+    return refAreaContainerEl;
 }
 
 
@@ -37,9 +39,11 @@ const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, l
  * @param {string} filePath
  * @return {*}  {Promise<{response: string, refCount: number}>}
  */
-const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{response: string, refCount: number}> => {
+const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{response: HTMLElement, refCount: number}> => {
     
-    let responseContent = ``;
+    // let responseContent = ``;
+    // const responseWrapperContainerEl = createDiv();
+
     let countOfRefs = 0;
     let linksToLoop: Link[] = null;
 
@@ -61,24 +65,31 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
             .map(file_path => { return linksToLoop.find(a => a.sourceFile.path === file_path)}
         );
 
+
+    const wrapperEl = createDiv();
+
     for (const file_path of uniqueFileKeys ) {
-            responseContent += `<div class="snw-ref-item-container">
-                                     <div class="snw-ref-item-file"
-                                        snw-data-line-number="${-1}" 
-                                        snw-data-file-name="${file_path.sourceFile.path.replace(".md","")}"
-                                        data-href="${file_path.sourceFile.path}" 
-                                        href="${file_path.sourceFile.path}">${file_path.sourceFile.basename}</div>`;
-            for (const ref of linksToLoop) {
-                if(file_path.sourceFile.path===ref.sourceFile.path) {
-                    responseContent += await getUIC_Ref_Item(ref);
-                }
+        const responseItemContainerEl = createDiv();
+        responseItemContainerEl.addClass("snw-ref-item-container");
+        wrapperEl.appendChild(responseItemContainerEl);
+
+        const refItemFileEl = createDiv();
+        refItemFileEl.addClass("snw-ref-item-file");
+        refItemFileEl.setAttribute("snw-data-line-number",  "-1");
+        refItemFileEl.setAttribute("snw-data-file-name",    file_path.sourceFile.path.replace(".md",""));
+        refItemFileEl.setAttribute("data-href",             file_path.sourceFile.path);
+        refItemFileEl.setAttribute("href",                  file_path.sourceFile.path);
+        refItemFileEl.innerText = file_path.sourceFile.basename;
+        responseItemContainerEl.appendChild(refItemFileEl);
+
+        for (const ref of linksToLoop) {
+            if(file_path.sourceFile.path===ref.sourceFile.path) {
+                responseItemContainerEl.appendChild(await getUIC_Ref_Item(ref));
             }
-            responseContent += `</div>`;
+        }
     }
 
-
-
-    return {response: responseContent, refCount: countOfRefs};
+    return {response: wrapperEl, refCount: countOfRefs};
 }
 
 

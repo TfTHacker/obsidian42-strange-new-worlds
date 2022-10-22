@@ -30,7 +30,6 @@ export class SideBarPaneView extends ItemView {
     }
 
     async updateView() {
-        // const container: HTMLElement = this.containerEl;
         const refType = this.thePlugin.lastSelectedReferenceType;
         const key = this.thePlugin.lastSelectedReferenceKey;
         const filePath = this.thePlugin.lastSelectedReferenceFilePath;
@@ -41,8 +40,7 @@ export class SideBarPaneView extends ItemView {
             this.thePlugin.snwAPI.console("sidepane.open() getReferencesCache()", getReferencesCache());
         }
 
-        const sidepaneContentsEl = document.createRange().createContextualFragment(await getUIC_SidePane(refType, key, filePath, lineNu));
-        this.containerEl.replaceChildren(sidepaneContentsEl)
+        this.containerEl.replaceChildren(await getUIC_SidePane(refType, key, filePath, lineNu))
     }
 
     async onClose() { // Nothing to clean up.

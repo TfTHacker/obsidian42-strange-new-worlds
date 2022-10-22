@@ -14,7 +14,7 @@ export /**
  * @param {Link} ref
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
+const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement>=> {
     const itemEl = createDiv();
     itemEl.addClass("snw-ref-item-info");
     itemEl.setAttribute("snw-data-line-number", ref.reference.position.start.line.toString());
@@ -25,7 +25,7 @@ const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
 
     itemEl.appendChild( fileChuncksEl );
 
-    return itemEl.outerHTML;
+    return itemEl;
 }
 
 
