@@ -60,9 +60,6 @@ export interface TransformedCache {
     embeds?: TransformedCachedItem[]
     createDate?: number;   //date when cache was generated with Date.now()
     cacheMetaData?: CachedMetadata;
-    // linksWithoutDuplicates?: TransformedCachedItem[]
-    // embedsWithDuplicates?: TransformedCachedItem[]
-    // sections?: SectionCache[]
 }
  
 export interface ListItem extends ListItemCache {

@@ -202,11 +202,6 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});		
 
-
-
-
-
-
 		containerEl.createEl("h2", { text: "Other Settings" });
 
 		new Setting(containerEl)

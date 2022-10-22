@@ -24,7 +24,6 @@ export default class ThePlugin extends Plugin {
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
     sidebarPaneSNW: SideBarPaneView;
-    // environmentInitialized = false;
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
@@ -41,9 +40,6 @@ export default class ThePlugin extends Plugin {
         // @ts-ignore
         globalThis.snwAPI = this.snwAPI;  // API access to SNW for Templater, Dataviewjs and the console debugger
 
-        // // initial build of references
-        // buildLinksAndReferences();
-        
         await this.loadSettings();
         this.addSettingTab(new SettingsTab(this.app, this));
 
@@ -52,12 +48,11 @@ export default class ThePlugin extends Plugin {
             return this.sidebarPaneSNW;
         });
 
-
-
         //initial index building
         const indexDebounce = debounce(() => {
             buildLinksAndReferences()
         }, 1000, true);
+
         this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,8 +77,6 @@ export default class ThePlugin extends Plugin {
                 if( !this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length ) {
                     await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
                 }
-                // this.app.metadataCache.trigger("snw:onlayoutready");
-                // setTimeout(()=>this.environmentInitialized=true, 5000); // Used to make everything is initialized.
             });
         });
     }
@@ -97,8 +90,6 @@ export default class ThePlugin extends Plugin {
         this.lastSelectedReferenceType = refType;
         this.lastSelectedReferenceFilePath = filePath;
         this.lastSelectedLineNumber = lineNu;
-        // this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
-        // await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: true});
         this.app.workspace.rightSplit.expand();
         await this.sidebarPaneSNW.updateView();
         setTimeout(() => {
@@ -157,11 +148,9 @@ export default class ThePlugin extends Plugin {
     onunload(): void {
         console.log("unloading " + this.appName)
         try {
-            // this.app.workspace.detachLeavesOfType(VIEW_TYPE_SNW);
             MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (this.app.workspace as any).unregisterHoverLinkSource(this.appID);
-
         } catch (error) { /* don't do anything */ }
     }
 

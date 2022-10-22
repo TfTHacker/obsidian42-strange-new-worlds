@@ -8,7 +8,6 @@ import { getUIC_SidePane } from "./components/uic-ref--parent";
 export const VIEW_TYPE_SNW = "Strange New Worlds";
 
 export class SideBarPaneView extends ItemView {
-    contentEl: HTMLElement;
     thePlugin: ThePlugin;
     
     constructor(leaf : WorkspaceLeaf, thePlugin: ThePlugin) {
@@ -24,12 +23,14 @@ export class SideBarPaneView extends ItemView {
 
     async onOpen() {
         const container: HTMLElement = this.containerEl;
+        const loadingEL: HTMLElement = container.createSpan({cls:"snw-sidepane-loading"});
+        loadingEL.innerText = `Discovering new worlds...`;
         container.empty();
-        container.innerHTML = `<span class="snw-sidepane-loading">Discovering new worlds...</span>`;
+        container.appendChild(loadingEL);
     }
 
     async updateView() {
-        const container: HTMLElement = this.containerEl;
+        // const container: HTMLElement = this.containerEl;
         const refType = this.thePlugin.lastSelectedReferenceType;
         const key = this.thePlugin.lastSelectedReferenceKey;
         const filePath = this.thePlugin.lastSelectedReferenceFilePath;
@@ -39,7 +40,9 @@ export class SideBarPaneView extends ItemView {
             this.thePlugin.snwAPI.console("sidepane.open() refType, key, filePath", refType, key, filePath);
             this.thePlugin.snwAPI.console("sidepane.open() getReferencesCache()", getReferencesCache());
         }
-        container.innerHTML = await getUIC_SidePane(refType, key, filePath, lineNu);
+
+        const sidepaneContentsEl = document.createRange().createContextualFragment(await getUIC_SidePane(refType, key, filePath, lineNu));
+        this.containerEl.replaceChildren(sidepaneContentsEl)
     }
 
     async onClose() { // Nothing to clean up.
