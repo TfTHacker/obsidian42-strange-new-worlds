@@ -10,6 +10,11 @@
  * @return {*}  {Promise<string>}
  */
 export const getUIC_Ref_Title_Div = async (key: string, filePath: string, refCount: number, lineNu: number, isPopover:boolean): Promise<string> => {
-    const titleClass = isPopover ? "snw-ref-title-popover" : "snw-ref-title-side-pane";
-    return `<div class="${titleClass}" snw-ref-title-key="${key}" snw-data-file-name="${filePath}" snw-data-line-number="${lineNu}">${key}</div>`;
+    const titleEl = createDiv();
+    titleEl.addClass(isPopover ? "snw-ref-title-popover" : "snw-ref-title-side-pane");
+    titleEl.setAttribute("snw-ref-title-key",   key);
+    titleEl.setAttribute("snw-data-file-name",  filePath);
+    titleEl.setAttribute("snw-data-line-number", lineNu.toString());
+    titleEl.innerText = key;
+    return titleEl.outerHTML;
 }
