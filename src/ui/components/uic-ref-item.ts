@@ -15,14 +15,17 @@ export /**
  * @return {*}  {Promise<string>}
  */
 const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
-    let response = "";
-        response += `<div class="snw-ref-item-info" 
-                          snw-data-line-number="${ref.reference.position.start.line}" 
-                          snw-data-file-name="${ref.sourceFile.path.replace(".md","")}"
-                          data-href="${ref.sourceFile.path.replace(".md","")}">`;
-        response += await grabChunkOfFile(ref.sourceFile, ref.reference.position);
-        response += `</div>`; 
-        return response;
+    const itemEl = createDiv();
+    itemEl.addClass("snw-ref-item-info");
+    itemEl.setAttribute("snw-data-line-number", ref.reference.position.start.line.toString());
+    itemEl.setAttribute("snw-data-file-name",   ref.sourceFile.path.replace(".md",""));
+    itemEl.setAttribute("data-href",            ref.sourceFile.path.replace(".md",""));
+
+    const fileChuncksEl = await grabChunkOfFile(ref.sourceFile, ref.reference.position);
+
+    itemEl.appendChild( fileChuncksEl );
+
+    return itemEl.outerHTML;
 }
 
 
@@ -33,7 +36,7 @@ const getUIC_Ref_Item = async (ref: Link): Promise<string>=> {
  * @param {Pos} position
  * @return {*}  {Promise<string>}
  */
-const grabChunkOfFile = async (file: TFile, position: Pos): Promise<string> =>{
+const grabChunkOfFile = async (file: TFile, position: Pos): Promise<HTMLElement> =>{
     const fileContents = await thePlugin.app.vault.cachedRead(file)
     const cachedMetaData = thePlugin.app.metadataCache.getFileCache(file);
 
@@ -52,8 +55,8 @@ const grabChunkOfFile = async (file: TFile, position: Pos): Promise<string> =>{
     const blockContents = fileContents.substring(startPosition, endPosition);
 
     const el = document.createElement("div");
-    el.setAttribute("uic","uic")  //used to track if this is UIC element. 
-    await MarkdownRenderer.renderMarkdown(blockContents, el, file.path, thePlugin)
+    el.setAttribute("uic","uic");  //used to track if this is UIC element. 
+    await MarkdownRenderer.renderMarkdown(blockContents, el, file.path, thePlugin);
 
-    return el.innerHTML
+    return el
 }
