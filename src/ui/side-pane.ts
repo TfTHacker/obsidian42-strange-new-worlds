@@ -24,7 +24,12 @@ export class SideBarPaneView extends ItemView {
     async onOpen() {
         const container: HTMLElement = this.containerEl;
         const loadingEL: HTMLElement = container.createSpan({cls:"snw-sidepane-loading"});
-        loadingEL.innerText = `Discovering new worlds...`;
+        const bannerEl: HTMLElement = createDiv({cls:"snw-sidepane-loading-banner"});
+        bannerEl.innerText= `Discovering Strange New Worlds...`
+        loadingEL.appendChild(bannerEl)
+        const pendingTextEl: HTMLElement = createDiv({cls:"snw-sidepane-loading-subtext"})
+        pendingTextEl.innerText = `Click a reference counter in the main document for information to appear here.`;
+        loadingEL.appendChild(pendingTextEl);
         container.empty();
         container.appendChild(loadingEL);
     }

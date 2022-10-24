@@ -205,3 +205,15 @@
     font-size: 8pt;
 }
  
+.snw-sidepane-loading {
+    color: var(--text-muted);
+    margin-top:  15px;
+    margin-left: 20px;
+}
+
+.snw-sidepane-loading-subtext {
+    color: var(--text-faint);
+    font-style: italic;
+    margin-top: 10px;
+    font-size: small;
+}
