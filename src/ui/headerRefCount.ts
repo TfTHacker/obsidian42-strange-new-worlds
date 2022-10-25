@@ -1,6 +1,6 @@
 // Displays in the header of open documents the count of incoming links
 
-import {MarkdownView, WorkspaceLeaf} from "obsidian";
+import {MarkdownView, Platform, WorkspaceLeaf} from "obsidian";
 import {Link} from "../types";
 import ThePlugin from "../main";
 import {processHtmlDecorationReferenceEvent} from "../cm-extensions/htmlDecorations";
@@ -77,17 +77,21 @@ function processHeader(mdView: MarkdownView) {
     }
 
     snwTitleRefCountDisplayCountEl.innerText = " " + incomingLinks.length.toString() + " ";
-    snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent)=> {
-        e.stopPropagation();
-        processHtmlDecorationReferenceEvent(wrapper)
-    };
+    if(Platform.isDesktop || Platform.isDesktopApp) {
+            snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent)=> {
+            e.stopPropagation();
+            processHtmlDecorationReferenceEvent(wrapper)
+        };
+    }
     wrapper.setAttribute("data-snw-key", mdView.file.basename);
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-filepath", mdView.file.path);
-    wrapper.onclick = (e : MouseEvent) => {
-        e.stopPropagation();
-        processHtmlDecorationReferenceEvent(e.target as HTMLElement);
-    }
+    // if(Platform.isDesktop || Platform.isDesktopApp) {
+        wrapper.onclick = (e : MouseEvent) => {
+            e.stopPropagation();
+            processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+        }
+    // }
 
     tippy(wrapper, {
         interactive: true,

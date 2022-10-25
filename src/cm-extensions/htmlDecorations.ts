@@ -2,6 +2,7 @@ import ThePlugin from "../main";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getUIC_Hoverview } from "src/ui/components/uic-ref--parent";
+import { Platform } from "obsidian";
 
 let thePlugin: ThePlugin;
 
@@ -36,7 +37,8 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     element.setAttribute("snw-data-line-number", lineNu.toString());
     if(attachCSSClass) element.addClass(attachCSSClass);
 
-    element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+    if(Platform.isDesktop || Platform.isDesktopApp) //click is default to desktop, otherwise mobile behaves differently
+        element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);

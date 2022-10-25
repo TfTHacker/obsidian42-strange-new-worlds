@@ -1,6 +1,7 @@
 //wrapper element for references area. shared between popover and sidepane
 
 import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
+import ThePlugin from "src/main";
 import { Link } from "src/types";
 import { getUIC_Ref_Item } from "./uic-ref-item";
 import { getUIC_Ref_Title_Div } from "./uic-ref-title";
@@ -15,12 +16,12 @@ export /**
  * @param {boolean} isHoverView
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<HTMLElement> => {
+const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean, thePlugin: ThePlugin): Promise<HTMLElement> => {
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
     const refAreaContainerEl = createDiv();
     
     //get title header for this reference area
-    refAreaContainerEl.append(await getUIC_Ref_Title_Div(key, filePath, refAreaItems.refCount, lineNu, isHoverView)); 
+    refAreaContainerEl.append(await getUIC_Ref_Title_Div(refType, key, filePath, refAreaItems.refCount, lineNu, isHoverView, thePlugin)); 
 
     const refAreaEl = createDiv();
     refAreaEl.addClass("snw-ref-area");

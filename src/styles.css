@@ -9,6 +9,10 @@
     padding-left: 1px;
 }
 
+.is-mobile .snw-reference {
+    font-size: 8pt;
+}
+
 /* CM Live Preview */
 .cm-content .snw-reference {
     padding-right: 2px;

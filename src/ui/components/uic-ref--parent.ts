@@ -12,34 +12,34 @@ export function setPluginVariableForUIC(plugin: ThePlugin) {
 }
 
 
-export /**
+/**
  * Starting point for the hover popup control. Calls into uic-ref-area, then uic-ref-title and uic-ref-item
  *
  * @param {Instance} instance   the Tippy instance. Tippy provides the floating container.
  */
-const getUIC_Hoverview = async (instance: Instance)=>{
+export const getUIC_Hoverview = async (instance: Instance)=>{
     const {refType, key, filePath, lineNu} = await getDataElements(instance);
     const popoverEl = createDiv();
     popoverEl.addClass("snw-popover-container")
-    popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true));
+    popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true, thePlugin));
 
     instance.setContent(popoverEl);
 
-    //event bindings
-    setTimeout( async () => {
-        const titleElement: HTMLElement = document.querySelector(".snw-ref-title-popover");
-        if(titleElement) {
-            titleElement.onclick = async (e: MouseEvent) => {
-                //open view into side pane
-                const refType = (e.target as HTMLElement).getAttribute("snw-ref-title-type")
-                const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
-                const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
-                const lineNu = (e.target as HTMLElement).getAttribute("snw-data-line-number")
-                thePlugin.activateView(refType, key, path, Number(lineNu));
-            }
-            await setFileLinkHandlers(true);    
-        }
-    }, 300);
+    // //event bindings
+    // setTimeout( async () => {
+    //     const titleElement: HTMLElement = document.querySelector(".snw-ref-title-popover");
+    //     if(titleElement) {
+    //         titleElement.onclick = async (e: MouseEvent) => {
+    //             //open view into side pane
+    //             const refType = (e.target as HTMLElement).getAttribute("snw-ref-title-type")
+    //             const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
+    //             const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
+    //             const lineNu = (e.target as HTMLElement).getAttribute("snw-data-line-number")
+    //             thePlugin.activateView(refType, key, path, Number(lineNu));
+    //         }
+    //         await setFileLinkHandlers(true);    
+    //     }
+    // }, 300);
 }
 
 
@@ -54,7 +54,7 @@ export /**
 const getUIC_SidePane = async (refType: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> =>{
     const sidepaneEL = createDiv();
     sidepaneEL.addClass("snw-sidepane-container");
-    sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false)) )
+    sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false, thePlugin)) )
 
     setTimeout( async () => {
         await setFileLinkHandlers(false);
@@ -69,7 +69,7 @@ const getUIC_SidePane = async (refType: string, key: string, filePath: string, l
  *
  * @param {boolean} isHoverView
  */
-const setFileLinkHandlers = async (isHoverView: boolean)=>{
+export const setFileLinkHandlers = async (isHoverView: boolean)=>{
     const linksToFiles: NodeList = document.querySelectorAll(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
     linksToFiles.forEach((node: Element)=>{
         if(!node.getAttribute("snw-has-handler")){
