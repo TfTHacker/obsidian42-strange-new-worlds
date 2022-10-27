@@ -1,5 +1,6 @@
 //wrapper element for references area. shared between popover and sidepane
 
+import { getIcon } from "obsidian";
 import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
 import ThePlugin from "src/main";
 import { Link } from "src/types";
@@ -74,13 +75,25 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
         responseItemContainerEl.addClass("snw-ref-item-container");
         wrapperEl.appendChild(responseItemContainerEl);
 
+
         const refItemFileEl = createDiv();
         refItemFileEl.addClass("snw-ref-item-file");
         refItemFileEl.setAttribute("snw-data-line-number",  "-1");
         refItemFileEl.setAttribute("snw-data-file-name",    file_path.sourceFile.path.replace(".md",""));
         refItemFileEl.setAttribute("data-href",             file_path.sourceFile.path);
         refItemFileEl.setAttribute("href",                  file_path.sourceFile.path);
-        refItemFileEl.innerText = file_path.sourceFile.basename;
+
+        const refItemFileIconEl = createDiv()
+        refItemFileIconEl.addClass("snw-ref-item-file-icon");
+        refItemFileIconEl.innerHTML = getIcon("file-box").outerHTML;
+        
+        const refItemFileLabelEl = createDiv();
+        refItemFileLabelEl.addClass("snw-ref-item-file-label");
+        refItemFileLabelEl.innerText = file_path.sourceFile.basename;
+
+        refItemFileEl.append(refItemFileIconEl);
+        refItemFileEl.append(refItemFileLabelEl);
+
         responseItemContainerEl.appendChild(refItemFileEl);
 
         for (const ref of linksToLoop) {
