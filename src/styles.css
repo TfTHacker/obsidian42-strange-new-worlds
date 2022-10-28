@@ -141,6 +141,7 @@ body {
     margin-bottom: 0px !important;
     max-height: 230px !important;
     overflow: hidden;
+    white-space: normal;
 }
 
 .snw-ref-item-info a {
