@@ -17,6 +17,8 @@ import { getIcon } from "obsidian";
 export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePath: string, refCount: number, lineNu: number, isPopover:boolean, thePlugin: ThePlugin): Promise<HTMLElement> => {
     const titleEl = createDiv();
     titleEl.addClass(isPopover ? "snw-ref-title-popover" : "snw-ref-title-side-pane");
+    titleEl.addClass("tree-item-self");
+    titleEl.addClass("is-clickable");
     titleEl.setAttribute("snw-ref-title-type",  refType);
     titleEl.setAttribute("snw-ref-title-key",   key);
     titleEl.setAttribute("snw-data-file-name",  filePath);

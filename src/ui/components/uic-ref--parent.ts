@@ -20,28 +20,14 @@ export function setPluginVariableForUIC(plugin: ThePlugin) {
 export const getUIC_Hoverview = async (instance: Instance)=>{
     const {refType, key, filePath, lineNu} = await getDataElements(instance);
     const popoverEl = createDiv();
-    popoverEl.addClass("snw-popover-container")
+    popoverEl.addClass("snw-popover-container");
+    popoverEl.addClass("search-result-container")
     popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true, thePlugin));
 
     instance.setContent(popoverEl);
 
-    // //event bindings
-    // setTimeout( async () => {
-    //     const titleElement: HTMLElement = document.querySelector(".snw-ref-title-popover");
-    //     if(titleElement) {
-    //         titleElement.onclick = async (e: MouseEvent) => {
-    //             //open view into side pane
-    //             const refType = (e.target as HTMLElement).getAttribute("snw-ref-title-type")
-    //             const key = (e.target as HTMLElement).getAttribute("snw-ref-title-key")
-    //             const path = (e.target as HTMLElement).getAttribute("snw-ref-title-filepath")
-    //             const lineNu = (e.target as HTMLElement).getAttribute("snw-data-line-number")
-    //             thePlugin.activateView(refType, key, path, Number(lineNu));
-    //         }
-    //         await setFileLinkHandlers(true);    
-    //     }
-    // }, 300);
 }
-
+ 
 
 export /**
  *  Loads the references into the side pane, using the same logic as the HoverView 
@@ -53,9 +39,10 @@ export /**
  */
 const getUIC_SidePane = async (refType: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> =>{
     const sidepaneEL = createDiv();
-    sidepaneEL.addClass("snw-sidepane-container");
+    sidepaneEL.addClass("snw-sidepane-container");   
+    sidepaneEL.addClass("search-result-container");
     sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false, thePlugin)) )
-
+ 
     setTimeout( async () => {
         await setFileLinkHandlers(false);
     }, 500);

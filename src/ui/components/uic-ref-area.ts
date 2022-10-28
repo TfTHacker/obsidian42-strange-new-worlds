@@ -72,12 +72,17 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
     for (const file_path of uniqueFileKeys ) {
         const responseItemContainerEl = createDiv();
-        responseItemContainerEl.addClass("snw-ref-item-container");
+        responseItemContainerEl.addClass("snw-ref-item-container"); 
+        responseItemContainerEl.addClass("tree-item");
+    
         wrapperEl.appendChild(responseItemContainerEl);
 
 
         const refItemFileEl = createDiv();
         refItemFileEl.addClass("snw-ref-item-file");
+        refItemFileEl.addClass("tree-item-self");
+        refItemFileEl.addClass("search-result-file-title");
+        refItemFileEl.addClass("is-clickable");
         refItemFileEl.setAttribute("snw-data-line-number",  "-1");
         refItemFileEl.setAttribute("snw-data-file-name",    file_path.sourceFile.path.replace(".md",""));
         refItemFileEl.setAttribute("data-href",             file_path.sourceFile.path);
@@ -85,10 +90,13 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
         const refItemFileIconEl = createDiv()
         refItemFileIconEl.addClass("snw-ref-item-file-icon");
+        refItemFileIconEl.addClass("tree-item-icon"); 
+        refItemFileIconEl.addClass("collapse-icon");
         refItemFileIconEl.innerHTML = getIcon("file-box").outerHTML;
         
         const refItemFileLabelEl = createDiv();
         refItemFileLabelEl.addClass("snw-ref-item-file-label");
+        refItemFileLabelEl.addClass("tree-item-inner");
         refItemFileLabelEl.innerText = file_path.sourceFile.basename;
 
         refItemFileEl.append(refItemFileIconEl);
@@ -96,9 +104,14 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
         responseItemContainerEl.appendChild(refItemFileEl);
 
+        const refItemsCollectionE = createDiv();
+        refItemsCollectionE.addClass("snw-ref-item-collection-items");
+        refItemsCollectionE.addClass("search-result-file-matches");  
+        responseItemContainerEl.appendChild(refItemsCollectionE); 
+
         for (const ref of linksToLoop) {
             if(file_path.sourceFile.path===ref.sourceFile.path) {
-                responseItemContainerEl.appendChild(await getUIC_Ref_Item(ref));
+                refItemsCollectionE.appendChild(await getUIC_Ref_Item(ref));
             }
         }
     }

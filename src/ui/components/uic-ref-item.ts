@@ -17,6 +17,8 @@ export /**
 const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement>=> {
     const itemEl = createDiv();
     itemEl.addClass("snw-ref-item-info");
+    itemEl.addClass("search-result-file-match");
+
     itemEl.setAttribute("snw-data-line-number", ref.reference.position.start.line.toString());
     itemEl.setAttribute("snw-data-file-name",   ref.sourceFile.path.replace(".md",""));
     itemEl.setAttribute("data-href",            ref.sourceFile.path.replace(".md",""));
