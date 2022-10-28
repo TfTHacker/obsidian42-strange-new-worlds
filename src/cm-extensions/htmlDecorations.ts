@@ -45,7 +45,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
 
     tippy(element, {
         interactive: true,
-        appendTo: () => document.body,
+        appendTo: () =>  element.closest(".view-content"),    //document.body
         allowHTML: true,
         onShow(instance) { setTimeout( async () => {
             await getUIC_Hoverview(instance)

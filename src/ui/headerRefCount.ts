@@ -95,7 +95,7 @@ function processHeader(mdView: MarkdownView) {
 
     tippy(wrapper, {
         interactive: true,
-        appendTo: () => document.body,
+        appendTo: () =>  wrapper.closest(".view-content"),
         allowHTML: true,
         onShow(instance) { setTimeout( async () => {
             await getUIC_Hoverview(instance)

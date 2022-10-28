@@ -23,9 +23,10 @@ export const getUIC_Hoverview = async (instance: Instance)=>{
     popoverEl.addClass("snw-popover-container");
     popoverEl.addClass("search-result-container")
     popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true, thePlugin));
-
     instance.setContent(popoverEl);
-
+    setTimeout( async () => {
+        await setFileLinkHandlers(false, popoverEl);
+    }, 500);
 }
  
 
@@ -44,7 +45,7 @@ const getUIC_SidePane = async (refType: string, key: string, filePath: string, l
     sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false, thePlugin)) )
  
     setTimeout( async () => {
-        await setFileLinkHandlers(false);
+        await setFileLinkHandlers(false, sidepaneEL);
     }, 500);
 
     return sidepaneEL
@@ -56,8 +57,8 @@ const getUIC_SidePane = async (refType: string, key: string, filePath: string, l
  *
  * @param {boolean} isHoverView
  */
-export const setFileLinkHandlers = async (isHoverView: boolean)=>{
-    const linksToFiles: NodeList = document.querySelectorAll(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
+export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForViewEl: HTMLElement)=>{
+    const linksToFiles: NodeList = rootElementForViewEl.querySelectorAll(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover");
     linksToFiles.forEach((node: Element)=>{
         if(!node.getAttribute("snw-has-handler")){
             node.setAttribute("snw-has-handler","true"); //prevent the event from being added twice

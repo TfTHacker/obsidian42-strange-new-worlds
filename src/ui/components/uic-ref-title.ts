@@ -1,7 +1,6 @@
 // the title displayed at the top of a uic-ref-area
 
 import ThePlugin from "src/main";
-import { setFileLinkHandlers } from "./uic-ref--parent";
 import {hideAll} from 'tippy.js';
 import { getIcon } from "obsidian";
 
@@ -46,9 +45,8 @@ export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePat
 
         //event bindings
         setTimeout( async () => {
-            const imgEl: HTMLElement = document.querySelector(".snw-ref-title-popover-open-sidepane-icon");
-            if(imgEl) {
-                imgEl.onclick = async (e: MouseEvent) => {
+            if(imgWrappper) {
+                imgWrappper.onclick = async (e: MouseEvent) => {
                     e.stopPropagation();
                     hideAll({duration: 0}); // hide popup
                     // @ts-ignore
@@ -60,7 +58,7 @@ export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePat
                     const lineNu = parentEl.getAttribute("snw-data-line-number")
                     thePlugin.activateView(refType, key, path, Number(lineNu));
                 }
-                await setFileLinkHandlers(true);    
+                // await setFileLinkHandlers(true, imgWrappper.querySelector(".view-content"));    
             }
         }, 300);
     } //END isPopover
