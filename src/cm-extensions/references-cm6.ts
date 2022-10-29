@@ -81,7 +81,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //link
                     widgetsToAdd.push({
                         // @ts-ignore
-                        key: match[0].replaceAll("#","").substring(1),
+                        key: match[0].replace(/^#+/,"").substring(1),
                         transformedCachedItem: transformedCache.headings,
                         refType: "heading",
                         from: to,
