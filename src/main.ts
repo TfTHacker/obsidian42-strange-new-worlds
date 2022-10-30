@@ -1,6 +1,6 @@
 import { Extension } from "@codemirror/state";
-import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
-import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
+import { debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin } from "obsidian";
+import { buildLinksAndReferences, setPluginVariableForIndexer } from "./indexer";
 import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./view-extensions/references-cm6";
 import { setPluginVariableForHtmlDecorations } from "./view-extensions/htmlDecorations";
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./view-extensions/references-preview";
@@ -85,6 +85,15 @@ export default class ThePlugin extends Plugin {
         setHeaderWithReferenceCounts();
     }
 
+    /**
+     * Displays the sidebar SNW pane
+     *
+     * @param {string} refType
+     * @param {string} key
+     * @param {string} filePath
+     * @param {number} lineNu
+     * @memberof ThePlugin
+     */
     async activateView(refType: string, key: string, filePath: string, lineNu: number) {
         this.lastSelectedReferenceKey = key;
         this.lastSelectedReferenceType = refType;
@@ -97,6 +106,11 @@ export default class ThePlugin extends Plugin {
         }, 100);
     }
 
+    /**
+     * Turns on and off the reference count displayed at the top of the document in the header area
+     *
+     * @memberof ThePlugin
+     */
     toggleStateHeaderCount(): void {
         const state = this.settings.displayIncomingFilesheader;
         if(state===true)
@@ -105,6 +119,11 @@ export default class ThePlugin extends Plugin {
             this.app.workspace.off("layout-change", this.layoutChangeEvent );
     }
 
+    /**
+     * Turns on and off the SNW reference counters in Reading mode
+     *
+     * @memberof ThePlugin
+     */
     toggleStateSNWMarkdownPreview(): void {
         const state = this.settings.displayInlineReferencesMarkdown;
         if(state==true && this.markdownPostProcessorSNW===null) {
@@ -115,14 +134,32 @@ export default class ThePlugin extends Plugin {
         }
     }
 
+    /**
+     * Turns on and off the SNW reference counters in CM editor
+     *
+     * @memberof ThePlugin
+     */
     toggleStateSNWLivePreview(): void {
         this.updateCMExtensionState("inline-ref", this.settings.displayInlineReferencesLivePreview, InlineReferenceExtension);
     }
 
+    /**
+     * Turns on and off the SNW reference counters in CM editor gutter
+     *
+     * @memberof ThePlugin
+     */
     toggleStateSNWGutters(): void {
         this.updateCMExtensionState("gutter", this.settings.displayEmbedReferencesInGutter, ReferenceGutterExtension);
     }
 
+    /**
+     * Manages which CM extensions are loaded into Obsidian
+     *
+     * @param {string} extensionIdentifier
+     * @param {boolean} extensionState
+     * @param {Extension} extension
+     * @memberof ThePlugin
+     */
     updateCMExtensionState(extensionIdentifier: string, extensionState: boolean, extension: Extension ) {
         if(extensionState==true) {
             this.editorExtensions.push(extension);

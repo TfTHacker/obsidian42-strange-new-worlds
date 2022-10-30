@@ -24,3 +24,5 @@ These view processors are in the /src/view-extensions/ folder
     - uic-ref-area.ts - the display of references
       - uic-ref-item.ts - the individual reference item rendering
 
+# tippy.js
+- This plugin uses one external library called tippy.js. It is a popular library for providing hovering popups. We did not use Obsidian's hover ontrol because we needed a lot more control over the popup. More info can be found here: https://atomiks.github.io/tippyjs/

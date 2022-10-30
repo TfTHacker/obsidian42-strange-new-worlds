@@ -1,4 +1,5 @@
 import { CachedMetadata, ListItemCache, Pos, TFile} from "obsidian";
+
 declare module "obsidian" {
     interface FileManager {
         getAllLinkResolutions: () => Link[]

@@ -47,6 +47,8 @@ export class SettingsTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
+		containerEl.createEl('h2', { text: this.thePlugin.appName });
+
 		containerEl.createEl("h2", { text: "View Modes" });
 
 		new Setting(containerEl)
@@ -100,10 +102,6 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});
 
-
-
-
-
 		containerEl.createEl("h2", { text: "Enable Reference Types in Reading mode"});
 		containerEl.createEl("sup", { text: "(requires reopening documents to take effect)" });
 
@@ -150,9 +148,6 @@ export class SettingsTab extends PluginSettingTab {
 					await this.thePlugin.saveSettings();
 				});
 			});					
-
-
-
 
 
 		containerEl.createEl("h2", { text: "Enable Reference Types in Live Preview Mode"});

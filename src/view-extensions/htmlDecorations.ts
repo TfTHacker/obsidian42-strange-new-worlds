@@ -55,12 +55,16 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     return element;
 }
 
-export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
+export /**
+ *  Opens the sidebar SNW pane by calling activateView on main.ts
+ *
+ * @param {HTMLElement} target
+ */
+const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
     const refType = target.getAttribute("data-snw-type");
     const key = target.getAttribute("data-snw-key");
     const filePath = target.getAttribute("data-snw-filepath")
     const lineNu = target.getAttribute("snw-data-line-number")
-    
 
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, key, refType, filePath", target,key,refType, filePath);

@@ -67,7 +67,6 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
             .map(file_path => { return linksToLoop.find(a => a.sourceFile.path === file_path)}
         );
 
-
     const wrapperEl = createDiv();
 
     for (const file_path of uniqueFileKeys ) {
@@ -76,7 +75,6 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
         responseItemContainerEl.addClass("tree-item");
     
         wrapperEl.appendChild(responseItemContainerEl);
-
 
         const refItemFileEl = createDiv();
         refItemFileEl.addClass("snw-ref-item-file");

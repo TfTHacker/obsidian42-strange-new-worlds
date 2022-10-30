@@ -1,5 +1,4 @@
-
-
+// This module builds on Obsidians cache to provide more specific link information
 
 import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos} from "obsidian";
 import ThePlugin from "./main";

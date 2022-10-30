@@ -58,7 +58,6 @@ export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePat
                     const lineNu = parentEl.getAttribute("snw-data-line-number")
                     thePlugin.activateView(refType, key, path, Number(lineNu));
                 }
-                // await setFileLinkHandlers(true, imgWrappper.querySelector(".view-content"));    
             }
         }, 300);
     } //END isPopover
