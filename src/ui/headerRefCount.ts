@@ -3,7 +3,7 @@
 import {MarkdownView, Platform, WorkspaceLeaf} from "obsidian";
 import {Link} from "../types";
 import ThePlugin from "../main";
-import {processHtmlDecorationReferenceEvent} from "../cm-extensions/htmlDecorations";
+import {processHtmlDecorationReferenceEvent} from "../view-extensions/htmlDecorations";
 import {getSnwAllLinksResolutions} from "../indexer";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'

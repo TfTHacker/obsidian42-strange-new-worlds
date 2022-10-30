@@ -1,12 +1,12 @@
 import { Extension } from "@codemirror/state";
 import {debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin} from "obsidian";
 import {buildLinksAndReferences, setPluginVariableForIndexer} from "./indexer";
-import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./cm-extensions/references-cm6";
-import { setPluginVariableForHtmlDecorations } from "./cm-extensions/htmlDecorations";
-import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./cm-extensions/references-preview";
-import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./cm-extensions/gutters";
+import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./view-extensions/references-cm6";
+import { setPluginVariableForHtmlDecorations } from "./view-extensions/htmlDecorations";
+import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./view-extensions/references-preview";
+import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./view-extensions/gutters-cm6";
 import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from "./ui/headerRefCount";
-import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/side-pane";
+import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/sidebar-pane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
 import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";

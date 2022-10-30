@@ -1,7 +1,7 @@
 import {gutter, GutterMarker, } from "@codemirror/view";
 import { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
-import { htmlDecorationForReferencesElement } from "src/cm-extensions/htmlDecorations";
+import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
 import { getSNWCacheByFile } from "src/indexer";
 import ThePlugin from "src/main";
 
