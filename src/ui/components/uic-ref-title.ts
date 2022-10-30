@@ -2,7 +2,7 @@
 
 import ThePlugin from "src/main";
 import {hideAll} from 'tippy.js';
-import { getIcon } from "obsidian";
+import { setIcon } from "obsidian";
 
 /**
  * Title in HoverView or sidepane
@@ -32,7 +32,7 @@ export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePat
     if(isPopover) {
         const openSidepaneIconEl = createSpan();
         openSidepaneIconEl.addClass("snw-ref-title-popover-icon")
-        openSidepaneIconEl.innerHTML = getIcon("more-horizontal").outerHTML;
+        setIcon(openSidepaneIconEl, "more-horizontal");
 
         const imgWrappper = createSpan();
         imgWrappper.appendChild(openSidepaneIconEl);

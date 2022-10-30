@@ -1,6 +1,6 @@
 //wrapper element for references area. shared between popover and sidepane
 
-import { getIcon } from "obsidian";
+import { setIcon } from "obsidian";
 import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
 import ThePlugin from "src/main";
 import { Link } from "src/types";
@@ -90,7 +90,7 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
         refItemFileIconEl.addClass("snw-ref-item-file-icon");
         refItemFileIconEl.addClass("tree-item-icon"); 
         refItemFileIconEl.addClass("collapse-icon");
-        refItemFileIconEl.innerHTML = getIcon("file-box").outerHTML;
+        setIcon(refItemFileIconEl, "file-box")
         
         const refItemFileLabelEl = createDiv();
         refItemFileLabelEl.addClass("snw-ref-item-file-label");

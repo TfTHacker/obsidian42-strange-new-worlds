@@ -23,7 +23,6 @@ export default class ThePlugin extends Plugin {
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
-    sidebarPaneSNW: SideBarPaneView;
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
@@ -43,10 +42,7 @@ export default class ThePlugin extends Plugin {
         await this.loadSettings();
         this.addSettingTab(new SettingsTab(this.app, this));
 
-        this.registerView(VIEW_TYPE_SNW, (leaf) => {
-            this.sidebarPaneSNW = new SideBarPaneView(leaf, this)
-            return this.sidebarPaneSNW;
-        });
+        this.registerView(VIEW_TYPE_SNW, (leaf) => new SideBarPaneView(leaf, this));
 
         //initial index building
         const indexDebounce = debounce(() => {
@@ -100,7 +96,9 @@ export default class ThePlugin extends Plugin {
         this.lastSelectedReferenceFilePath = filePath;
         this.lastSelectedLineNumber = lineNu;
         this.app.workspace.rightSplit.expand();
-        await this.sidebarPaneSNW.updateView();
+
+        await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
+
         setTimeout(() => {
             this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
         }, 100);
