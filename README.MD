@@ -20,8 +20,8 @@ We are not known to be lazy, but for this plugin we had to be. This plugin lever
 # SNW References
 When a reference is displayed either in a hover popup or the sidepane, it can be clicked to be opened. By default it will open in the current pane. However using the following keyboard commands, you have more control over how they open.
 + CTRL/CMD + Click - Opens reference in a new tab
-+ CTRL/CMD + SHIFT + Click - Opens reference in a new vertical pane
-+ CTRL/CMD + ALT + Click - Opens reference in a new horizontal pane
++ CTRL/CMD + SHIFT + Click - Opens reference in a new horizontal pane (split down)
++ CTRL/CMD + ALT + Click - Opens reference in a new vertical pane (split right)
 + Alt + Click - Opens reference in a new window
 
 # odd issues

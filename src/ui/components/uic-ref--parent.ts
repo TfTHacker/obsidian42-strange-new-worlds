@@ -70,13 +70,15 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
                 const filePath = handlerElement.getAttribute("snw-data-file-name");
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                 
-                if((e.ctrlKey || e.metaKey) && e.altKey)  
-                    thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT);
-                else if(e.ctrlKey || e.metaKey)  
+                if((e.ctrlKey || e.metaKey) && e.altKey)  // horitzonal pane
                     thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
-                else if(e.altKey)
+                else if((e.ctrlKey || e.metaKey) && e.shiftKey)  //vertical pane
+                    thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT);
+                else if(e.ctrlKey || e.metaKey)  //new tab
+                    thePlugin.app.workspace.getLeaf("tab").openFile(fileT);
+                else if(e.altKey) //new window
                     thePlugin.app.workspace.getLeaf("window").openFile(fileT);
-                else 
+                else //current window
                     thePlugin.app.workspace.getLeaf(false).openFile(fileT);
 
                 // for file titles, the embed handling for titles related to block id's and headers is hard to calculate, so its more efficient to do it here
