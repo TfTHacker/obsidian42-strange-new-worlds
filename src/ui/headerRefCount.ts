@@ -41,6 +41,8 @@ function processHeader(mdView: MarkdownView) {
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
     
     const allLinks: Link[] = getSnwAllLinksResolutions(); 
+    if(allLinks==undefined) return;
+    
     const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
     
     // if no incoming links, check if there is a header and remove it. In all cases, exit roturin

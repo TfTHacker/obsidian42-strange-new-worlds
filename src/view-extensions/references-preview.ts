@@ -33,10 +33,17 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     if(el.hasAttribute("uic")) return; // this is a custom component, don't render SNW inside it.
 
     const currentFile = thePlugin.app.vault.fileMap[ctx.sourcePath];
+    
+    if(currentFile===undefined) return; 
+
     // check for incompatibility with other plugins
     if(thePlugin.app.metadataCache.getFileCache(currentFile)?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
     
-    ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile ));
+    try {
+        ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile ));        
+    } catch (error) {
+        // for now just fail - no logging
+    }
 
 }
 
