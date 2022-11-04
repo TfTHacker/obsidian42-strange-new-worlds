@@ -1,5 +1,5 @@
 import { Extension } from "@codemirror/state";
-import { debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Plugin } from "obsidian";
+import { debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plugin } from "obsidian";
 import { buildLinksAndReferences, setPluginVariableForIndexer } from "./indexer";
 import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./view-extensions/references-cm6";
 import { setPluginVariableForHtmlDecorations } from "./view-extensions/htmlDecorations";
@@ -147,7 +147,12 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateSNWGutters(): void {
-        this.updateCMExtensionState("gutter", this.settings.displayEmbedReferencesInGutter, ReferenceGutterExtension);
+        let gutterState: boolean;
+        if(Platform.isMobile || Platform.isMobileApp) 
+            gutterState = this.settings.displayEmbedReferencesInGutterMobile;
+        else 
+            gutterState = this.settings.displayEmbedReferencesInGutter;
+        this.updateCMExtensionState("gutter", gutterState, ReferenceGutterExtension);
     }
 
     /**

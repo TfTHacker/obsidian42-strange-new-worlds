@@ -2,37 +2,39 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import ThePlugin from "../main";
 
 export interface Settings {
-	minimumRefCountThreshold:			number;
-	displayIncomingFilesheader: 		boolean;
-	displayInlineReferencesLivePreview: boolean;
-	displayInlineReferencesMarkdown: 	boolean;
-	displayEmbedReferencesInGutter:		boolean;
-	cacheUpdateInMilliseconds:			number;
-	enableRenderingBlockIdInMarkdown:	boolean;
-	enableRenderingLinksInMarkdown:		boolean;
-	enableRenderingHeadersInMarkdown:	boolean;
-	enableRenderingEmbedsInMarkdown:	boolean;
-	enableRenderingBlockIdInLivePreview:boolean;
-	enableRenderingLinksInLivePreview:	boolean;
-	enableRenderingHeadersInLivePreview:boolean;
-	enableRenderingEmbedsInLivePreview:	boolean;
+	minimumRefCountThreshold:				number;
+	displayIncomingFilesheader: 			boolean;
+	displayInlineReferencesLivePreview: 	boolean;
+	displayInlineReferencesMarkdown: 		boolean;
+	displayEmbedReferencesInGutter:			boolean;
+	displayEmbedReferencesInGutterMobile: 	boolean;
+	cacheUpdateInMilliseconds:				number;
+	enableRenderingBlockIdInMarkdown:		boolean;
+	enableRenderingLinksInMarkdown:			boolean;
+	enableRenderingHeadersInMarkdown:		boolean;
+	enableRenderingEmbedsInMarkdown:		boolean;
+	enableRenderingBlockIdInLivePreview:	boolean;
+	enableRenderingLinksInLivePreview:		boolean;
+	enableRenderingHeadersInLivePreview:	boolean;
+	enableRenderingEmbedsInLivePreview:		boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-	minimumRefCountThreshold:			1,
-	displayIncomingFilesheader: 		true,
-	displayInlineReferencesLivePreview: true,
-	displayInlineReferencesMarkdown: 	true,
-	displayEmbedReferencesInGutter: 	true,
-	cacheUpdateInMilliseconds: 			500,
-	enableRenderingBlockIdInMarkdown: 	true,
-	enableRenderingLinksInMarkdown: 	true,
-	enableRenderingHeadersInMarkdown: 	true,
-	enableRenderingEmbedsInMarkdown: 	true,
-	enableRenderingBlockIdInLivePreview:true,
-	enableRenderingLinksInLivePreview: 	true,
-	enableRenderingHeadersInLivePreview:true,
-	enableRenderingEmbedsInLivePreview: true
+	minimumRefCountThreshold:				1,
+	displayIncomingFilesheader: 			true,
+	displayInlineReferencesLivePreview: 	true,
+	displayInlineReferencesMarkdown: 		true,
+	displayEmbedReferencesInGutter: 		true,
+	displayEmbedReferencesInGutterMobile: 	false,
+	cacheUpdateInMilliseconds: 				500,
+	enableRenderingBlockIdInMarkdown: 		true,
+	enableRenderingLinksInMarkdown: 		true,
+	enableRenderingHeadersInMarkdown: 		true,
+	enableRenderingEmbedsInMarkdown: 		true,
+	enableRenderingBlockIdInLivePreview:	true,
+	enableRenderingLinksInLivePreview: 		true,
+	enableRenderingHeadersInLivePreview:	true,
+	enableRenderingEmbedsInLivePreview: 	true
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -88,7 +90,7 @@ export class SettingsTab extends PluginSettingTab {
 			});			
 
 		new Setting(containerEl)
-			.setName("Embed references in Gutter in Live Preview Mode")
+			.setName("Embed references in Gutter in Live Preview Mode (Desktop)")
 			.setDesc(`Displays a count of references in the gutter while in live preview. This is done only in a
 					  special scenario. It has to do with the way Obsidian renders embeds, example: ![[link]] when  
 					  they are on its own line. Strange New Worlds cannot embed the count in this scenario, so a hint is 
@@ -101,6 +103,19 @@ export class SettingsTab extends PluginSettingTab {
 					await this.thePlugin.saveSettings();
 				});
 			});
+
+		new Setting(containerEl)
+			.setName("Embed references in Gutter in Live Preview Mode (Mobile)")
+			.setDesc(`This is off by default on mobile since the gutter space takes up a some fo the right margin.`	)
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.displayEmbedReferencesInGutterMobile);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.displayEmbedReferencesInGutterMobile = value;
+					this.thePlugin.toggleStateSNWGutters();
+					await this.thePlugin.saveSettings();
+				});
+			});
+
 
 		containerEl.createEl("h2", { text: "Enable Reference Types in Reading mode"});
 		containerEl.createEl("sup", { text: "(requires reopening documents to take effect)" });
