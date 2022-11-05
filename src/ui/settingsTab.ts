@@ -106,7 +106,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Embed references in Gutter in Live Preview Mode (Mobile)")
-			.setDesc(`This is off by default on mobile since the gutter space takes up a some fo the right margin.`	)
+			.setDesc(`This is off by default on mobile since the gutter takes up some space in the left margin.`	)
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.thePlugin.settings.displayEmbedReferencesInGutterMobile);
 				cb.onChange(async (value: boolean) => {
