@@ -10,12 +10,14 @@ import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/sidebar-pane";
 import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
 import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
+import PluginCommands from "./pluginCommands";
 
 
 export default class ThePlugin extends Plugin {
     appName = "Obsidian42 - Strange New Worlds"; 
     appID = "obsidian42-strange-new-worlds";  
 	settings: Settings;
+    snwPluginActivelyShowingCounts: boolean;  //controls global state if the plugin is showing counters 
     lastSelectedReferenceType : string;
     lastSelectedReferenceKey : string; 
     lastSelectedReferenceFilePath : string;
@@ -23,6 +25,8 @@ export default class ThePlugin extends Plugin {
     snwAPI: SnwAPI;
     markdownPostProcessorSNW: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
+    commands: PluginCommands;
+
     
     async onload(): Promise < void > {
         console.log("loading " + this.appName);
@@ -41,6 +45,14 @@ export default class ThePlugin extends Plugin {
 
         await this.loadSettings();
         this.addSettingTab(new SettingsTab(this.app, this));
+
+        // set current state based on startup parameters
+        if((Platform.isMobile||Platform.isMobileApp))
+            this.snwPluginActivelyShowingCounts = this.settings.enableOnStartupMobile;
+        else
+            this.snwPluginActivelyShowingCounts = this.settings.enableOnStartupDesktop;
+
+        this.commands = new PluginCommands(this);
 
         this.registerView(VIEW_TYPE_SNW, (leaf) => new SideBarPaneView(leaf, this));
 
@@ -113,10 +125,7 @@ export default class ThePlugin extends Plugin {
         let state = this.settings.displayIncomingFilesheader;
 
         if(state===true) 
-            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
-                state=false;
-            if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
-                state=false;
+            state = this.snwPluginActivelyShowingCounts;
 
         if(state===true)
             this.app.workspace.on("layout-change", this.layoutChangeEvent );
@@ -133,10 +142,7 @@ export default class ThePlugin extends Plugin {
         let state = this.settings.displayInlineReferencesMarkdown;
 
         if(state===true) 
-            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
-                state=false;
-            if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
-                state=false;
+            state = this.snwPluginActivelyShowingCounts;
 
         if(state==true && this.markdownPostProcessorSNW===null) {
             this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
@@ -155,10 +161,7 @@ export default class ThePlugin extends Plugin {
         let state = this.settings.displayInlineReferencesLivePreview;
 
         if(state===true) 
-            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
-                state=false;
-            if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
-                state=false;
+            state = this.snwPluginActivelyShowingCounts;
 
         this.updateCMExtensionState("inline-ref", state, InlineReferenceExtension);
     }
@@ -169,15 +172,12 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateSNWGutters(): void {
-        let state: boolean = this.settings.displayEmbedReferencesInGutter;
-
+        let state = (Platform.isMobile || Platform.isMobileApp) ? 
+                    this.settings.displayEmbedReferencesInGutterMobile : 
+                    this.settings.displayEmbedReferencesInGutter;
+                    
         if(state===true) 
-            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
-                state=false;
-            else if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
-                state=false;
-            else if(Platform.isMobile || Platform.isMobileApp) 
-                state = this.settings.displayEmbedReferencesInGutterMobile;
+            state = this.snwPluginActivelyShowingCounts;
 
         this.updateCMExtensionState("gutter", state, ReferenceGutterExtension);
     }

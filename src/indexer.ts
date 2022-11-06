@@ -28,6 +28,8 @@ export function getSnwAllLinksResolutions(){
  * @export
  */
 export function buildLinksAndReferences(): void {
+    if(thePlugin.snwPluginActivelyShowingCounts!=true) return;
+    
     allLinkResolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
 
     // START: Remove file exclusions for frontmatter snw-index-exclude
@@ -93,6 +95,7 @@ const cacheCurrentPages = new Map<string,TransformedCache>();
  * @return {*}  {TransformedCache}
  */
 export function getSNWCacheByFile(file: TFile): TransformedCache {
+    if(thePlugin.snwPluginActivelyShowingCounts!=true) return;
 
     if(cacheCurrentPages.has(file.path)) {
         const cachedPage = cacheCurrentPages.get(file.path);

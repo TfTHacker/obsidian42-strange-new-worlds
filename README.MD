@@ -28,10 +28,14 @@ When a reference is displayed either in a hover popup or the sidepane, it can be
 + CTRL/CMD + ALT + Click - Opens reference in a new vertical pane (split right)
 + Alt + Click - Opens reference in a new window
 
+# Startup and Toggling SNW counters on/off
++ In Settings: you can configure if SNW counters are active on startup for desktop and mobile. For example, this allows you to have SNW active in the desktop and make it inactive on mobile.
++ Command palette: toggle SNW counters on and off. When used, it is valid for the current session. Otherwise, the on/off state is controlled based on their startup settings in Settings.
+
 # SNW frontmatter directives
 The following can be added to a file's front matter to provide more control to SNW's behavior
 + add `snw-index-exclude: true` - prevents SNW from including this file in its index. This means any links to this file will not display block counts
-+ add `snw-file-exclude: true` - prevents any block reference counters from being displayed on the current page. Basically turns it off SNW for the page. NOTE: This will not affect embeded links. Embed files must have this YAML property set as well to have its counters excluded.
++ add `snw-file-exclude: true` - prevents any block reference counters from being displayed on the current page. Basically turns off SNW for the file. NOTE: This will not affect embedded links. Embed files must have this YAML property set as well to have its counters excluded.
 
 # odd issues
 Modifying the underyling Obsidian rendering engine is not easy. It is a complex piece of software. There are some issues we have not been able to resolve, so we had to compromise. We will list such examples as they surface here:
