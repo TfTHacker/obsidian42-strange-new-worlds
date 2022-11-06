@@ -2,6 +2,8 @@ import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
 import ThePlugin from "../main";
 
 export interface Settings {
+	enableOnStartupDesktop:					boolean;
+	enableOnStartupMobile:					boolean;
 	minimumRefCountThreshold:				number;
 	displayIncomingFilesheader: 			boolean;
 	displayInlineReferencesLivePreview: 	boolean;
@@ -20,6 +22,8 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
+	enableOnStartupDesktop:					true,
+	enableOnStartupMobile:					true,
 	minimumRefCountThreshold:				1,
 	displayIncomingFilesheader: 			true,
 	displayInlineReferencesLivePreview: 	true,
@@ -50,6 +54,38 @@ export class SettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		containerEl.createEl('h2', { text: this.thePlugin.appName });
+
+		containerEl.createEl("h2", { text: "Enable on startup" });
+		new Setting(containerEl)
+			.setName("Enable upon startup (Desktop)")
+			.setDesc("If disabled, SNW will not show block counters from startup until enabled from the command palette. (May require closing tabs for this to take effect.)")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableOnStartupDesktop);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableOnStartupDesktop = value;
+					await this.thePlugin.saveSettings();
+					this.thePlugin.toggleStateHeaderCount();
+					this.thePlugin.toggleStateSNWMarkdownPreview();
+					this.thePlugin.toggleStateSNWLivePreview();
+					this.thePlugin.toggleStateSNWGutters();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("Enable startup (Mobile)")
+			.setDesc("If disabled, SNW will not show block counters from startup until enabled from the command palette. (May require closing tabs for this to take effect.)")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableOnStartupMobile);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableOnStartupMobile = value;
+					await this.thePlugin.saveSettings();
+					this.thePlugin.toggleStateHeaderCount();
+					this.thePlugin.toggleStateSNWMarkdownPreview();
+					this.thePlugin.toggleStateSNWLivePreview();
+					this.thePlugin.toggleStateSNWGutters();
+				});
+			});
+
 
 		containerEl.createEl("h2", { text: "View Modes" });
 

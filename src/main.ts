@@ -110,7 +110,14 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateHeaderCount(): void {
-        const state = this.settings.displayIncomingFilesheader;
+        let state = this.settings.displayIncomingFilesheader;
+
+        if(state===true) 
+            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
+                state=false;
+            if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
+                state=false;
+
         if(state===true)
             this.app.workspace.on("layout-change", this.layoutChangeEvent );
         else 
@@ -123,7 +130,14 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateSNWMarkdownPreview(): void {
-        const state = this.settings.displayInlineReferencesMarkdown;
+        let state = this.settings.displayInlineReferencesMarkdown;
+
+        if(state===true) 
+            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
+                state=false;
+            if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
+                state=false;
+
         if(state==true && this.markdownPostProcessorSNW===null) {
             this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
         } else {
@@ -138,7 +152,15 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateSNWLivePreview(): void {
-        this.updateCMExtensionState("inline-ref", this.settings.displayInlineReferencesLivePreview, InlineReferenceExtension);
+        let state = this.settings.displayInlineReferencesLivePreview;
+
+        if(state===true) 
+            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
+                state=false;
+            if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
+                state=false;
+
+        this.updateCMExtensionState("inline-ref", state, InlineReferenceExtension);
     }
 
     /**
@@ -147,12 +169,17 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateSNWGutters(): void {
-        let gutterState: boolean;
-        if(Platform.isMobile || Platform.isMobileApp) 
-            gutterState = this.settings.displayEmbedReferencesInGutterMobile;
-        else 
-            gutterState = this.settings.displayEmbedReferencesInGutter;
-        this.updateCMExtensionState("gutter", gutterState, ReferenceGutterExtension);
+        let state: boolean = this.settings.displayEmbedReferencesInGutter;
+
+        if(state===true) 
+            if((Platform.isMobile || Platform.isMobileApp) && this.settings.enableOnStartupMobile===false)
+                state=false;
+            else if((Platform.isDesktop || Platform.isDesktopApp) && this.settings.enableOnStartupDesktop===false)
+                state=false;
+            else if(Platform.isMobile || Platform.isMobileApp) 
+                state = this.settings.displayEmbedReferencesInGutterMobile;
+
+        this.updateCMExtensionState("gutter", state, ReferenceGutterExtension);
     }
 
     /**
