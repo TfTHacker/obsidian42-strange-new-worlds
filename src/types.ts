@@ -42,6 +42,7 @@ export interface Link {
     resolvedFile: TFile
     resolvedPaths: string[]
     sourceFile: TFile 
+    excludedFile: boolean;
 }
 
 export interface TransformedCachedItem {

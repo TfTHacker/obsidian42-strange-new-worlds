@@ -5,7 +5,7 @@ import ThePlugin from "./main";
 import {Link, TransformedCache} from "./types";
 
 let references: {[x:string]:Link[]};
-let allLinkRsolutions: Link[];
+let allLinkResolutions: Link[];
 let lastUpdateToReferences = 0;
 let thePlugin: ThePlugin;
 
@@ -18,7 +18,7 @@ export function getReferencesCache() {
 }
 
 export function getSnwAllLinksResolutions(){
-    return allLinkRsolutions;
+    return allLinkResolutions;
 }
 
 /**
@@ -28,9 +28,29 @@ export function getSnwAllLinksResolutions(){
  * @export
  */
 export function buildLinksAndReferences(): void {
-    allLinkRsolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
-    const refs = allLinkRsolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
-        
+    allLinkResolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
+
+    // START: Remove file exclusions for frontmatter snw-index-exclude
+    const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e)=>{
+        return e[1]?.frontmatter?.["snw-index-exclude"]
+    });
+    const snwIndexExceptions = Object.entries(app.metadataCache.fileCache).filter((e)=>{
+        return snwIndexExceptionsList.find(f=>f[0]===e[1].hash);
+    });
+
+    for (let i = 0; i < allLinkResolutions.length; i++) {
+        allLinkResolutions[i].excludedFile = false;
+        const fileName = allLinkResolutions[i].resolvedFile.path;
+        for (let e = 0; e < snwIndexExceptions.length; e++) {
+            if(fileName==snwIndexExceptions[e][0]) {
+                allLinkResolutions[i].excludedFile = true;
+                break;
+            }
+        }
+    }
+    // END: Exclusions
+
+    const refs = allLinkResolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
         let keyBasedOnLink = "";
         let keyBasedOnFullPath = ""
 
@@ -176,10 +196,10 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
             });
         }
     }
-
+    
     transformedCache.cacheMetaData = cachedMetaData;
     transformedCache.createDate = Date.now();
     cacheCurrentPages.set(file.path, transformedCache);
-
+    
     return transformedCache;
 }

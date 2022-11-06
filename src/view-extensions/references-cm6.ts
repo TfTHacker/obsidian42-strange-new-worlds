@@ -48,65 +48,65 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
             decorate: (add, from, to, match, view) => {         
                 const mdView = view.state.field( editorInfoField );
                 const firstCharacterMatch = match[0].charAt(0);
-                const transformedCache = getSNWCacheByFile(mdView.file);               
-                const widgetsToAdd: {key: string, transformedCachedItem: TransformedCachedItem[], refType: string, from: number, to: number}[] = []
-
-                if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
-                    widgetsToAdd.push({
-                        key: mdView.file.path.replace(".md","") + match[0].replace(" ^","#^"), //change this to match the references cache
-                        transformedCachedItem: transformedCache.blocks,
-                        refType: "block",
-                        from: to,
-                        to: to
-                    });
-                } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
-                    widgetsToAdd.push({
-                        key: match[0].replace("![[","").replace("]]",""),
-                        transformedCachedItem: transformedCache.embeds,
-                        refType:"embed",
-                        from: to,
-                        to: to
-                    });                                       
-                } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
-                    widgetsToAdd.push({
-                        key: match[0].replace("[[","").replace("]]",""),
-                        transformedCachedItem: transformedCache.links,
-                        refType: "link",
-                        from: to,
-                        to: to
-                    });
-                } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //link
-                    widgetsToAdd.push({
-                        // @ts-ignore
-                        key: match[0].replace(/^#+/,"").substring(1),
-                        transformedCachedItem: transformedCache.headings,
-                        refType: "heading",
-                        from: to,
-                        to: to 
-                    });
-                    // this was not working with mobile from 0.16.4 so had to convert it to a string
-                    const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
-                    if(linksinHeader)
-                        for (const l of linksinHeader) {
-                            widgetsToAdd.push({
-                                key: l.replace("![[","").replace("[[","").replace("]]",""), //change this to match the references cache
-                                transformedCachedItem: l.startsWith("!") ? transformedCache.embeds : transformedCache.links,
-                                refType: "link",
-                                from: (to - match[0].length) + (match[0].indexOf(l) + l.length),
-                                to: (to - match[0].length) + (match[0].indexOf(l) + l.length)
-                            });
-                        }                        
-                }
-
-                for (const ref of widgetsToAdd.sort((a,b)=>a.to-b.to) ) {
-                    if(ref.key!="") {
-                        const wdgt = constructWidgetForInlineReference(ref.refType, ref.key, ref.transformedCachedItem, mdView.file.path);
-                        if(wdgt!=null) {
-                            add(ref.from, ref.to, Decoration.widget({widget: wdgt, side: 1}));    
-                        }
+                const transformedCache = getSNWCacheByFile(mdView.file);  
+                if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]!=true) {
+                    const widgetsToAdd: {key: string, transformedCachedItem: TransformedCachedItem[], refType: string, from: number, to: number}[] = []
+                    if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
+                        widgetsToAdd.push({
+                            key: mdView.file.path.replace(".md","") + match[0].replace(" ^","#^"), //change this to match the references cache
+                            transformedCachedItem: transformedCache.blocks,
+                            refType: "block",
+                            from: to,
+                            to: to
+                        });
+                    } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
+                        widgetsToAdd.push({
+                            key: match[0].replace("![[","").replace("]]",""),
+                            transformedCachedItem: transformedCache.embeds,
+                            refType:"embed",
+                            from: to,
+                            to: to
+                        });                                       
+                    } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
+                        widgetsToAdd.push({
+                            key: match[0].replace("[[","").replace("]]",""),
+                            transformedCachedItem: transformedCache.links,
+                            refType: "link",
+                            from: to,
+                            to: to
+                        });
+                    } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //link
+                        widgetsToAdd.push({
+                            // @ts-ignore
+                            key: match[0].replace(/^#+/,"").substring(1),
+                            transformedCachedItem: transformedCache.headings,
+                            refType: "heading",
+                            from: to,
+                            to: to 
+                        });
+                        // this was not working with mobile from 0.16.4 so had to convert it to a string
+                        const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
+                        if(linksinHeader)
+                            for (const l of linksinHeader) {
+                                widgetsToAdd.push({
+                                    key: l.replace("![[","").replace("[[","").replace("]]",""), //change this to match the references cache
+                                    transformedCachedItem: l.startsWith("!") ? transformedCache.embeds : transformedCache.links,
+                                    refType: "link",
+                                    from: (to - match[0].length) + (match[0].indexOf(l) + l.length),
+                                    to: (to - match[0].length) + (match[0].indexOf(l) + l.length)
+                                });
+                            }                        
                     }
-                } // end for
-                
+
+                    for (const ref of widgetsToAdd.sort((a,b)=>a.to-b.to) ) {
+                        if(ref.key!="") {
+                            const wdgt = constructWidgetForInlineReference(ref.refType, ref.key, ref.transformedCachedItem, mdView.file.path);
+                            if(wdgt!=null) {
+                                add(ref.from, ref.to, Decoration.widget({widget: wdgt, side: 1}));    
+                            }
+                        }
+                    } // end for
+                }
             },
         })
 
@@ -147,7 +147,7 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
         }
 
         if(matchKey===key) {
-            if(ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
+            if(ref?.references[0]?.excludedFile!=true && ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
                 return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null, ref.pos.start.line);
             else
                 return null;

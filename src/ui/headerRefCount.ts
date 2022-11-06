@@ -4,7 +4,7 @@ import {MarkdownView, Platform, WorkspaceLeaf} from "obsidian";
 import {Link} from "../types";
 import ThePlugin from "../main";
 import {processHtmlDecorationReferenceEvent} from "../view-extensions/htmlDecorations";
-import {getSnwAllLinksResolutions} from "../indexer";
+import {getSnwAllLinksResolutions, getSNWCacheByFile} from "../indexer";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'
 import { getUIC_Hoverview } from "./components/uic-ref--parent";
@@ -39,14 +39,24 @@ export default function setHeaderWithReferenceCounts() {
 function processHeader(mdView: MarkdownView) {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
+
     
     const allLinks: Link[] = getSnwAllLinksResolutions(); 
     if(allLinks==undefined) return;
-    
+
     const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
-    
+
+    let incomingLinksCount = incomingLinks.length;
+
+    // check if the page is to be ignored
+    const transformedCache = getSNWCacheByFile(mdView.file);
+    if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) incomingLinksCount=0;
+
+    // check if headers for this file are excluded
+    if(incomingLinks[0]?.excludedFile===true) incomingLinksCount=0;
+
     // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
-    if (incomingLinks.length < thePlugin.settings.minimumRefCountThreshold) {
+    if (incomingLinksCount < thePlugin.settings.minimumRefCountThreshold) {
         if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) 
         mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
         return;

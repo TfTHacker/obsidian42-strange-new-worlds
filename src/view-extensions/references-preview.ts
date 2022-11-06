@@ -29,15 +29,18 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
 
     // @ts-ignore
     if(ctx.remainingNestLevel===4) return;  // This is an attempt to prevent processing of embed files
-
+    
+    // check if SNW should ingore this page
+    if(ctx?.frontmatter?.["snw-file-exclude"]===true) return; //no support for kanban board
+    
     if(el.hasAttribute("uic")) return; // this is a custom component, don't render SNW inside it.
 
     const currentFile = thePlugin.app.vault.fileMap[ctx.sourcePath];
-    
     if(currentFile===undefined) return; 
 
     // check for incompatibility with other plugins
-    if(thePlugin.app.metadataCache.getFileCache(currentFile)?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
+    const fileCache = thePlugin.app.metadataCache.getFileCache(currentFile);
+    if(fileCache?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
     
     try {
         ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile ));        
@@ -70,6 +73,8 @@ class snwChildComponent extends MarkdownRenderChild {
         const minRefCountThreshold = thePlugin.settings.minimumRefCountThreshold;
         const transformedCache = getSNWCacheByFile(this.currentFile);
 
+        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) return;
+
         if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
 
             if (thePlugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
@@ -80,7 +85,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 } catch (error) { /* nothing to do here */ }
                 
                 for (const value of transformedCache.blocks) {
-                    if ( value.references.length >= minRefCountThreshold && 
+                    if ( value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && 
                         (value.pos.start.line >= this.sectionInfo?.lineStart && value.pos.end.line <= this.sectionInfo?.lineEnd) &&
                         !isThisAnEmbed ) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
@@ -103,7 +108,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 this.containerEl.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
                     const embedKey = element.getAttribute('src');
                     for (const value of transformedCache.embeds) {
-                        if (value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
+                        if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
                             const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                             referenceElement.addClass('snw-embed-preview');
                             element.after(referenceElement);
@@ -118,7 +123,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 if (transformedCache?.headings && headerKey) {
                     const textContext = headerKey.getAttribute("data-heading")
                     for (const value of transformedCache.headings)  {
-                        if (value.references.length >= minRefCountThreshold && value.headerMatch === textContext) {
+                        if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && value.headerMatch === textContext) {
                             const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                             referenceElement.addClass("snw-heading-preview");
                             this.containerEl.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
@@ -132,7 +137,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 this.containerEl.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
                     const link = element.getAttribute('data-href');
                     for (const value of transformedCache.links) {
-                        if (value.references.length >= minRefCountThreshold && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
+                        if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
                             const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0].resolvedFile.path.replace(".md",""), "", value.pos.start.line);
                             referenceElement.addClass('snw-link-preview');
                             element.after(referenceElement);

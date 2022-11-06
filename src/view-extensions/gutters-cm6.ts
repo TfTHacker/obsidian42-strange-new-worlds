@@ -46,6 +46,10 @@ const ReferenceGutterExtension = gutter({
         const mdView = editorView.state.field( editorInfoField );
         
         if(!mdView.file) return;
+        const transformedCache = getSNWCacheByFile(mdView.file);
+
+        // check if the page is to be ignored
+        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) return;
 
         const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
 
@@ -53,9 +57,8 @@ const ReferenceGutterExtension = gutter({
             const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
             for (const embed of embedsFromMetaDataCache) {
                 if(embed.position.start.line +1 === lineNumberInFile) {
-                    const transformedCache = getSNWCacheByFile(mdView.file);
                     for (const ref of transformedCache.embeds) {
-                        if(ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
+                        if(ref?.references[0].excludedFile!=true && ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
                             // @ts-ignore
                             let refOriginalLink = ref.references[0].reference.original;
                             if(refOriginalLink.substring(0,1)!="!") 
