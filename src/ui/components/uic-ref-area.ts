@@ -24,8 +24,7 @@ const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, l
     //get title header for this reference area
     refAreaContainerEl.append(await getUIC_Ref_Title_Div(refType, key, filePath, refAreaItems.refCount, lineNu, isHoverView, thePlugin)); 
 
-    const refAreaEl = createDiv();
-    refAreaEl.addClass("snw-ref-area");
+    const refAreaEl = createDiv({cls: "snw-ref-area"});
     refAreaEl.append(refAreaItems.response)
     refAreaContainerEl.append(refAreaEl)
 
@@ -43,9 +42,6 @@ const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, l
  */
 const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{response: HTMLElement, refCount: number}> => {
     
-    // let responseContent = ``;
-    // const responseWrapperContainerEl = createDiv();
-
     let countOfRefs = 0;
     let linksToLoop: Link[] = null;
 

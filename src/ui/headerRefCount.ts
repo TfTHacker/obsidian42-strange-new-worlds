@@ -78,10 +78,8 @@ function processHeader(mdView: MarkdownView) {
     let wrapper: HTMLElement = containerViewContent.querySelector(".snw-header-count-wrapper");
 
     if (!wrapper) {
-        wrapper = document.createElement("div");
-        wrapper.className = "snw-header-count-wrapper";
-        snwTitleRefCountDisplayCountEl = document.createElement("div");
-        snwTitleRefCountDisplayCountEl.className = "snw-header-count"; 
+        wrapper = createDiv({cls: "snw-header-count-wrapper"});
+        snwTitleRefCountDisplayCountEl = createDiv({cls: "snw-header-count"}); 
         wrapper.appendChild(snwTitleRefCountDisplayCountEl);
         containerViewContent.prepend(wrapper)
     } else {
@@ -107,8 +105,10 @@ function processHeader(mdView: MarkdownView) {
 
     tippy(wrapper, {
         interactive: true,
-        appendTo: () =>  wrapper.closest(".view-content"),
+        appendTo: () =>  document.body, 
         allowHTML: true,
+        zIndex: 9999,
+        placement: "auto-end",
         onShow(instance) { setTimeout( async () => {
             await getUIC_Hoverview(instance)
         }, 1); } 

@@ -23,8 +23,7 @@ export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePat
     titleEl.setAttribute("snw-data-file-name",  filePath);
     titleEl.setAttribute("snw-data-line-number",lineNu.toString());
 
-    const titleLabelEl = createDiv();
-    titleLabelEl.addClass("snw-ref-title-popover-label");
+    const titleLabelEl = createDiv({cls: "snw-ref-title-popover-label"});
     titleLabelEl.innerText = key;
 
     titleEl.append(titleLabelEl);

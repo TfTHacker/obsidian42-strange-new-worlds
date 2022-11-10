@@ -14,8 +14,8 @@ import PluginCommands from "./pluginCommands";
 
 
 export default class ThePlugin extends Plugin {
-    appName = "Obsidian42 - Strange New Worlds"; 
-    appID = "obsidian42-strange-new-worlds";  
+    appName =  this.manifest.name; 
+    appID = this.manifest.id;  
 	settings: Settings;
     snwPluginActivelyShowingCounts: boolean;  //controls global state if the plugin is showing counters 
     lastSelectedReferenceType : string;

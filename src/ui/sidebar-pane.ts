@@ -17,17 +17,17 @@ export class SideBarPaneView extends ItemView {
 
     getViewType() { return VIEW_TYPE_SNW }
 
-    getDisplayText() { return "Strange New Worlds"}
+    getDisplayText() { return VIEW_TYPE_SNW}
 
     getIcon() { return "dot-network" }
 
     async onOpen() {
         const container: HTMLElement = this.containerEl;
         const loadingEL: HTMLElement = container.createSpan({cls:"snw-sidepane-loading"});
-        const bannerEl: HTMLElement = createDiv({cls:"snw-sidepane-loading-banner"});
+        const bannerEl: HTMLElement = createDiv({cls: "snw-sidepane-loading-banner"});
         bannerEl.innerText= `Discovering Strange New Worlds...`
         loadingEL.appendChild(bannerEl)
-        const pendingTextEl: HTMLElement = createDiv({cls:"snw-sidepane-loading-subtext"})
+        const pendingTextEl: HTMLElement = createDiv({cls: "snw-sidepane-loading-subtext"})
         pendingTextEl.innerText = `Click a reference counter in the main document for information to appear here.`;
         loadingEL.appendChild(pendingTextEl);
         container.empty();

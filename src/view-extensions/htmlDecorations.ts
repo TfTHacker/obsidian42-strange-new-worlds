@@ -28,8 +28,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, filePath)", thePlugin, count,referenceType,key,filePath);
 
-    const element = document.createElement("div")
-    element.className = "snw-reference snw-" + referenceType;
+    const element = createDiv({cls: "snw-reference snw-" + referenceType });
     element.innerText= count.toString();
     element.setAttribute("data-snw-type", referenceType);
     element.setAttribute("data-snw-key", key);
@@ -45,8 +44,10 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
 
     tippy(element, {
         interactive: true,
-        appendTo: () =>  element.closest(".view-content"),    //document.body
+        appendTo: () => document.body,
         allowHTML: true,
+        zIndex: 9999,
+        placement: "auto-end",
         onShow(instance) { setTimeout( async () => {
             await getUIC_Hoverview(instance)
         }, 1); } 

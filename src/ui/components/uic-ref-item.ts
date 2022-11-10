@@ -56,7 +56,7 @@ const grabChunkOfFile = async (file: TFile, position: Pos): Promise<HTMLElement>
 
     const blockContents = fileContents.substring(startPosition, endPosition);
 
-    const el = document.createElement("div");
+    const el = createDiv();
     el.setAttribute("uic","uic");  //used to track if this is UIC element. 
     await MarkdownRenderer.renderMarkdown(blockContents, el, file.path, thePlugin);
 
