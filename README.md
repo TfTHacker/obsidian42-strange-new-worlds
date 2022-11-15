@@ -21,6 +21,12 @@ More features
 # Lazy networking (linking)
 We are not known to be lazy, but for this plugin we had to be. This plugin leverages the indexing Obsidian does in the background, which is amazing. However, for performance reasons some things don't update right away. So depending on what you are doing, reference counts sometimes shown by this plugin may be incorrect as you work with links, embeds and blocks. But eventaully they will be correct as the cache updates itself. It is better than nothing, right? 
 
+# Incompatiblities
+Sadly there can be some plugin incompatibilities. No one is at fault, but we all fight for the same resources in Obsidian. I will maintain a list of issues here:
++ Excalidraw: SNW does now show the counter
++ Kanban: SNW does not show the counter
++ Tasks plugin: on task lines, SNW won't show the counter in Reading View (though works in live preview)
+
 # SNW References
 When a reference is displayed either in a hover popup or the sidepane, it can be clicked to be opened. By default it will open in the current pane. However using the following keyboard commands, you have more control over how they open.
 + Opens a tab if the modifier key Cmd/Ctrl is pressed OR if this is a middle-click MouseEvent.
