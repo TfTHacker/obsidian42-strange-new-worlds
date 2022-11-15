@@ -1,12 +1,12 @@
 import {MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile} from "obsidian";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
 import {getSNWCacheByFile} from "../indexer";
-import ThePlugin from "../main";
+import SNWPlugin from "../main";
 
 
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableForMarkdownPreviewProcessor(plugin: ThePlugin) {
+export function setPluginVariableForMarkdownPreviewProcessor(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 
@@ -19,7 +19,7 @@ export function setPluginVariableForMarkdownPreviewProcessor(plugin: ThePlugin) 
  * @export
  * @param {HTMLElement} el
  * @param {MarkdownPostProcessorContext} ctx
- * @param {ThePlugin} thePlugin
+ * @param {SNWPlugin} thePlugin
  * @return {*} 
  */
 export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext) {

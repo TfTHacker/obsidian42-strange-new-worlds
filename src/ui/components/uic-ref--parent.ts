@@ -1,12 +1,12 @@
-import { MarkdownView } from 'obsidian';
-import ThePlugin from 'src/main';
+import { Keymap, MarkdownView } from 'obsidian';
+import SNWPlugin from 'src/main';
 import { Instance, ReferenceElement } from 'tippy.js';
 import { getUIC_Ref_Area } from "./uic-ref-area";
 import { setPluginVariableUIC_RefItem } from './uic-ref-item';
 
-let thePlugin: ThePlugin = null;
+let thePlugin: SNWPlugin = null;
 
-export function setPluginVariableForUIC(plugin: ThePlugin) {
+export function setPluginVariableForUIC(plugin: SNWPlugin) {
     thePlugin = plugin;
     setPluginVariableUIC_RefItem(plugin);
 }
@@ -70,16 +70,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
                 const filePath = handlerElement.getAttribute("snw-data-file-name");
                 const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
                 
-                if((e.ctrlKey || e.metaKey) && e.altKey)  // horitzonal pane
-                    thePlugin.app.workspace.getLeaf("split", "vertical").openFile(fileT);
-                else if((e.ctrlKey || e.metaKey) && e.shiftKey)  //vertical pane
-                    thePlugin.app.workspace.getLeaf("split", "horizontal").openFile(fileT);
-                else if(e.ctrlKey || e.metaKey)  //new tab
-                    thePlugin.app.workspace.getLeaf("tab").openFile(fileT);
-                else if(e.altKey) //new window
-                    thePlugin.app.workspace.getLeaf("window").openFile(fileT);
-                else //current window
-                    thePlugin.app.workspace.getLeaf(false).openFile(fileT);
+                thePlugin.app.workspace.getLeaf(Keymap.isModEvent(e)).openFile(fileT);
 
                 // for file titles, the embed handling for titles related to block id's and headers is hard to calculate, so its more efficient to do it here
                 const titleKey = handlerElement.getAttribute("snw-ref-title-key");
@@ -115,7 +106,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
                     e.preventDefault();
                     // @ts-ignore
                     const hoverMetaKeyRequired = app.internalPlugins.plugins['page-preview'].instance.overrides['obsidian42-strange-new-worlds']==false ? false : true;
-                    if( hoverMetaKeyRequired===false || (hoverMetaKeyRequired===true && (e.ctrlKey || e.metaKey)) ) {
+                    if( hoverMetaKeyRequired===false || (hoverMetaKeyRequired===true && Keymap.isModifier(e,"Mod")) ) {
                         const target = e.target as HTMLElement;
                         const previewLocation = { scroll: Number(target.getAttribute("snw-data-line-number")) };
                         const filePath  = target.getAttribute("snw-data-file-name");

@@ -10,11 +10,11 @@ import { editorInfoField } from "obsidian";
 import { getSNWCacheByFile } from "src/indexer";
 import { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
-import ThePlugin from "src/main";
+import SNWPlugin from "src/main";
 
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableForCM6InlineReferences(plugin: ThePlugin) {
+export function setPluginVariableForCM6InlineReferences(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 

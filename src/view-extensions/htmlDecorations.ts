@@ -1,12 +1,12 @@
-import ThePlugin from "../main";
+import SNWPlugin from "../main";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getUIC_Hoverview } from "src/ui/components/uic-ref--parent";
 import { Platform } from "obsidian";
 
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableForHtmlDecorations(plugin: ThePlugin) {
+export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 

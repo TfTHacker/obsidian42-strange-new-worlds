@@ -1,15 +1,15 @@
 // This module builds on Obsidians cache to provide more specific link information
 
 import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos} from "obsidian";
-import ThePlugin from "./main";
+import SNWPlugin from "./main";
 import {Link, TransformedCache} from "./types";
 
 let references: {[x:string]:Link[]};
 let allLinkResolutions: Link[];
 let lastUpdateToReferences = 0;
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableForIndexer(plugin: ThePlugin) {
+export function setPluginVariableForIndexer(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 
@@ -28,7 +28,7 @@ export function getSnwAllLinksResolutions(){
  * @export
  */
 export function buildLinksAndReferences(): void {
-    if(thePlugin.snwPluginActivelyShowingCounts!=true) return;
+    if(thePlugin.showCountsActive!=true) return;
     
     allLinkResolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
 
@@ -95,7 +95,7 @@ const cacheCurrentPages = new Map<string,TransformedCache>();
  * @return {*}  {TransformedCache}
  */
 export function getSNWCacheByFile(file: TFile): TransformedCache {
-    if(thePlugin.snwPluginActivelyShowingCounts!=true) return;
+    if(thePlugin.showCountsActive!=true) return;
 
     if(cacheCurrentPages.has(file.path)) {
         const cachedPage = cacheCurrentPages.get(file.path);

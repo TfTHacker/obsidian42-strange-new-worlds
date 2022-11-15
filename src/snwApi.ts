@@ -1,5 +1,5 @@
 import { getSNWCacheByFile } from "./indexer";
-import ThePlugin from "./main";
+import SNWPlugin from "./main";
 import { Settings } from "./ui/settingsTab";
 
 
@@ -11,7 +11,7 @@ import { Settings } from "./ui/settingsTab";
  * @class SnwAPI
  */
 export default class SnwAPI {
-    plugin: ThePlugin;
+    plugin: SNWPlugin;
     settings: Settings; 
     enableDebugging = {
         CM6Extension: false, 
@@ -22,7 +22,7 @@ export default class SnwAPI {
         SidePane: false
     }
 
-    constructor(plugin: ThePlugin) {
+    constructor(plugin: SNWPlugin) {
         this.plugin = plugin    
     }
 

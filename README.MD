@@ -23,10 +23,9 @@ We are not known to be lazy, but for this plugin we had to be. This plugin lever
 
 # SNW References
 When a reference is displayed either in a hover popup or the sidepane, it can be clicked to be opened. By default it will open in the current pane. However using the following keyboard commands, you have more control over how they open.
-+ CTRL/CMD + Click - Opens reference in a new tab
-+ CTRL/CMD + SHIFT + Click - Opens reference in a new horizontal pane (split down)
-+ CTRL/CMD + ALT + Click - Opens reference in a new vertical pane (split right)
-+ Alt + Click - Opens reference in a new window
++ Opens a tab if the modifier key Cmd/Ctrl is pressed OR if this is a middle-click MouseEvent.
++ Opens a split pane if Cmd/Ctrl+Alt is pressed.
++ Oepns a new window if Cmd/Ctrl+Alt+Shift is pressed.
 
 # Startup and Toggling SNW counters on/off
 + In Settings: you can configure if SNW counters are active on startup for desktop and mobile. For example, this allows you to have SNW active in the desktop and make it inactive on mobile.

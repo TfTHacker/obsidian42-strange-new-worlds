@@ -2,16 +2,16 @@
 
 import {MarkdownView, Platform, WorkspaceLeaf} from "obsidian";
 import {Link} from "../types";
-import ThePlugin from "../main";
+import SNWPlugin from "../main";
 import {processHtmlDecorationReferenceEvent} from "../view-extensions/htmlDecorations";
 import {getSnwAllLinksResolutions, getSNWCacheByFile} from "../indexer";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css'
 import { getUIC_Hoverview } from "./components/uic-ref--parent";
 
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableForHeaderRefCount(plugin: ThePlugin) {
+export function setPluginVariableForHeaderRefCount(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 
@@ -23,7 +23,7 @@ export function setPluginVariableForHeaderRefCount(plugin: ThePlugin) {
  */
 export default function setHeaderWithReferenceCounts() {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
-        thePlugin.snwAPI.console("headerImageCount.setHeaderWithReferenceCounts(thePlugin)", ThePlugin);
+        thePlugin.snwAPI.console("headerImageCount.setHeaderWithReferenceCounts(thePlugin)", SNWPlugin);
     
     thePlugin.app.workspace.iterateAllLeaves((leaf : WorkspaceLeaf) => {
         if (leaf.view.getViewType() === "markdown") 

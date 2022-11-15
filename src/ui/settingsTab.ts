@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting, ToggleComponent } from "obsidian";
-import ThePlugin from "../main";
+import SNWPlugin from "../main";
 
 export interface Settings {
 	enableOnStartupDesktop:					boolean;
@@ -42,9 +42,9 @@ export const DEFAULT_SETTINGS: Settings = {
 }
 
 export class SettingsTab extends PluginSettingTab {
-	thePlugin: ThePlugin;
+	thePlugin: SNWPlugin;
 
-	constructor(app: App, plugin: ThePlugin) {
+	constructor(app: App, plugin: SNWPlugin) {
 		super(app, plugin);
 		this.thePlugin = plugin;
 	}

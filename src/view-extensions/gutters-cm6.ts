@@ -3,11 +3,11 @@ import { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
 import { getSNWCacheByFile } from "src/indexer";
-import ThePlugin from "src/main";
+import SNWPlugin from "src/main";
 
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableForCM6Gutter(plugin: ThePlugin) {
+export function setPluginVariableForCM6Gutter(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 

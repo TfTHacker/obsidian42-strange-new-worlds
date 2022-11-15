@@ -2,15 +2,15 @@
 
 import {ItemView, WorkspaceLeaf} from "obsidian";
 import {getReferencesCache} from "../indexer";
-import ThePlugin from "../main";
+import SNWPlugin from "../main";
 import { getUIC_SidePane } from "./components/uic-ref--parent";
 
 export const VIEW_TYPE_SNW = "Strange New Worlds";
 
 export class SideBarPaneView extends ItemView {
-    thePlugin: ThePlugin;
+    thePlugin: SNWPlugin;
     
-    constructor(leaf : WorkspaceLeaf, thePlugin: ThePlugin) {
+    constructor(leaf : WorkspaceLeaf, thePlugin: SNWPlugin) {
         super(leaf);
         this.thePlugin = thePlugin;
     }

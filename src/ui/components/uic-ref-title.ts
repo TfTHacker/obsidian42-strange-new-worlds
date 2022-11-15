@@ -1,6 +1,6 @@
 // the title displayed at the top of a uic-ref-area
 
-import ThePlugin from "src/main";
+import SNWPlugin from "src/main";
 import {hideAll} from 'tippy.js';
 import { setIcon } from "obsidian";
 
@@ -13,7 +13,7 @@ import { setIcon } from "obsidian";
  * @param {boolean} isPopover
  * @return {*}  {Promise<string>}
  */
-export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePath: string, refCount: number, lineNu: number, isPopover:boolean, thePlugin: ThePlugin): Promise<HTMLElement> => {
+export const getUIC_Ref_Title_Div = async (refType: string, key: string, filePath: string, refCount: number, lineNu: number, isPopover:boolean, thePlugin: SNWPlugin): Promise<HTMLElement> => {
     const titleEl = createDiv();
     titleEl.addClass(isPopover ? "snw-ref-title-popover" : "snw-ref-title-side-pane");
     titleEl.addClass("tree-item-self");

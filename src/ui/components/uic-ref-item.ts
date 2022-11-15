@@ -1,10 +1,10 @@
 import { MarkdownRenderer, Pos, TFile } from "obsidian";
-import ThePlugin from "src/main";
+import SNWPlugin from "src/main";
 import { Link } from "../../types";
 
-let thePlugin: ThePlugin;
+let thePlugin: SNWPlugin;
 
-export function setPluginVariableUIC_RefItem(plugin: ThePlugin) {
+export function setPluginVariableUIC_RefItem(plugin: SNWPlugin) {
     thePlugin = plugin;
 }
 

@@ -2,7 +2,7 @@
 
 import { setIcon } from "obsidian";
 import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
-import ThePlugin from "src/main";
+import SNWPlugin from "src/main";
 import { Link } from "src/types";
 import { getUIC_Ref_Item } from "./uic-ref-item";
 import { getUIC_Ref_Title_Div } from "./uic-ref-title";
@@ -17,7 +17,7 @@ export /**
  * @param {boolean} isHoverView
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean, thePlugin: ThePlugin): Promise<HTMLElement> => {
+const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean, thePlugin: SNWPlugin): Promise<HTMLElement> => {
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
     const refAreaContainerEl = createDiv();
     

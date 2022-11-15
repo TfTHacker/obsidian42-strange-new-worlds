@@ -13,17 +13,17 @@ import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
 import PluginCommands from "./pluginCommands";
 
 
-export default class ThePlugin extends Plugin {
+export default class SNWPlugin extends Plugin {
     appName =  this.manifest.name; 
     appID = this.manifest.id;  
 	settings: Settings;
-    snwPluginActivelyShowingCounts: boolean;  //controls global state if the plugin is showing counters 
+    showCountsActive: boolean;  //controls global state if the plugin is showing counters 
     lastSelectedReferenceType : string;
     lastSelectedReferenceKey : string; 
     lastSelectedReferenceFilePath : string;
     lastSelectedLineNumber: number;
     snwAPI: SnwAPI;
-    markdownPostProcessorSNW: MarkdownPostProcessor = null;
+    markdownPostProcessor: MarkdownPostProcessor = null;
     editorExtensions: Extension[] = [];
     commands: PluginCommands;
 
@@ -48,9 +48,9 @@ export default class ThePlugin extends Plugin {
 
         // set current state based on startup parameters
         if((Platform.isMobile||Platform.isMobileApp))
-            this.snwPluginActivelyShowingCounts = this.settings.enableOnStartupMobile;
+            this.showCountsActive = this.settings.enableOnStartupMobile;
         else
-            this.snwPluginActivelyShowingCounts = this.settings.enableOnStartupDesktop;
+            this.showCountsActive = this.settings.enableOnStartupDesktop;
 
         this.commands = new PluginCommands(this);
 
@@ -61,10 +61,9 @@ export default class ThePlugin extends Plugin {
             buildLinksAndReferences()
         }, 1000, true);
 
-        this.registerEvent(this.app.metadataCache.on("resolve", (file) => indexDebounce()));
+        this.registerEvent(this.app.metadataCache.on("resolve", indexDebounce ));
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (this.app.workspace as any).registerHoverLinkSource(this.appID, {
+        this.app.workspace.registerHoverLinkSource(this.appID, {
             display: this.appName,
             defaultMod: true,
         });
@@ -79,12 +78,12 @@ export default class ThePlugin extends Plugin {
         this.toggleStateSNWGutters();
 
         this.app.workspace.onLayoutReady( async () => {
+            if( !this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length ) {
+                await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
+            }
             const resolved = this.app.metadataCache.on("resolved", async () => {
                 buildLinksAndReferences();
                 this.app.metadataCache.offref(resolved);
-                if( !this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length ) {
-                    await this.app.workspace.getRightLeaf(false).setViewState({type: VIEW_TYPE_SNW, active: false});
-                }
             });
         });
     }
@@ -107,13 +106,8 @@ export default class ThePlugin extends Plugin {
         this.lastSelectedReferenceType = refType;
         this.lastSelectedReferenceFilePath = filePath;
         this.lastSelectedLineNumber = lineNu;
-        this.app.workspace.rightSplit.expand();
-
         await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
-
-        setTimeout(() => {
-            this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
-        }, 100);
+        this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
     }
 
     /**
@@ -122,12 +116,7 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateHeaderCount(): void {
-        let state = this.settings.displayIncomingFilesheader;
-
-        if(state===true) 
-            state = this.snwPluginActivelyShowingCounts;
-
-        if(state===true)
+        if(this.settings.displayIncomingFilesheader && this.showCountsActive)
             this.app.workspace.on("layout-change", this.layoutChangeEvent );
         else 
             this.app.workspace.off("layout-change", this.layoutChangeEvent );
@@ -139,16 +128,11 @@ export default class ThePlugin extends Plugin {
      * @memberof ThePlugin
      */
     toggleStateSNWMarkdownPreview(): void {
-        let state = this.settings.displayInlineReferencesMarkdown;
-
-        if(state===true) 
-            state = this.snwPluginActivelyShowingCounts;
-
-        if(state==true && this.markdownPostProcessorSNW===null) {
-            this.markdownPostProcessorSNW = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
+        if(this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor===null) {
+            this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
         } else {
-            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
-            this.markdownPostProcessorSNW=null;
+            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            this.markdownPostProcessor=null;
         }
     }
 
@@ -161,7 +145,7 @@ export default class ThePlugin extends Plugin {
         let state = this.settings.displayInlineReferencesLivePreview;
 
         if(state===true) 
-            state = this.snwPluginActivelyShowingCounts;
+            state = this.showCountsActive;
 
         this.updateCMExtensionState("inline-ref", state, InlineReferenceExtension);
     }
@@ -177,7 +161,7 @@ export default class ThePlugin extends Plugin {
                     this.settings.displayEmbedReferencesInGutter;
                     
         if(state===true) 
-            state = this.snwPluginActivelyShowingCounts;
+            state = this.showCountsActive;
 
         this.updateCMExtensionState("gutter", state, ReferenceGutterExtension);
     }
@@ -215,9 +199,8 @@ export default class ThePlugin extends Plugin {
     onunload(): void {
         console.log("unloading " + this.appName)
         try {
-            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessorSNW);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (this.app.workspace as any).unregisterHoverLinkSource(this.appID);
+            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            this.app.workspace.unregisterHoverLinkSource(this.appID);
         } catch (error) { /* don't do anything */ }
     }
 

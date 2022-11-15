@@ -1,6 +1,16 @@
 import { CachedMetadata, ListItemCache, Pos, TFile} from "obsidian";
 
 declare module "obsidian" {
+
+    interface Workspace {
+        registerHoverLinkSource: (appID: string,
+            appInfo: {
+                display: string,
+                defaultMod: boolean
+            }) => void
+        unregisterHoverLinkSource: (appID: string)=>void
+    }
+
     interface FileManager {
         getAllLinkResolutions: () => Link[]
     }
