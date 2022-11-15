@@ -19,7 +19,7 @@ export class SideBarPaneView extends ItemView {
 
     getDisplayText() { return VIEW_TYPE_SNW}
 
-    getIcon() { return "dot-network" }
+    getIcon() { return "file-digit" }
 
     async onOpen() {
         const container: HTMLElement = this.containerEl;
