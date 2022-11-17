@@ -58,7 +58,7 @@ const ReferenceGutterExtension = gutter({
             for (const embed of embedsFromMetaDataCache) {
                 if(embed.position.start.line +1 === lineNumberInFile) {
                     for (const ref of transformedCache.embeds) {
-                        if(ref?.references[0].excludedFile!=true && ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
+                        if(ref?.references[0]?.excludedFile!=true && ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
                             // @ts-ignore
                             let refOriginalLink = ref.references[0].reference.original;
                             if(refOriginalLink.substring(0,1)!="!") 
