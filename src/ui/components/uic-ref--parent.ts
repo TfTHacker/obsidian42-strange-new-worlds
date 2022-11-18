@@ -95,7 +95,9 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
                 if(lineNu>0) {
                     setTimeout(() => {
                         // jumps to the line of the file where the reference is located
-                        thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: lineNu });
+                        try {
+                            thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({line: lineNu });
+                        } catch (error) { /* Do nothing */ }
                     }, 400);
                 }
             })
