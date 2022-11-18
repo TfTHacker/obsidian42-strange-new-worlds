@@ -1,5 +1,6 @@
 //wrapper element for references area. shared between popover and sidepane
 
+
 import { setIcon } from "obsidian";
 import { getReferencesCache, getSnwAllLinksResolutions } from "src/indexer";
 import SNWPlugin from "src/main";
@@ -7,6 +8,12 @@ import { Link } from "src/types";
 import { getUIC_Ref_Item } from "./uic-ref-item";
 import { getUIC_Ref_Title_Div } from "./uic-ref-title";
 
+
+let thePlugin: SNWPlugin;
+
+export function setPluginVariableUIC_RefArea(plugin: SNWPlugin) {
+    thePlugin = plugin;
+}
 
 export /**
  *  Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
@@ -17,7 +24,7 @@ export /**
  * @param {boolean} isHoverView
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean, thePlugin: SNWPlugin): Promise<HTMLElement> => {
+const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<HTMLElement> => {
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
     const refAreaContainerEl = createDiv();
     
@@ -65,7 +72,13 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
     const wrapperEl = createDiv();
 
-    for (const file_path of uniqueFileKeys ) {
+    let maxItemsToShow = uniqueFileKeys.length-1;
+
+    if(thePlugin.settings.maxFileCountToDisplay!=1000 && maxItemsToShow >= thePlugin.settings.maxFileCountToDisplay-1)
+        maxItemsToShow = thePlugin.settings.maxFileCountToDisplay;
+
+    for (let index = 0; index < maxItemsToShow; index++) {
+        const file_path = uniqueFileKeys[index];
         const responseItemContainerEl = createDiv();
         responseItemContainerEl.addClass("snw-ref-item-container"); 
         responseItemContainerEl.addClass("tree-item");

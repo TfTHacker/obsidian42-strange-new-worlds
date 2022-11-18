@@ -1,5 +1,6 @@
 # vscode
 .vscode 
+TODONOTES.md
 
 # Intellij
 *.iml
@@ -30,3 +31,4 @@ build
 .Trashes
 ehthumbs.db
 Thumbs.db
+

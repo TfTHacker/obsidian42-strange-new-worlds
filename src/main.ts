@@ -11,6 +11,7 @@ import { SettingsTab, Settings, DEFAULT_SETTINGS} from "./ui/settingsTab";
 import SnwAPI from "./snwApi";
 import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
 import PluginCommands from "./pluginCommands";
+import { setPluginVariableUIC_RefArea } from "./ui/components/uic-ref-area";
 
 
 export default class SNWPlugin extends Plugin {
@@ -32,6 +33,7 @@ export default class SNWPlugin extends Plugin {
         console.log("loading " + this.appName);
 
         setPluginVariableForIndexer(this);
+        setPluginVariableUIC_RefArea(this);
         setPluginVariableForHtmlDecorations(this);
         setPluginVariableForCM6Gutter(this);
         setPluginVariableForHeaderRefCount(this);

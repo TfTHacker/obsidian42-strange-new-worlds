@@ -22,7 +22,7 @@ export const getUIC_Hoverview = async (instance: Instance)=>{
     const popoverEl = createDiv();
     popoverEl.addClass("snw-popover-container");
     popoverEl.addClass("search-result-container")
-    popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true, thePlugin));
+    popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true));
     instance.setContent(popoverEl);
     setTimeout( async () => {
         await setFileLinkHandlers(false, popoverEl);
@@ -42,7 +42,7 @@ const getUIC_SidePane = async (refType: string, key: string, filePath: string, l
     const sidepaneEL = createDiv();
     sidepaneEL.addClass("snw-sidepane-container");   
     sidepaneEL.addClass("search-result-container");
-    sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false, thePlugin)) )
+    sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false)) )
  
     setTimeout( async () => {
         await setFileLinkHandlers(false, sidepaneEL);

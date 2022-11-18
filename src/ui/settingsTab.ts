@@ -4,7 +4,8 @@ import SNWPlugin from "../main";
 export interface Settings {
 	enableOnStartupDesktop:					boolean;
 	enableOnStartupMobile:					boolean;
-	minimumRefCountThreshold:				number;
+	minimumRefCountThreshold:				number;	//minimum required to display a count
+	maxFileCountToDisplay:					number; // maximum number of items to display in popup or sidepane
 	displayIncomingFilesheader: 			boolean;
 	displayInlineReferencesLivePreview: 	boolean;
 	displayInlineReferencesMarkdown: 		boolean;
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	enableOnStartupDesktop:					true,
 	enableOnStartupMobile:					true,
 	minimumRefCountThreshold:				1,
+	maxFileCountToDisplay:					50,
 	displayIncomingFilesheader: 			true,
 	displayInlineReferencesLivePreview: 	true,
 	displayInlineReferencesMarkdown: 		true,
@@ -54,6 +56,37 @@ export class SettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		containerEl.createEl('h2', { text: this.thePlugin.appName });
+
+
+		containerEl.createEl("h2", { text: "Thresholds" });
+		new Setting(containerEl)
+		.setName("Minimal required count to show counter")
+		.setDesc(`This setting defines how many references there needs to be for the reference count box to appear. May require reloading open files.
+				 Currently set to: ${this.thePlugin.settings.minimumRefCountThreshold} refernences.`)
+		.addSlider(slider => slider
+			.setLimits(1, 1000 , 1)
+			.setValue(this.thePlugin.settings.minimumRefCountThreshold)
+			.onChange(async (value) => {
+				this.thePlugin.settings.minimumRefCountThreshold = value;
+				await this.thePlugin.saveSettings();
+			})
+			.setDynamicTooltip()
+		)
+
+		new Setting(containerEl)
+		.setName("Maximum file references to show")
+		.setDesc(`This setting defines the max amount of files with their references are displayed in the popup or sidebar.  Set to 1000 for no maximum.
+				 Currently set to: ${this.thePlugin.settings.maxFileCountToDisplay} refernences.`)
+		.addSlider(slider => slider
+			.setLimits(1, 1000 , 1)
+			.setValue(this.thePlugin.settings.maxFileCountToDisplay)
+			.onChange(async (value) => {
+				this.thePlugin.settings.maxFileCountToDisplay = value;
+				await this.thePlugin.saveSettings();
+			})
+			.setDynamicTooltip()
+		)
+
 
 		containerEl.createEl("h2", { text: "Enable on startup" });
 		new Setting(containerEl)
@@ -240,21 +273,7 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});		
 
-		containerEl.createEl("h2", { text: "Other Settings" });
 
-		new Setting(containerEl)
-			.setName("Minimal file count threshold")
-			.setDesc(`This setting defines how many references there needs to be for the reference count box to appear. Default is one reference.
-					 Currently set to: ${this.thePlugin.settings.minimumRefCountThreshold} refernences.`)
-			.addSlider(slider => slider
-				.setLimits(1, 20 , 1)
-				.setValue(this.thePlugin.settings.minimumRefCountThreshold)
-				.onChange(async (value) => {
-					this.thePlugin.settings.minimumRefCountThreshold = value;
-					await this.thePlugin.saveSettings();
-				})
-				.setDynamicTooltip()
-			)
 
 		containerEl.createEl("h2", { text: "Cache Tuning" });
 
