@@ -26,7 +26,7 @@ export const DEFAULT_SETTINGS: Settings = {
 	enableOnStartupDesktop:					true,
 	enableOnStartupMobile:					true,
 	minimumRefCountThreshold:				1,
-	maxFileCountToDisplay:					50,
+	maxFileCountToDisplay:					100,
 	displayIncomingFilesheader: 			true,
 	displayInlineReferencesLivePreview: 	true,
 	displayInlineReferencesMarkdown: 		true,

@@ -72,9 +72,9 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
     const wrapperEl = createDiv();
 
-    let maxItemsToShow = uniqueFileKeys.length-1;
+    let maxItemsToShow = uniqueFileKeys.length;
 
-    if(thePlugin.settings.maxFileCountToDisplay!=1000 && maxItemsToShow >= thePlugin.settings.maxFileCountToDisplay-1)
+    if(thePlugin.settings.maxFileCountToDisplay!=1000 && maxItemsToShow >= thePlugin.settings.maxFileCountToDisplay)
         maxItemsToShow = thePlugin.settings.maxFileCountToDisplay;
 
     for (let index = 0; index < maxItemsToShow; index++) {
