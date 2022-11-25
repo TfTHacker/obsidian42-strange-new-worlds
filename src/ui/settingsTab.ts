@@ -279,7 +279,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName(`How often should the SNW Cache update`)
-			.setDesc(`By default SNW will updates its internal cache every half a second (500 milliseconds) when there is some change in the vualt.
+			.setDesc(`By default SNW will updates its internal cache every half a second (500 milliseconds) when there is some change in the vault.
 					  Increase the time to slighlty improve performance on less performant devices or decrease it to improve refresh of vault information.
 					  Currently set to: ${this.thePlugin.settings.cacheUpdateInMilliseconds} milliseconds. (Requires Obsidian Restart)`	)
 			.addSlider(slider => slider
