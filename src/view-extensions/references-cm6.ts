@@ -147,7 +147,9 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
         }
 
         if(matchKey===key) {
-            if(ref?.references[0]?.excludedFile!=true && ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
+            if( ref?.references[0]?.excludedFile!=true &&
+                ref?.references[0]?.resolvedFile &&
+                ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
                 return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null, ref.pos.start.line);
             else
                 return null;

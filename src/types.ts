@@ -25,6 +25,7 @@ declare module "obsidian" {
                 position: Pos
             }
         }
+        iterateReferences:( cb: (sourcePath: string, reference: ReferenceCache)  => void ) => void
     }
 
     interface Vault {
@@ -50,7 +51,8 @@ export interface Link {
         position: Pos
     }
     resolvedFile: TFile
-    resolvedPaths: string[]
+    // resolvedPaths: string[]
+    ghostLink: string
     sourceFile: TFile 
     excludedFile: boolean;
 }

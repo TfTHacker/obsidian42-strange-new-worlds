@@ -54,7 +54,10 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
     if(refType==="File") {
         const allLinks: Link[] = getSnwAllLinksResolutions(); 
-        const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===filePath);
+        const incomingLinks = allLinks.filter(f=>{
+            if(!f?.resolvedFile) return false;
+            return f?.resolvedFile?.path===filePath;
+        });
         countOfRefs = incomingLinks.length;
         linksToLoop = incomingLinks;
     } else {

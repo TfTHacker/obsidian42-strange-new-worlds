@@ -1,6 +1,6 @@
 // This module builds on Obsidians cache to provide more specific link information
 
-import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos} from "obsidian";
+import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos, parseLinktext} from "obsidian";
 import SNWPlugin from "./main";
 import {Link, TransformedCache} from "./types";
 
@@ -30,7 +30,28 @@ export function getSnwAllLinksResolutions(){
 export function buildLinksAndReferences(): void {
     if(thePlugin.showCountsActive!=true) return;
     
-    allLinkResolutions = thePlugin.app.fileManager.getAllLinkResolutions(); //cache this for use in other pages
+    allLinkResolutions = [];
+    thePlugin.app.metadataCache.iterateReferences((src,refs)=>{
+        const resolvedFilePath = parseLinktext(refs.link);
+        if(resolvedFilePath?.path) {
+            const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+            const ghlink = !resolvedTFile ? resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
+            
+            allLinkResolutions.push(
+                {
+                    reference: {
+                        displayText: refs.displayText,
+                        link: refs.link,
+                        position: refs.position
+                    },
+                    resolvedFile: resolvedTFile, 
+                    ghostLink: ghlink,
+                    sourceFile:   thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/"),
+                    excludedFile: false
+                }
+            )
+        }
+    })
 
     // START: Remove file exclusions for frontmatter snw-index-exclude
     const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e)=>{
@@ -40,24 +61,32 @@ export function buildLinksAndReferences(): void {
         return snwIndexExceptionsList.find(f=>f[0]===e[1].hash);
     });
 
+
+
     for (let i = 0; i < allLinkResolutions.length; i++) {
         allLinkResolutions[i].excludedFile = false;
-        const fileName = allLinkResolutions[i].resolvedFile.path;
-        for (let e = 0; e < snwIndexExceptions.length; e++) {
-            if(fileName==snwIndexExceptions[e][0]) {
-                allLinkResolutions[i].excludedFile = true;
-                break;
+        if(allLinkResolutions[i]?.resolvedFile?.path){
+            const fileName = allLinkResolutions[i].resolvedFile.path;
+            for (let e = 0; e < snwIndexExceptions.length; e++) {
+                if(fileName==snwIndexExceptions[e][0]) {
+                    allLinkResolutions[i].excludedFile = true;
+                    break;
+                }
             }
-        }
+        } 
     }
     // END: Exclusions
+    
 
     const refs = allLinkResolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
         let keyBasedOnLink = "";
         let keyBasedOnFullPath = ""
 
         keyBasedOnLink = link.reference.link;
-        keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
+        if(link?.resolvedFile)
+            keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
+        else
+            keyBasedOnFullPath = link.ghostLink;
 
         if(keyBasedOnLink===keyBasedOnFullPath) {
             keyBasedOnFullPath=null;
@@ -203,6 +232,6 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     transformedCache.cacheMetaData = cachedMetaData;
     transformedCache.createDate = Date.now();
     cacheCurrentPages.set(file.path, transformedCache);
-    
+
     return transformedCache;
 }

@@ -44,7 +44,10 @@ function processHeader(mdView: MarkdownView) {
     const allLinks: Link[] = getSnwAllLinksResolutions(); 
     if(allLinks==undefined) return;
 
-    const incomingLinks = allLinks.filter(f=>f?.resolvedFile.path===mdView.file.path);
+    const incomingLinks = allLinks.filter(f=>{
+        if(!f?.resolvedFile) return false;
+        return f?.resolvedFile?.path===mdView.file.path;
+    });
 
     let incomingLinksCount = incomingLinks.length;
 
