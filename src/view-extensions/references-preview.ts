@@ -78,6 +78,7 @@ class snwChildComponent extends MarkdownRenderChild {
         if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
 
             if (thePlugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
+                debugger;
                 let isThisAnEmbed = false;
                 try { // we don't want to proccess embeds
                     // @ts-ignore
@@ -85,13 +86,18 @@ class snwChildComponent extends MarkdownRenderChild {
                 } catch (error) { /* nothing to do here */ }
                 
                 for (const value of transformedCache.blocks) {
-                    if ( value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && 
-                        (value.pos.start.line >= this.sectionInfo?.lineStart && value.pos.end.line <= this.sectionInfo?.lineEnd) &&
-                        !isThisAnEmbed ) {
+                    if (value.references[0]?.excludedFile != true
+                        && value.references.length >= minRefCountThreshold
+                        && (value.pos.start.line >= this.sectionInfo?.lineStart && value.pos.end.line <= this.sectionInfo?.lineEnd)
+                        && !isThisAnEmbed ) {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
-                        let blockElement: HTMLElement = this.containerEl.querySelector('p')
+                        let blockElement: HTMLElement = this.containerEl.querySelector('p');
+                        const valueLineInSection: number = value.pos.start.line - this.sectionInfo.lineStart;
                         if (!blockElement) {
-                            blockElement = this.containerEl.querySelector(`li[data-line="${value.pos.start.line}"]`);
+                            blockElement = this.containerEl.querySelector(`li[data-line="${valueLineInSection}"]`);
+                        }
+                        if (!blockElement) {
+                            blockElement = this.containerEl.querySelector(`ol[data-line="${valueLineInSection}"]`)
                         }
                         try {
                             if (!blockElement.hasClass("snw-block-preview")) {
