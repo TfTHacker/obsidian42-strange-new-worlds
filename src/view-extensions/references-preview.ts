@@ -78,7 +78,6 @@ class snwChildComponent extends MarkdownRenderChild {
         if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
 
             if (thePlugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
-                debugger;
                 let isThisAnEmbed = false;
                 try { // we don't want to proccess embeds
                     // @ts-ignore
