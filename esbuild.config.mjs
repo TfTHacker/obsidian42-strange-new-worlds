@@ -26,7 +26,7 @@ esbuild.build({
     logLevel: "info",
     sourcemap: prod ? false : "inline",
     treeShaking: true,
-    minify: false,
+    minify: true,
     outdir: "build",
     external: [
       "obsidian",
