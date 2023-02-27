@@ -91,13 +91,12 @@ class snwChildComponent extends MarkdownRenderChild {
                         const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
                         let blockElement: HTMLElement = this.containerEl.querySelector('p')
                         if (!blockElement) {
-                            blockElement = this.containerEl.querySelector("li");
+                            blockElement = this.containerEl.querySelector(`li[data-line="${value.pos.start.line}"]`);
                         }
                         try {
                             if (!blockElement.hasClass("snw-block-preview")) {
                                 referenceElement.addClass("snw-block-preview");
                                 blockElement.append(referenceElement);
-                                break;
                             } 
                         } catch (error) { /* nothing to do here */ }
                     }
