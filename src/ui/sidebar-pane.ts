@@ -1,6 +1,7 @@
 // Sidepane used by SNW for displaying references
 
 import {ItemView, WorkspaceLeaf} from "obsidian";
+import { scrollResultsIntoView } from "src/utils";
 import {getReferencesCache} from "../indexer";
 import SNWPlugin from "../main";
 import { getUIC_SidePane } from "./components/uic-ref--parent";
@@ -46,6 +47,8 @@ export class SideBarPaneView extends ItemView {
         }
 
         this.containerEl.replaceChildren(await getUIC_SidePane(refType, key, filePath, lineNu))
+
+        scrollResultsIntoView(this.containerEl);
     }
 
     async onClose() { // Nothing to clean up.
