@@ -62,7 +62,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 		.setName("Minimal required count to show counter")
 		.setDesc(`This setting defines how many references there needs to be for the reference count box to appear. May require reloading open files.
-				 Currently set to: ${this.thePlugin.settings.minimumRefCountThreshold} refernences.`)
+				 Currently set to: ${this.thePlugin.settings.minimumRefCountThreshold} references.`)
 		.addSlider(slider => slider
 			.setLimits(1, 1000 , 1)
 			.setValue(this.thePlugin.settings.minimumRefCountThreshold)
@@ -76,7 +76,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 		.setName("Maximum file references to show")
 		.setDesc(`This setting defines the max amount of files with their references are displayed in the popup or sidebar.  Set to 1000 for no maximum.
-				 Currently set to: ${this.thePlugin.settings.maxFileCountToDisplay} refernences.`)
+				 Currently set to: ${this.thePlugin.settings.maxFileCountToDisplay} references.`)
 		.addSlider(slider => slider
 			.setLimits(1, 1000 , 1)
 			.setValue(this.thePlugin.settings.maxFileCountToDisplay)
