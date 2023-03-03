@@ -1,4 +1,4 @@
-import { MarkdownRenderer, Pos, TFile } from "obsidian";
+import { MarkdownRenderer } from "obsidian";
 import SNWPlugin from "src/main";
 import { Link } from "../../types";
 
