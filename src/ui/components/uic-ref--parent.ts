@@ -1,6 +1,7 @@
 import { Keymap, MarkdownView } from 'obsidian';
 import SNWPlugin from 'src/main';
 import { Instance, ReferenceElement } from 'tippy.js';
+import { scrollResultsIntoView } from 'src/utils';
 import { getUIC_Ref_Area } from "./uic-ref-area";
 import { setPluginVariableUIC_RefItem } from './uic-ref-item';
 
@@ -27,6 +28,7 @@ export const getUIC_Hoverview = async (instance: Instance)=>{
     setTimeout( async () => {
         await setFileLinkHandlers(false, popoverEl);
     }, 500);
+    scrollResultsIntoView(popoverEl);
 }
  
 
@@ -43,7 +45,7 @@ const getUIC_SidePane = async (refType: string, key: string, filePath: string, l
     sidepaneEL.addClass("snw-sidepane-container");   
     sidepaneEL.addClass("search-result-container");
     sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false)) )
- 
+
     setTimeout( async () => {
         await setFileLinkHandlers(false, sidepaneEL);
     }, 500);
