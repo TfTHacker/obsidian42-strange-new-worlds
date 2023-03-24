@@ -20,6 +20,7 @@ export interface Settings {
 	enableRenderingLinksInLivePreview:		boolean;
 	enableRenderingHeadersInLivePreview:	boolean;
 	enableRenderingEmbedsInLivePreview:		boolean;
+	enableIngoredFiles:						boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -40,7 +41,8 @@ export const DEFAULT_SETTINGS: Settings = {
 	enableRenderingBlockIdInLivePreview:	true,
 	enableRenderingLinksInLivePreview: 		true,
 	enableRenderingHeadersInLivePreview:	true,
-	enableRenderingEmbedsInLivePreview: 	true
+	enableRenderingEmbedsInLivePreview: 	true,
+	enableIngoredFiles:						false,
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -291,5 +293,18 @@ export class SettingsTab extends PluginSettingTab {
 				})
 				.setDynamicTooltip()
 			)
+
+		containerEl.createEl("h2", { text: "Index" });
+
+		new Setting(containerEl)
+			.setName("Enable Obsidian ingored files")
+			.setDesc("If enabled, will respect the general obsidian ignored files settings")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableIngoredFiles);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableIngoredFiles = value;
+					await this.thePlugin.saveSettings();
+				});
+			});
 	}
 }
