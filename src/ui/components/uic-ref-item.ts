@@ -1,6 +1,13 @@
 import { MarkdownRenderer } from "obsidian";
 import SNWPlugin from "src/main";
 import { Link } from "../../types";
+import { ContextBuilder } from "./context/context-builder";
+import {
+    formatHeadingBreadCrumbs,
+    formatListBreadcrumbs,
+    formatListWithDescendants,
+} from "./context/formatting-utils";
+import { getTextAtPosition } from "./context/position-utils";
 
 let thePlugin: SNWPlugin;
 
@@ -14,22 +21,27 @@ export /**
  * @param {Link} ref
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement>=> {
+const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
     const itemEl = createDiv();
     itemEl.addClass("snw-ref-item-info");
     itemEl.addClass("search-result-file-match");
 
-    itemEl.setAttribute("snw-data-line-number", ref.reference.position.start.line.toString());
-    itemEl.setAttribute("snw-data-file-name",   ref.sourceFile.path.replace(".md",""));
-    itemEl.setAttribute("data-href",            ref.sourceFile.path.replace(".md",""));
+    itemEl.setAttribute(
+        "snw-data-line-number",
+        ref.reference.position.start.line.toString()
+    );
+    itemEl.setAttribute(
+        "snw-data-file-name",
+        ref.sourceFile.path.replace(".md", "")
+    );
+    itemEl.setAttribute("data-href", ref.sourceFile.path.replace(".md", ""));
 
     const fileChuncksEl = await grabChunkOfFile(ref);
 
-    itemEl.appendChild( fileChuncksEl );
+    itemEl.appendChild(fileChuncksEl);
 
     return itemEl;
-}
-
+};
 
 /**
  * Grabs a block from a file, then runs it through a markdown render
@@ -37,32 +49,105 @@ const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement>=> {
  * @param {Link} ref
  * @return {*}  {Promise<string>}
  */
-const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> =>{
-    const fileContents = await thePlugin.app.vault.cachedRead(ref.sourceFile)
-    const cachedMetaData = thePlugin.app.metadataCache.getFileCache(ref.sourceFile);
+const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
+    const fileContents = await thePlugin.app.vault.cachedRead(ref.sourceFile);
+    const fileCache = thePlugin.app.metadataCache.getFileCache(ref.sourceFile);
+    const linkPosition = ref.reference.position;
 
-    let startPosition = 0;
-    let endPosition = 0; 
+    const container = createDiv();
+    container.setAttribute("uic", "uic"); //used to track if this is UIC element.
 
-    for (let i = 0; i < cachedMetaData.sections.length; i++) {
-        const sec = cachedMetaData.sections[i];
-        if(sec.position.start.offset <= ref.reference.position.start.offset && sec.position.end.offset >= ref.reference.position.end.offset) {
-            startPosition = sec.position.start.offset;
-            endPosition = sec.position.end.offset;
-            break;
+    const contextBuilder = new ContextBuilder(fileContents, fileCache);
+
+    const headingBreadcrumbs =
+        contextBuilder.getHeadingBreadcrumbs(linkPosition);
+    if (headingBreadcrumbs.length > 0) {
+        const headingBreadcrumbsEl = container.createDiv();
+        headingBreadcrumbsEl.addClass("snw-breadcrumbs");
+
+        headingBreadcrumbsEl.createEl("span", { text: "H" });
+
+        await MarkdownRenderer.renderMarkdown(
+            formatHeadingBreadCrumbs(headingBreadcrumbs),
+            headingBreadcrumbsEl,
+            ref.sourceFile.path,
+            thePlugin
+        );
+    }
+
+    const indexOfListItemContainingLink =
+        contextBuilder.getListItemIndexContaining(linkPosition);
+    const isLinkInListItem = indexOfListItemContainingLink >= 0;
+
+    if (isLinkInListItem) {
+        const listBreadcrumbs = contextBuilder.getListBreadcrumbs(linkPosition);
+
+        if (listBreadcrumbs.length > 0) {
+            const contextEl = container.createDiv();
+            contextEl.addClass("snw-breadcrumbs");
+
+            contextEl.createEl("span", { text: "L" });
+
+            await MarkdownRenderer.renderMarkdown(
+                formatListBreadcrumbs(fileContents, listBreadcrumbs),
+                contextEl,
+                ref.sourceFile.path,
+                thePlugin
+            );
+        }
+
+        const listItemWithDescendants =
+            contextBuilder.getListItemWithDescendants(
+                indexOfListItemContainingLink
+            );
+
+        const contextEl = container.createDiv();
+        await MarkdownRenderer.renderMarkdown(
+            formatListWithDescendants(fileContents, listItemWithDescendants),
+            contextEl,
+            ref.sourceFile.path,
+            thePlugin
+        );
+    } else {
+        const sectionContainingLink =
+            contextBuilder.getSectionContaining(linkPosition);
+
+        const blockContents = getTextAtPosition(
+            fileContents,
+            sectionContainingLink.position
+        );
+
+        await MarkdownRenderer.renderMarkdown(
+            blockContents,
+            container,
+            ref.sourceFile.path,
+            thePlugin
+        );
+    }
+
+    const headingThatContainsLink =
+        contextBuilder.getHeadingContaining(linkPosition);
+    if (headingThatContainsLink) {
+        const firstSectionPosition = contextBuilder.getFirstSectionUnder(
+            headingThatContainsLink.position
+        );
+        if (firstSectionPosition) {
+            const contextEl = container.createDiv();
+            await MarkdownRenderer.renderMarkdown(
+                getTextAtPosition(fileContents, firstSectionPosition.position),
+                contextEl,
+                ref.sourceFile.path,
+                thePlugin
+            );
         }
     }
 
-    const blockContents = fileContents.substring(startPosition, endPosition);
-
-    const el = createDiv();
-    el.setAttribute("uic","uic");  //used to track if this is UIC element. 
-    await MarkdownRenderer.renderMarkdown(blockContents, el, ref.sourceFile.path, thePlugin);
-
     // add highlight to the link
-    const elems = el.querySelectorAll("*");
-    const res = Array.from(elems).find(v => v.textContent == ref.reference.displayText);
-    res.addClass('search-result-file-matched-text')
+    const elems = container.querySelectorAll("*");
+    const res = Array.from(elems).find(
+        (v) => v.textContent == ref.reference.displayText
+    );
+    res.addClass("search-result-file-matched-text");
 
-    return el    
-}
+    return container;
+};
