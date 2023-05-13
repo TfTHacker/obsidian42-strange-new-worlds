@@ -2,7 +2,7 @@ import {gutter, GutterMarker, } from "@codemirror/view";
 import { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
-import { getSNWCacheByFile } from "src/indexer";
+import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import SNWPlugin from "src/main";
 
 let thePlugin: SNWPlugin;
@@ -59,10 +59,17 @@ const ReferenceGutterExtension = gutter({
                 if(embed.position.start.line +1 === lineNumberInFile) {
                     for (const ref of transformedCache.embeds) {
                         if(ref?.references[0]?.excludedFile!=true && ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
-                            if( editorView.state.doc.lineAt(line.from).text.trim() ===   `![[${ref.key}]]`) {
-                                if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
-                                    thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, "snw-embed-special" );
-                                return new referenceGutterMarker(ref.references.length, "embed", ref.key, ref.references[0].resolvedFile.path.replace(".md",""), "snw-embed-special");
+                            const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim(); 
+                            if(lineToAnalyze.startsWith("!")){
+                                // const resolvedFilePath = parseLinktext(lineToAnalyze.replace("![[","").replace("]]",""));
+                                // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+                                // const lineFromFile = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
+                                const lineFromFile = parseLinkTextToFullPath(lineToAnalyze.replace("![[","").replace("]]",""));
+                                if( lineFromFile === ref.key) {
+                                    if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
+                                        thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, "snw-embed-special" );
+                                    return new referenceGutterMarker(ref.references.length, "embed", ref.key, ref.references[0].resolvedFile.path.replace(".md",""), "snw-embed-special");
+                                }
                             }
                         }
                     }

@@ -33,9 +33,11 @@ export function buildLinksAndReferences(): void {
     allLinkResolutions = [];
     thePlugin.app.metadataCache.iterateReferences((src,refs)=>{
         const resolvedFilePath = parseLinktext(refs.link);
+        console.log("resolvedFilePath",resolvedFilePath)
         if(resolvedFilePath?.path) {
             const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-            const ghlink = !resolvedTFile ? resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
+            const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath; // file doesnt exist, empthy link
+            const ghlink = resolvedTFile===null ?  resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
             const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/");
 
             if (thePlugin.settings.enableIngoredFiles) {
@@ -43,11 +45,13 @@ export function buildLinksAndReferences(): void {
                     return;
                 }
             }
+            
             allLinkResolutions.push(
                 {
                     reference: {
                         displayText: refs.displayText,
-                        link: refs.link,
+                        // link: refs.link, // old approach
+                        link: fileLink!="" ? fileLink : ghlink,
                         position: refs.position
                     },
                     resolvedFile: resolvedTFile, 
@@ -67,8 +71,6 @@ export function buildLinksAndReferences(): void {
         return snwIndexExceptionsList.find(f=>f[0]===e[1].hash);
     });
 
-
-
     for (let i = 0; i < allLinkResolutions.length; i++) {
         allLinkResolutions[i].excludedFile = false;
         if(allLinkResolutions[i]?.resolvedFile?.path){
@@ -82,7 +84,6 @@ export function buildLinksAndReferences(): void {
         } 
     }
     // END: Exclusions
-    
 
     const refs = allLinkResolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
         let keyBasedOnLink = "";
@@ -130,6 +131,7 @@ const cacheCurrentPages = new Map<string,TransformedCache>();
  * @return {*}  {TransformedCache}
  */
 export function getSNWCacheByFile(file: TFile): TransformedCache {
+    
     if(thePlugin.showCountsActive!=true) return;
 
     if(cacheCurrentPages.has(file.path)) {
@@ -188,13 +190,17 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
     if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
+            // const resolvedFilePath = parseLinktext(link.link);
+            // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+            // const newLinkPath = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
+            const newLinkPath = parseLinkTextToFullPath(link.link);
             return {
-                key: link.link,
+                key: newLinkPath,
                 original: link.original,
                 type: "link",
                 pos: link.position,
                 page: file.basename,
-                references: references[link.link] || []
+                references: references[newLinkPath] || []
             };
         });
         if (transformedCache.links) {
@@ -210,19 +216,23 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
     if (cachedMetaData?.embeds) {
         transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
-            return {
-                key: embed.link,
+            // const resolvedFilePath = parseLinktext(embed.link);
+            // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+            // resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
+            const newEmbedPath = parseLinkTextToFullPath(embed.link)
+            const output = {
+                key: newEmbedPath,
                 page: file.basename,
                 type: "embed",
                 pos: embed.position,
-                references: references[embed.link] || []
+                references: references[newEmbedPath] || []
             };
+            return output;
         });
         if (transformedCache.embeds) {
             transformedCache.embeds = transformedCache.embeds.map((embed) => {
                 if (embed.key.includes("#") && !embed.key.includes("#^") && transformedCache.headings) {
                     const heading = headings.filter((heading : string) => heading.includes(embed.key.split("#")[1]))[0];
-
                     embed.original = heading ? heading : undefined;
                 }
 
@@ -240,4 +250,10 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     cacheCurrentPages.set(file.path, transformedCache);
 
     return transformedCache;
+}
+
+export function parseLinkTextToFullPath(link: string): string {
+    const resolvedFilePath = parseLinktext(link);
+    const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+    return resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;    
 }

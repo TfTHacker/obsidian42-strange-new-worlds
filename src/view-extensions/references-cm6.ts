@@ -7,7 +7,7 @@
 
 import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType} from "@codemirror/view";
 import { editorInfoField } from "obsidian";
-import { getSNWCacheByFile } from "src/indexer";
+import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
 import SNWPlugin from "src/main";
@@ -75,7 +75,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                             from: to,
                             to: to
                         });
-                    } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //link
+                    } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //heading
                         widgetsToAdd.push({
                             // @ts-ignore
                             key: match[0].replace(/^#+/,"").substring(1),
@@ -135,8 +135,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
  * @return {*}  {InlineReferenceWidget}
  */
 const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
-    if((refType==="embed" || refType==="link")  &&  key.contains("|")) // check for aliased references
-        key = key.substring(0, key.search(/\|/));
+    
 
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
@@ -144,6 +143,15 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
         if(refType==="heading") {
             matchKey = ref.headerMatch; // headers require special comparison
             key = key.replace(/^\s+|\s+$/g,''); // should be not leading spaces
+        }
+
+        if(refType==="embed" || refType==="link") {
+            if(key.contains("|")) // check for aliased references
+                key = key.substring(0, key.search(/\|/));
+            // const resolvedFilePath = parseLinktext(key);
+            // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+            // key = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
+            key = parseLinkTextToFullPath(key);            
         }
 
         if(matchKey===key) {

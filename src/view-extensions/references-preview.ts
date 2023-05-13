@@ -1,6 +1,6 @@
 import {MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile} from "obsidian";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
-import {getSNWCacheByFile} from "../indexer";
+import {getSNWCacheByFile, parseLinkTextToFullPath} from "../indexer";
 import SNWPlugin from "../main";
 
 
@@ -110,7 +110,11 @@ class snwChildComponent extends MarkdownRenderChild {
 
             if (thePlugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
                 this.containerEl.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
-                    const embedKey = element.getAttribute('src');
+                    // const embedSrc = element.getAttribute('src');
+                    // const resolvedFilePath = parseLinktext(embedSrc);
+                    // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+                    // const embedKey = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
+                    const embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
                     for (const value of transformedCache.embeds) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
                             const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
@@ -139,7 +143,11 @@ class snwChildComponent extends MarkdownRenderChild {
 
             if(thePlugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
                 this.containerEl.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
-                    const link = element.getAttribute('data-href');
+                    // const srcLink = element.getAttribute('data-href');
+                    // const resolvedFilePath = parseLinktext(srcLink);
+                    // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
+                    // const link = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
+                    const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
                     for (const value of transformedCache.links) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
                             const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
