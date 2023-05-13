@@ -26,6 +26,7 @@ declare module "obsidian" {
             }
         }
         iterateReferences:( cb: (sourcePath: string, reference: ReferenceCache)  => void ) => void
+        isUserIgnored(path: string): boolean;
     }
 
     interface Vault {

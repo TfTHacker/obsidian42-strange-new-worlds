@@ -36,7 +36,13 @@ export function buildLinksAndReferences(): void {
         if(resolvedFilePath?.path) {
             const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
             const ghlink = !resolvedTFile ? resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
-            
+            const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/");
+
+            if (thePlugin.settings.enableIngoredFiles) {
+                if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path)) {
+                    return;
+                }
+            }
             allLinkResolutions.push(
                 {
                     reference: {
@@ -46,7 +52,7 @@ export function buildLinksAndReferences(): void {
                     },
                     resolvedFile: resolvedTFile, 
                     ghostLink: ghlink,
-                    sourceFile:   thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/"),
+                    sourceFile:   sourceFile,
                     excludedFile: false
                 }
             )
