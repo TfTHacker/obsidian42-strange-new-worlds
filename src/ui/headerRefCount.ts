@@ -106,7 +106,7 @@ function processHeader(mdView: MarkdownView) {
         }
     // }
 
-    tippy(wrapper, {
+    const tippyObject =  tippy(wrapper, {
         interactive: true,
         appendTo: () =>  document.body, 
         allowHTML: true,
@@ -117,6 +117,8 @@ function processHeader(mdView: MarkdownView) {
         }, 1); } 
     });
 
+    tippyObject.popper.classList.add("snw-tippy");
+    
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("snwTitleRefCountDisplayCountEl", snwTitleRefCountDisplayCountEl)
 

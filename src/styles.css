@@ -237,3 +237,13 @@ body {
     padding-left: 3px;
     padding-right: 3px;
 }
+
+
+/* .tippy-box settings to avoid conflicts with other plugins */
+.snw-tippy .tippy-box {
+    background-color: transparent;
+}
+
+.snw-tippy .tippy-content {
+    padding: 0px;
+}

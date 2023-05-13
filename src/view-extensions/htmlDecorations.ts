@@ -42,7 +42,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
 
-    tippy(element, {
+    const tippyObject =  tippy(element, {
         interactive: true,
         appendTo: () => document.body,
         allowHTML: true,
@@ -52,6 +52,8 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
             await getUIC_Hoverview(instance)
         }, 1); } 
     });
+    
+    tippyObject.popper.classList.add("snw-tippy");
 
     return element;
 }
