@@ -33,7 +33,6 @@ export function buildLinksAndReferences(): void {
     allLinkResolutions = [];
     thePlugin.app.metadataCache.iterateReferences((src,refs)=>{
         const resolvedFilePath = parseLinktext(refs.link);
-        console.log("resolvedFilePath",resolvedFilePath)
         if(resolvedFilePath?.path) {
             const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
             const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath; // file doesnt exist, empthy link
@@ -132,8 +131,6 @@ const cacheCurrentPages = new Map<string,TransformedCache>();
  */
 export function getSNWCacheByFile(file: TFile): TransformedCache {
     
-    if(thePlugin.showCountsActive!=true) return;
-
     if(cacheCurrentPages.has(file.path)) {
         const cachedPage = cacheCurrentPages.get(file.path);
         // Check if references have been updated since last cache update, and if cache is old
@@ -141,6 +138,8 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
             return cachedPage;
         }
     }
+
+    if(thePlugin.showCountsActive!=true) return;
 
     const transformedCache: TransformedCache = {};
     const cachedMetaData = thePlugin.app.metadataCache.getFileCache(file);
@@ -190,10 +189,17 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
     if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
+            
             // const resolvedFilePath = parseLinktext(link.link);
             // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
             // const newLinkPath = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
-            const newLinkPath = parseLinkTextToFullPath(link.link);
+            let newLinkPath = parseLinkTextToFullPath(link.link);
+            
+
+            if(newLinkPath==="") { // file does not exist, likely a ghost file, so just leave the link
+                newLinkPath = link.link
+            } 
+            
             return {
                 key: newLinkPath,
                 original: link.original,
@@ -255,5 +261,8 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 export function parseLinkTextToFullPath(link: string): string {
     const resolvedFilePath = parseLinktext(link);
     const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-    return resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;    
+    if(resolvedTFile===null)
+        return "";
+    else
+        return resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;    
 }

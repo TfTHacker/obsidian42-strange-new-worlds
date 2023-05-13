@@ -151,14 +151,17 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
             // const resolvedFilePath = parseLinktext(key);
             // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
             // key = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
-            key = parseLinkTextToFullPath(key);            
+            const parsedKey = parseLinkTextToFullPath(key);     
+            key = parsedKey==="" ? key : parsedKey; //if no results, likely a ghost link
+            console.log("matchkey key", matchKey, key, ref)       
         }
 
         if(matchKey===key) {
+            // ref?.references[0]?.resolvedFile &&
+            const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace(".md","") : key;
             if( ref?.references[0]?.excludedFile!=true &&
-                ref?.references[0]?.resolvedFile &&
                 ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
-                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), null, ref.pos.start.line);
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, filePath, null, ref.pos.start.line);
             else
                 return null;
         }
