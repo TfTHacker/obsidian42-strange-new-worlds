@@ -17,6 +17,11 @@ More features
 
 [![](media/YouTubeFeatures.png)](https://youtu.be/9mg6p4yWOVw)
 
+Reviews
+
+[![](media/YT_Curtis_Review.png)](https://youtu.be/bOipNGRSqRo)
+- Great review by Curtic McHale
+
 
 # Lazy networking (linking)
 We are not known to be lazy, but for this plugin we had to be. This plugin leverages the indexing Obsidian does in the background, which is amazing. However, for performance reasons some things don't update right away. So depending on what you are doing, reference counts sometimes shown by this plugin may be incorrect as you work with links, embeds and blocks. But eventaully they will be correct as the cache updates itself. It is better than nothing, right? 
