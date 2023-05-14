@@ -6,7 +6,7 @@
  */
 
 import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType} from "@codemirror/view";
-import { editorInfoField } from "obsidian";
+import { editorInfoField, stripHeading } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
@@ -52,8 +52,8 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]!=true) {
                     const widgetsToAdd: {key: string, transformedCachedItem: TransformedCachedItem[], refType: string, from: number, to: number}[] = []
                     if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
-                        widgetsToAdd.push({
-                            key: mdView.file.path.replace(".md","") + match[0].replace(" ^","#^"), //change this to match the references cache
+                        widgetsToAdd.push({         //blocks
+                            key: mdView.file.path.replace(".md","") + match[0].replace(" ^",""), //change this to match the references cache
                             transformedCachedItem: transformedCache.blocks,
                             refType: "block",
                             from: to,
@@ -78,7 +78,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                     } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //heading
                         widgetsToAdd.push({
                             // @ts-ignore
-                            key: match[0].replace(/^#+/,"").substring(1),
+                            key: stripHeading(match[0].replace(/^#+/,"").substring(1)),
                             transformedCachedItem: transformedCache.headings,
                             refType: "heading",
                             from: to,
@@ -125,7 +125,6 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 }) 
 
 
-
 /**
  * Helper function for preparting the Widget for displaying the reference count
  *
@@ -135,29 +134,25 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
  * @return {*}  {InlineReferenceWidget}
  */
 const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
-    
+
+    // console.log(refType,key,references)
 
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
         let matchKey = ref.key;
         if(refType==="heading") {
-            matchKey = ref.headerMatch; // headers require special comparison
+            matchKey = stripHeading(ref.headerMatch); // headers require special comparison
             key = key.replace(/^\s+|\s+$/g,''); // should be not leading spaces
         }
 
         if(refType==="embed" || refType==="link") {
             if(key.contains("|")) // check for aliased references
                 key = key.substring(0, key.search(/\|/));
-            // const resolvedFilePath = parseLinktext(key);
-            // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-            // key = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
             const parsedKey = parseLinkTextToFullPath(key);     
             key = parsedKey==="" ? key : parsedKey; //if no results, likely a ghost link
-            console.log("matchkey key", matchKey, key, ref)       
         }
 
         if(matchKey===key) {
-            // ref?.references[0]?.resolvedFile &&
             const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace(".md","") : key;
             if( ref?.references[0]?.excludedFile!=true &&
                 ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)

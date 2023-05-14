@@ -31,11 +31,11 @@ export function buildLinksAndReferences(): void {
     if(thePlugin.showCountsActive!=true) return;
     
     allLinkResolutions = [];
-    thePlugin.app.metadataCache.iterateReferences((src,refs)=>{
+    thePlugin.app.metadataCache.iterateReferences((src,refs)=>{ 
         const resolvedFilePath = parseLinktext(refs.link);
         if(resolvedFilePath?.path) {
             const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-            const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath; // file doesnt exist, empthy link
+            const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + stripHeading(resolvedFilePath.subpath); // file doesnt exist, empthy link
             const ghlink = resolvedTFile===null ?  resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
             const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/");
 
@@ -165,36 +165,30 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     if (cachedMetaData?.blocks) {
         const filePath = file.path.replace(".md","");
         transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => ({
-            key: filePath + "#^" + block.id,
+            key: filePath + block.id,
             pos: block.position,
             page: file.basename,
             type: "block",
-            references: references[ filePath + "#^" + block.id ] || []
+            references: references[ filePath + block.id ] || []
         }));
     }
 
     if (cachedMetaData?.headings) {
         transformedCache.headings = cachedMetaData.headings.map((header: {heading: string; position: Pos; level: number;}) => ({
             original: "#".repeat(header.level) + " " + header.heading,
-            key: `${file.path.replace(".md","")}#${stripHeading(header.heading)}`, 
+            key: `${file.path.replace(".md","")}${stripHeading(header.heading)}`, 
             headerMatch: header.heading,
             headerMatch2: file.basename + "#" + header.heading,
             pos: header.position,
             page: file.basename,
             type: "heading",
-            references: references[`${file.path.replace(".md","")}#${stripHeading(header.heading)}`] || 
-                        references[`${file.basename}$#${(stripHeading(header.heading))}`] || []
+            references: references[`${file.path.replace(".md","")}${stripHeading(header.heading)}`] || []
         }));
     }
 
     if (cachedMetaData?.links) {
         transformedCache.links = cachedMetaData.links.map((link) => {
-            
-            // const resolvedFilePath = parseLinktext(link.link);
-            // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-            // const newLinkPath = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
             let newLinkPath = parseLinkTextToFullPath(link.link);
-            
 
             if(newLinkPath==="") { // file does not exist, likely a ghost file, so just leave the link
                 newLinkPath = link.link
@@ -222,9 +216,6 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
     if (cachedMetaData?.embeds) {
         transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
-            // const resolvedFilePath = parseLinktext(embed.link);
-            // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-            // resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
             const newEmbedPath = parseLinkTextToFullPath(embed.link)
             const output = {
                 key: newEmbedPath,
@@ -264,5 +255,5 @@ export function parseLinkTextToFullPath(link: string): string {
     if(resolvedTFile===null)
         return "";
     else
-        return resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;    
+        return resolvedTFile.path.replace(".md","") + stripHeading(resolvedFilePath.subpath);    
 }
