@@ -37,16 +37,17 @@ export class SideBarPaneView extends ItemView {
 
     async updateView() {
         const refType = this.thePlugin.lastSelectedReferenceType;
+        const realLink = this.thePlugin.lastSelectedReferenceRealLink;
         const key = this.thePlugin.lastSelectedReferenceKey;
         const filePath = this.thePlugin.lastSelectedReferenceFilePath;
         const lineNu = this.thePlugin.lastSelectedLineNumber;
 
         if(this.thePlugin.snwAPI.enableDebugging.SidePane) {
-            this.thePlugin.snwAPI.console("sidepane.open() refType, key, filePath", refType, key, filePath);
+            this.thePlugin.snwAPI.console("sidepane.open() refType, realLink, key, filePath", refType, realLink, key, filePath);
             this.thePlugin.snwAPI.console("sidepane.open() getReferencesCache()", getReferencesCache());
         }
 
-        this.containerEl.replaceChildren(await getUIC_SidePane(refType, key, filePath, lineNu))
+        this.containerEl.replaceChildren(await getUIC_SidePane(refType, realLink, key, filePath, lineNu))
 
         scrollResultsIntoView(this.containerEl);
     }

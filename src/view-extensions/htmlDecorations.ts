@@ -24,13 +24,14 @@ export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
  * @param {string} attachCSSClass   if special class is need for the elment
  * @return {*}  {HTMLElement}
  */
-export function htmlDecorationForReferencesElement(count: number, referenceType: string, key: string, filePath: string, attachCSSClass: string, lineNu: number): HTMLElement {
+export function htmlDecorationForReferencesElement(count: number, referenceType: string, realLink: string, key: string, filePath: string, attachCSSClass: string, lineNu: number): HTMLElement {
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, key, filePath)", thePlugin, count,referenceType,key,filePath);
+        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, realLink, key, filePath)", thePlugin, count,referenceType,realLink,key,filePath);
 
     const element = createDiv({cls: "snw-reference snw-" + referenceType });
     element.innerText= count.toString();
     element.setAttribute("data-snw-type", referenceType);
+    element.setAttribute("data-snw-reallink", realLink);
     element.setAttribute("data-snw-key", key);
     element.setAttribute("data-snw-filepath", filePath);
     element.setAttribute("snw-data-line-number", lineNu.toString());
@@ -65,13 +66,16 @@ export /**
  */
 const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
     const refType = target.getAttribute("data-snw-type");
-    const key = target.getAttribute("data-snw-key");
+    const realLink = target.getAttribute("data-snw-realLink");
+    const key = target.getAttribute("data-snw-key");;
     const filePath = target.getAttribute("data-snw-filepath")
     const lineNu = target.getAttribute("snw-data-line-number")
 
-    if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, key, refType, filePath", target,key,refType, filePath);
+    console.log("processHtmlDecorationReferenceEvent", refType, realLink, key, filePath, lineNu);
 
-    thePlugin.activateView(refType, key, filePath, Number(lineNu));
+    if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
+        thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath", target,realLink, key,refType, filePath);
+
+    thePlugin.activateView(refType, realLink, key, filePath, Number(lineNu));
 
 }

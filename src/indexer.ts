@@ -56,6 +56,7 @@ export function buildLinksAndReferences(): void {
                     },
                     resolvedFile: resolvedTFile, 
                     ghostLink: ghlink,
+                    realLink: refs.link,
                     sourceFile:   sourceFile,
                     excludedFile: false
                 }

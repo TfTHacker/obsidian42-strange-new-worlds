@@ -19,11 +19,11 @@ export function setPluginVariableForUIC(plugin: SNWPlugin) {
  * @param {Instance} instance   the Tippy instance. Tippy provides the floating container.
  */
 export const getUIC_Hoverview = async (instance: Instance)=>{
-    const {refType, key, filePath, lineNu} = await getDataElements(instance);
+    const {refType, realLink, key, filePath, lineNu} = await getDataElements(instance);
     const popoverEl = createDiv();
     popoverEl.addClass("snw-popover-container");
     popoverEl.addClass("search-result-container")
-    popoverEl.appendChild( await getUIC_Ref_Area(refType, key, filePath, lineNu, true));
+    popoverEl.appendChild( await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, true));
     instance.setContent(popoverEl);
     setTimeout( async () => {
         await setFileLinkHandlers(false, popoverEl);
@@ -40,11 +40,11 @@ export /**
  * @param {string} filePath
  * @return {*}  {Promise<string>}
  */
-const getUIC_SidePane = async (refType: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> =>{
+const getUIC_SidePane = async (refType: string, realLink: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> =>{
     const sidepaneEL = createDiv();
     sidepaneEL.addClass("snw-sidepane-container");   
     sidepaneEL.addClass("search-result-container");
-    sidepaneEL.append( (await getUIC_Ref_Area(refType, key, filePath, lineNu, false)) )
+    sidepaneEL.append( (await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, false)) )
 
     setTimeout( async () => {
         await setFileLinkHandlers(false, sidepaneEL);
@@ -134,11 +134,12 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
  * @param {Instance} instance
  * @return {*}  {Promise<{refType: string; key: string; filePath: string}>}
  */
-const getDataElements = async (instance: Instance): Promise<{refType: string; key: string; filePath: string, lineNu: number}> => {
+const getDataElements = async (instance: Instance): Promise<{refType: string; realLink:string; key: string; filePath: string, lineNu: number}> => {
     const parentElement: ReferenceElement = instance.reference;
     const refType   = parentElement.getAttribute("data-snw-type");
+    const realLink  = parentElement.getAttribute("data-snw-reallink");
     const key       = parentElement.getAttribute("data-snw-key");
     const path      = parentElement.getAttribute("data-snw-filepath");
     const lineNum   = Number(parentElement.getAttribute("snw-data-line-number")); 
-    return { refType: refType, key: key, filePath: path, lineNu: lineNum};
+    return { refType: refType, realLink: realLink, key: key, filePath: path, lineNu: lineNum};
 }

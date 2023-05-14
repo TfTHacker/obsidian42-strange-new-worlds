@@ -163,7 +163,7 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
             const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace(".md","") : key;
             if( ref?.references[0]?.excludedFile!=true &&
                 ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
-                return new InlineReferenceWidget(ref.references.length, ref.type, ref.key, filePath, null, ref.pos.start.line);
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.references[0].realLink, ref.key, filePath, null, ref.pos.start.line);
             else
                 return null;
         }
@@ -180,15 +180,17 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
  export class InlineReferenceWidget extends WidgetType {
     referenceCount: number;
     referenceType: string;
+    realLink: string;
     key: string;    //a unique identifer for the reference
     filePath: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
     lineNu: number; //number of line within the file
 
-    constructor(refCount: number, cssclass: string, key:string, filePath: string, addCSSClass: string, lineNu: number ) {
+    constructor(refCount: number, cssclass: string, realLink:string, key:string, filePath: string, addCSSClass: string, lineNu: number ) {
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
+        this.realLink = realLink;
         this.key = key;
         this.filePath = filePath;
         this.addCssClass = addCSSClass;
@@ -200,7 +202,7 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
     // }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.filePath, this.addCssClass, this.lineNu);
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.realLink, this.key, this.filePath, this.addCssClass, this.lineNu);
     }
 
     destroy() {}

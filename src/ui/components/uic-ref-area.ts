@@ -24,12 +24,12 @@ export /**
  * @param {boolean} isHoverView
  * @return {*}  {Promise<string>}
  */
-const getUIC_Ref_Area = async (refType: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<HTMLElement> => {
+const getUIC_Ref_Area = async (refType: string, realLink: string, key: string, filePath: string, lineNu: number, isHoverView:boolean): Promise<HTMLElement> => {
     const refAreaItems = await getRefAreaItems(refType, key, filePath);
     const refAreaContainerEl = createDiv();
     
     //get title header for this reference area
-    refAreaContainerEl.append(await getUIC_Ref_Title_Div(refType, key, filePath, refAreaItems.refCount, lineNu, isHoverView, thePlugin)); 
+    refAreaContainerEl.append(await getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, thePlugin)); 
 
     const refAreaEl = createDiv({cls: "snw-ref-area"});
     refAreaEl.append(refAreaItems.response)

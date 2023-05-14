@@ -54,6 +54,7 @@ export interface Link {
     resolvedFile: TFile
     // resolvedPaths: string[]
     ghostLink: string
+    realLink: string  //the real link in the markdonw
     sourceFile: TFile 
     excludedFile: boolean;
 }

@@ -40,7 +40,6 @@ function processHeader(mdView: MarkdownView) {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
 
-    
     const allLinks: Link[] = getSnwAllLinksResolutions(); 
     if(allLinks==undefined) return;
 
@@ -96,6 +95,7 @@ function processHeader(mdView: MarkdownView) {
             processHtmlDecorationReferenceEvent(wrapper)
         };
     }
+    wrapper.setAttribute("data-snw-reallink", mdView.file.basename);
     wrapper.setAttribute("data-snw-key", mdView.file.basename);
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-filepath", mdView.file.path);

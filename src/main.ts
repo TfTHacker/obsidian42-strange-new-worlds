@@ -20,6 +20,7 @@ export default class SNWPlugin extends Plugin {
 	settings: Settings;
     showCountsActive: boolean;  //controls global state if the plugin is showing counters 
     lastSelectedReferenceType : string;
+    lastSelectedReferenceRealLink : string; 
     lastSelectedReferenceKey : string; 
     lastSelectedReferenceFilePath : string;
     lastSelectedLineNumber: number;
@@ -103,11 +104,12 @@ export default class SNWPlugin extends Plugin {
      * @param {number} lineNu
      * @memberof ThePlugin
      */
-    async activateView(refType: string, key: string, filePath: string, lineNu: number) {
-        this.lastSelectedReferenceKey = key;
-        this.lastSelectedReferenceType = refType;
+    async activateView(refType: string, realLink: string, key: string, filePath: string, lineNu: number) {
+        this.lastSelectedReferenceType     = refType;
+        this.lastSelectedReferenceRealLink = realLink;
+        this.lastSelectedReferenceKey      = key;
         this.lastSelectedReferenceFilePath = filePath;
-        this.lastSelectedLineNumber = lineNu;
+        this.lastSelectedLineNumber        = lineNu;
         await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
         this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
     }

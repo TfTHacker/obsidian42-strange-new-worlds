@@ -89,7 +89,7 @@ class snwChildComponent extends MarkdownRenderChild {
                         && value.references.length >= minRefCountThreshold
                         && (value.pos.start.line >= this.sectionInfo?.lineStart && value.pos.end.line <= this.sectionInfo?.lineEnd)
                         && !isThisAnEmbed ) {
-                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
+                        const referenceElement = htmlDecorationForReferencesElement(value.references.length, "block", value.references[0].realLink, value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
                         let blockElement: HTMLElement = this.containerEl.querySelector('p');
                         const valueLineInSection: number = value.pos.start.line - this.sectionInfo.lineStart;
                         if (!blockElement) {
@@ -123,7 +123,7 @@ class snwChildComponent extends MarkdownRenderChild {
                     }
                     for (const value of transformedCache.embeds) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
-                            const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
+                            const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.references[0].realLink, value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
                             referenceElement.addClass('snw-embed-preview');
                             element.after(referenceElement);
                             break;
@@ -138,7 +138,7 @@ class snwChildComponent extends MarkdownRenderChild {
                     const textContext = headerKey.getAttribute("data-heading")
                     for (const value of transformedCache.headings)  {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && value.headerMatch === textContext) {
-                            const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
+                            const referenceElement = htmlDecorationForReferencesElement(value.references.length, "heading", value.references[0].realLink, value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
                             referenceElement.addClass("snw-heading-preview");
                             this.containerEl.querySelector("h1,h2,h3,h4,h5,h6").insertAdjacentElement("beforeend", referenceElement);                        
                             break;
@@ -152,7 +152,7 @@ class snwChildComponent extends MarkdownRenderChild {
                     const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
                     for (const value of transformedCache.links) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
-                            const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
+                            const referenceElement = htmlDecorationForReferencesElement(value.references.length, "link", value.references[0].realLink, value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);
                             referenceElement.addClass('snw-link-preview');
                             element.after(referenceElement);
                             break;

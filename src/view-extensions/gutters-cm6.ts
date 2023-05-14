@@ -15,20 +15,22 @@ const referenceGutterMarker = class extends GutterMarker {
     referenceCount: number;
     referenceType: string;
     key: string;    //a unique identifer for the reference
+    realLink: string;
     filePath: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
 
-    constructor(refCount: number, cssclass: string, key:string, filePath: string, addCSSClass: string){
+    constructor(refCount: number, cssclass: string, realLink: string,  key:string, filePath: string, addCSSClass: string){
         super();
         this.referenceCount = refCount;
         this.referenceType = cssclass;
+        this.realLink = realLink;
         this.key = key;
         this.filePath = filePath;
         this.addCssClass = addCSSClass;
     }
 
     toDOM() {
-        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.key, this.filePath, this.addCssClass, 0);
+        return htmlDecorationForReferencesElement(this.referenceCount, this.referenceType, this.realLink, this.key, this.filePath, this.addCssClass, 0);
     }
 }
 
@@ -71,7 +73,7 @@ const ReferenceGutterExtension = gutter({
                                 if( lineFromFile === ref.key) {
                                     if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
                                         thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, "snw-embed-special" );
-                                    return new referenceGutterMarker(ref.references.length, "embed", ref.key, ref.references[0].resolvedFile.path.replace(".md",""), "snw-embed-special");
+                                    return new referenceGutterMarker(ref.references.length, "embed", ref.references[0].realLink, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), "snw-embed-special");
                                 }
                             }
                         }
