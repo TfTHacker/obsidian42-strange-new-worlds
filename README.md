@@ -17,9 +17,11 @@ More features
 
 [![](media/YouTubeFeatures.png)](https://youtu.be/9mg6p4yWOVw)
 
-Reviews
-<a href="https://youtu.be/bOipNGRSqRo">
-<img src='media/YT_Curtis_Review.png' width='410'></a>
+# Reviews
+
+<a href="https://youtu.be/bOipNGRSqRo" target="_blank">
+<img src='media/YT_Curtis_Review.png' width='400'></a>
+
 - Great review by Curtic McHale
 
 
