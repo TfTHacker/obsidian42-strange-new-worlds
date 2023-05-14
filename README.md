@@ -42,6 +42,9 @@ The following can be added to a file's front matter to provide more control to S
 + add `snw-index-exclude: true` - prevents SNW from including this file in its index. This means any links to this file will not display block counts
 + add `snw-file-exclude: true` - prevents any block reference counters from being displayed on the current page. Basically turns off SNW for the file. NOTE: This will not affect embedded links. Embed files must have this YAML property set as well to have its counters excluded.
 
+# Exclude Obsidian's ignored folders
+When this is toggled on in SNW settings, the plugin will skip processing files in Obsidian's ignore folder list from Settings > Files & Links > Exclude Files.
+
 # odd issues
 Modifying the underyling Obsidian rendering engine is not easy. It is a complex piece of software. There are some issues we have not been able to resolve, so we had to compromise. We will list such examples as they surface here:
 - An embed marked to render its display that is on its own line will force the reference counter to the next line. So if you have typed on a line something like this, all by itself: `![[MyPage#header1]]` it will show any block reference counts on the following line. However if the same text is entered as: `- ![[MyPage#header1]]`, that is, with any other text, it will render the block references as by design.
