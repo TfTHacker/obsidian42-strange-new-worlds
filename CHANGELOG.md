@@ -14,4 +14,4 @@
 + Fix to block reference counters not formatting properly when in lists (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/89)
 + Fix to Header reference does not render when header includes a colon (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/94)
 + Fix Indicators don't appear correctly on tasks as well (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/39)
-
++ Links or embeds pointing to their own page will now be included in reference counts. (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/60) (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/77)

@@ -33,6 +33,7 @@ export function buildLinksAndReferences(): void {
     allLinkResolutions = [];
     thePlugin.app.metadataCache.iterateReferences((src,refs)=>{ 
         const resolvedFilePath = parseLinktext(refs.link);
+        if(resolvedFilePath.path==="") resolvedFilePath.path = src.replace(".md","");
         if(resolvedFilePath?.path) {
             const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
             const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + stripHeading(resolvedFilePath.subpath); // file doesnt exist, empthy link
@@ -193,7 +194,11 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
             if(newLinkPath==="") { // file does not exist, likely a ghost file, so just leave the link
                 newLinkPath = link.link
             } 
-            
+
+            if(newLinkPath.startsWith("#^") || newLinkPath.startsWith("#") )  { // handles links from same page
+                newLinkPath = file.path.replace(".md","") + stripHeading(newLinkPath);
+            }
+
             return {
                 key: newLinkPath,
                 original: link.original,
@@ -216,7 +221,13 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
     if (cachedMetaData?.embeds) {
         transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
-            const newEmbedPath = parseLinkTextToFullPath(embed.link)
+            let newEmbedPath = parseLinkTextToFullPath(embed.link)
+
+            // if newEmbedPath is empty, then this is a link on the same page
+            if(newEmbedPath==="" && (embed.link.startsWith("#^") || embed.link.startsWith("#")) )  {
+                newEmbedPath = file.path.replace(".md","") + stripHeading(embed.link);
+            }
+
             const output = {
                 key: newEmbedPath,
                 page: file.basename,

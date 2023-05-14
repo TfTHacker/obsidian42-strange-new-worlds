@@ -1,4 +1,4 @@
-import {MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile} from "obsidian";
+import {MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile, stripHeading} from "obsidian";
 import {htmlDecorationForReferencesElement} from "./htmlDecorations";
 import {getSNWCacheByFile, parseLinkTextToFullPath} from "../indexer";
 import SNWPlugin from "../main";
@@ -117,7 +117,10 @@ class snwChildComponent extends MarkdownRenderChild {
 
             if (thePlugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
                 this.containerEl.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
-                    const embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
+                    let embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
+                    if(embedKey==="") {
+                        embedKey = this.currentFile.path.replace(".md","") + stripHeading(element.getAttribute('src'));
+                    }
                     for (const value of transformedCache.embeds) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
                             const referenceElement = htmlDecorationForReferencesElement(value.references.length, "embed", value.key, value.references[0]?.resolvedFile?.path.replace(".md",""), "", value.pos.start.line);

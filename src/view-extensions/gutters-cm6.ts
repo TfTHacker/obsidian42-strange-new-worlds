@@ -1,6 +1,6 @@
 import {gutter, GutterMarker, } from "@codemirror/view";
 import { BlockInfo, EditorView } from "@codemirror/view";
-import { editorInfoField } from "obsidian";
+import { editorInfoField, stripHeading } from "obsidian";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import SNWPlugin from "src/main";
@@ -61,10 +61,13 @@ const ReferenceGutterExtension = gutter({
                         if(ref?.references[0]?.excludedFile!=true && ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
                             const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim(); 
                             if(lineToAnalyze.startsWith("!")){
-                                // const resolvedFilePath = parseLinktext(lineToAnalyze.replace("![[","").replace("]]",""));
-                                // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-                                // const lineFromFile = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
-                                const lineFromFile = parseLinkTextToFullPath(lineToAnalyze.replace("![[","").replace("]]",""));
+                                const strippedLineToAnalyze = lineToAnalyze.replace("![[","").replace("]]","")
+                                let lineFromFile = "";
+                                if(strippedLineToAnalyze.startsWith("#")){
+                                    lineFromFile = mdView.file.path.replace(".md","") + stripHeading(strippedLineToAnalyze);
+                                } else {
+                                    lineFromFile = parseLinkTextToFullPath(strippedLineToAnalyze);
+                                }
                                 if( lineFromFile === ref.key) {
                                     if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
                                         thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, "snw-embed-special" );

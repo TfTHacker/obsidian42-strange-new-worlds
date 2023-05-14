@@ -60,16 +60,22 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                             to: to
                         });
                     } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
+                        let newEmbed =match[0].replace("![[","").replace("]]","");
+                        if(newEmbed.startsWith("#")) //link to an internal page link, add page name
+                            newEmbed = mdView.file.path.replace(".md","") + stripHeading(newEmbed);
                         widgetsToAdd.push({
-                            key: match[0].replace("![[","").replace("]]",""),
+                            key: newEmbed,
                             transformedCachedItem: transformedCache.embeds,
                             refType:"embed",
                             from: to,
                             to: to
                         });                                       
                     } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
+                        let newLink = match[0].replace("[[","").replace("]]","");
+                        if(newLink.startsWith("#")) //link to an internal page link, add page name
+                            newLink = mdView.file.path.replace(".md","") + newLink;
                         widgetsToAdd.push({
-                            key: match[0].replace("[[","").replace("]]",""),
+                            key: newLink,
                             transformedCachedItem: transformedCache.links,
                             refType: "link",
                             from: to,
@@ -135,8 +141,6 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
  */
 const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
 
-    // console.log(refType,key,references)
-
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
         let matchKey = ref.key;
@@ -150,6 +154,9 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
                 key = key.substring(0, key.search(/\|/));
             const parsedKey = parseLinkTextToFullPath(key);     
             key = parsedKey==="" ? key : parsedKey; //if no results, likely a ghost link
+            if(matchKey.startsWith("#")) { // internal page link
+                matchKey = filePath.replace(".md","") + stripHeading(matchKey)
+            }
         }
 
         if(matchKey===key) {
