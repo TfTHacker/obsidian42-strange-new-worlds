@@ -94,14 +94,21 @@ class snwChildComponent extends MarkdownRenderChild {
                         const valueLineInSection: number = value.pos.start.line - this.sectionInfo.lineStart;
                         if (!blockElement) {
                             blockElement = this.containerEl.querySelector(`li[data-line="${valueLineInSection}"]`);
-                        }
-                        if (!blockElement) {
-                            blockElement = this.containerEl.querySelector(`ol[data-line="${valueLineInSection}"]`)
+                            if(blockElement.querySelector("ul"))
+                                blockElement.querySelector("ul").before(referenceElement);
+                            else
+                                blockElement.append(referenceElement);
+                        } else {
+                            if (!blockElement) {
+                                blockElement = this.containerEl.querySelector(`ol[data-line="${valueLineInSection}"]`)
+                                blockElement.append(referenceElement)
+                            } else {
+                                blockElement.append(referenceElement)
+                            }    
                         }
                         try {
                             if (!blockElement.hasClass("snw-block-preview")) {
                                 referenceElement.addClass("snw-block-preview");
-                                blockElement.append(referenceElement);
                             } 
                         } catch (error) { /* nothing to do here */ }
                     }
@@ -110,10 +117,6 @@ class snwChildComponent extends MarkdownRenderChild {
 
             if (thePlugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
                 this.containerEl.querySelectorAll(".internal-embed:not(.snw-embed-preview)").forEach(element => {
-                    // const embedSrc = element.getAttribute('src');
-                    // const resolvedFilePath = parseLinktext(embedSrc);
-                    // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-                    // const embedKey = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
                     const embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
                     for (const value of transformedCache.embeds) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
@@ -143,10 +146,6 @@ class snwChildComponent extends MarkdownRenderChild {
 
             if(thePlugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
                 this.containerEl.querySelectorAll("a.internal-link:not(.snw-link-preview)").forEach(element => {
-                    // const srcLink = element.getAttribute('data-href');
-                    // const resolvedFilePath = parseLinktext(srcLink);
-                    // const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-                    // const link = resolvedTFile.path.replace(".md","") + resolvedFilePath.subpath;
                     const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
                     for (const value of transformedCache.links) {
                         if (value.references[0]?.excludedFile!=true && value.references.length >= minRefCountThreshold && (value.key === link || (value?.original!=undefined && value?.original.contains(link)))) {
