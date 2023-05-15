@@ -4,6 +4,7 @@
 + Breadcrumbs: Add context around links inside the previews of SNW. Many thanks for PR by @@ivan-lednev (https://github.com/TfTHacker/obsidian42-strange-new-worlds/pull/90)
 + Respect Obsidian's global excluded files. Many thanks for PR by @sk91 (https://github.com/TfTHacker/obsidian42-strange-new-worlds/pull/88)
 + Ghost links now supported: This is a link to a file that doesnt exist in the vault. A counter now appears to such "ghosted" links. (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/67)(https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/26)
++ Added two new frontmatter properties to control if SNW counters are shown in canvas: `snw-canvas-exclude-preview: true` and `snw-canvas-exclude-edit: true`
 
 ## Updates
 + All core libraries updated to Obsidian 1.3.0
@@ -15,3 +16,4 @@
 + Fix to Header reference does not render when header includes a colon (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/94)
 + Fix Indicators don't appear correctly on tasks as well (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/39)
 + Links or embeds pointing to their own page will now be included in reference counts. (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/60) (https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/77)
++ Fix so that SNW doesnt run in the kanban plugin 

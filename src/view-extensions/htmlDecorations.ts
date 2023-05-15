@@ -67,9 +67,9 @@ export /**
 const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
     const refType = target.getAttribute("data-snw-type");
     const realLink = target.getAttribute("data-snw-realLink");
-    const key = target.getAttribute("data-snw-key");;
-    const filePath = target.getAttribute("data-snw-filepath")
-    const lineNu = target.getAttribute("snw-data-line-number")
+    const key = target.getAttribute("data-snw-key");
+    const filePath = target.getAttribute("data-snw-filepath");
+    const lineNu = target.getAttribute("snw-data-line-number");
 
     console.log("processHtmlDecorationReferenceEvent", refType, realLink, key, filePath, lineNu);
 

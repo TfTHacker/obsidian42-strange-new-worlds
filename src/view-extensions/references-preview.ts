@@ -23,7 +23,7 @@ export function setPluginVariableForMarkdownPreviewProcessor(plugin: SNWPlugin) 
  * @return {*} 
  */
 export default function markdownPreviewProcessor(el : HTMLElement, ctx : MarkdownPostProcessorContext) {
-
+    
     if(thePlugin.snwAPI.enableDebugging.PreviewRendering)
         thePlugin.snwAPI.console("markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext,ctx.getSectionInfo", el, ctx, ctx.getSectionInfo(el))
 
@@ -31,7 +31,8 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
     if(ctx.remainingNestLevel===4) return;  // This is an attempt to prevent processing of embed files
     
     // check if SNW should ingore this page
-    if(ctx?.frontmatter?.["snw-file-exclude"]===true) return; //no support for kanban board
+    if(ctx?.frontmatter?.["snw-file-exclude"]===true) return; 
+    if(ctx?.frontmatter?.["snw-canvas-exclude-preview"]===true) return; 
     
     if(el.hasAttribute("uic")) return; // this is a custom component, don't render SNW inside it.
 
@@ -40,7 +41,8 @@ export default function markdownPreviewProcessor(el : HTMLElement, ctx : Markdow
 
     // check for incompatibility with other plugins
     const fileCache = thePlugin.app.metadataCache.getFileCache(currentFile);
-    if(fileCache?.frontmatter?.["kanban-plugin"] ) return; //no support for kanban board
+    // @ts-ignore
+    if(fileCache?.frontmatter?.["kanban-plugin"] || ctx.el.parentElement?.classList.contains("kanban-plugin__markdown-preview-view") ) return; //no support for kanban board
     
     try {
         ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile ));        

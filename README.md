@@ -32,7 +32,6 @@ We are not known to be lazy, but for this plugin we had to be. This plugin lever
 Sadly there can be some plugin incompatibilities. No one is at fault, but we all fight for the same resources in Obsidian. I will maintain a list of issues here:
 + Excalidraw: SNW does now show the counter
 + Kanban: SNW does not show the counter
-+ Tasks plugin: on task lines, SNW won't show the counter in Reading View (though works in live preview)
 
 # SNW References
 When a reference is displayed either in a hover popup or the sidepane, it can be clicked to be opened. By default it will open in the current pane. However using the following keyboard commands, you have more control over how they open.
@@ -45,9 +44,13 @@ When a reference is displayed either in a hover popup or the sidepane, it can be
 + Command palette: toggle SNW counters on and off. When used, it is valid for the current session. Otherwise, the on/off state is controlled based on their startup settings in Settings.
 
 # SNW frontmatter directives
-The following can be added to a file's front matter to provide more control to SNW's behavior
+The following can be added to a file's front matter to provide more control to SNW's behavior.
 + add `snw-index-exclude: true` - prevents SNW from including this file in its index. This means any links to this file will not display block counts
 + add `snw-file-exclude: true` - prevents any block reference counters from being displayed on the current page. Basically turns off SNW for the file. NOTE: This will not affect embedded links. Embed files must have this YAML property set as well to have its counters excluded.
++ add `snw-canvas-exclude-preview: true` - prevents SNW from showing reference counters in a file embedded into canvas while in preview mode (it's default display mode which means the file is not being edited in canvas)
++ add `snw-canvas-exclude-edit: true` - prevents SNW from showing reference counters in a file embedded into canvas while in edit mode. 
+
+> Note: reloading the document may be needed for these frontmatter properties to take effect.
 
 # Exclude Obsidian's ignored folders
 When this is toggled on in SNW settings, the plugin will skip processing files in Obsidian's ignore folder list from Settings > Files & Links > Exclude Files.
