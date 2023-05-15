@@ -7,7 +7,7 @@ The basic idea is we want to see when links, block references and embeds have as
 
 Documentation for this plugin can be found at: https://publish.obsidian.md/tfthacker/SNW
 
-# Say Thank You
+## Say Thank You
 If you are interested in reading articles written by me, please check out my articles on Medium: https://bit.ly/o42-medium.
 
 If you are enjoying this plugin then feel free to buying me a coffee on [https://ko-fi/TfTHacker](https://ko-fi.com/TfTHacker).
