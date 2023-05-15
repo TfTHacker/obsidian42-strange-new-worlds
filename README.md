@@ -28,16 +28,14 @@ More features
 # Lazy networking (linking)
 We are not known to be lazy, but for this plugin we had to be. This plugin leverages the indexing Obsidian does in the background, which is amazing. However, for performance reasons some things don't update right away. So depending on what you are doing, reference counts sometimes shown by this plugin may be incorrect as you work with links, embeds and blocks. But eventaully they will be correct as the cache updates itself. It is better than nothing, right? 
 
-# Incompatiblities
-Sadly there can be some plugin incompatibilities. No one is at fault, but we all fight for the same resources in Obsidian. I will maintain a list of issues here:
-+ Excalidraw: SNW does now show the counter
-+ Kanban: SNW does not show the counter
-
 # SNW References
 When a reference is displayed either in a hover popup or the sidepane, it can be clicked to be opened. By default it will open in the current pane. However using the following keyboard commands, you have more control over how they open.
 + Opens a tab if the modifier key Cmd/Ctrl is pressed OR if this is a middle-click MouseEvent.
 + Opens a split pane if Cmd/Ctrl+Alt is pressed.
 + Oepns a new window if Cmd/Ctrl+Alt+Shift is pressed.
+
+# Themes and what you should know
+SNW works with all themese, but it doesn't mean that things always look the way you expect. Before writing that you have a visual issue, please change your theme to something like Minimal and test if SNW is behaving as you expect. Some themes (like the Obsidian default theme) have large hidden gutters that aren't visible until you turn on line numbering or SNW'w gutter references. If the large gutter bothers you, the SNW gutter references can be turned of in settings.
 
 # Startup and Toggling SNW counters on/off
 + In Settings: you can configure if SNW counters are active on startup for desktop and mobile. For example, this allows you to have SNW active in the desktop and make it inactive on mobile.
@@ -54,6 +52,11 @@ The following can be added to a file's front matter to provide more control to S
 
 # Exclude Obsidian's ignored folders
 When this is toggled on in SNW settings, the plugin will skip processing files in Obsidian's ignore folder list from Settings > Files & Links > Exclude Files.
+
+# Incompatiblities
+Sadly there can be some plugin incompatibilities. No one is at fault, but we all fight for the same resources in Obsidian. I will maintain a list of issues here:
++ Excalidraw: SNW does now show the counter
++ Kanban: SNW does not show the counter
 
 # odd issues
 Modifying the underyling Obsidian rendering engine is not easy. It is a complex piece of software. There are some issues we have not been able to resolve, so we had to compromise. We will list such examples as they surface here:
