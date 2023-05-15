@@ -7,6 +7,9 @@ The basic idea is we want to see when links, block references and embeds have as
 
 Documentation for this plugin can be found at: https://publish.obsidian.md/tfthacker/SNW
 
+See videos on how to use Strange New Worlds: https://publish.obsidian.md/tfthacker/SNW-videos
+
+
 ## Say Thank You
 If you are interested in reading articles written by me, please check out my articles on Medium: https://bit.ly/o42-medium.
 
