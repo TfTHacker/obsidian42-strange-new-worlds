@@ -52,6 +52,7 @@ const ReferenceGutterExtension = gutter({
 
         // check if the page is to be ignored
         if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) return;
+        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"]===true) return;
 
         const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
 

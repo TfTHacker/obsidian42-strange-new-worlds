@@ -49,9 +49,6 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                 const mdView = view.state.field( editorInfoField );
                 const firstCharacterMatch = match[0].charAt(0);
                 const transformedCache = getSNWCacheByFile(mdView.file);  
-                console.log("transformedCache?.cacheMetaData?.frontmatter", transformedCache?.cacheMetaData?.frontmatter,
-                transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"],
-                transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"]!=true)
                 if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]!=true && 
                    transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"]!=true) {
                     const widgetsToAdd: {key: string, transformedCachedItem: TransformedCachedItem[], refType: string, from: number, to: number}[] = []
