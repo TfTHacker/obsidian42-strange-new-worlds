@@ -6,5 +6,9 @@
   "description": "Revealing networked thought and the strange new worlds created by your vault",
   "author": "TfTHacker",
   "authorUrl": "https://twitter.com/TfTHacker",
-  "isDesktopOnly": false
+  "isDesktopOnly": false,
+  "fundingUrl": {
+    "Buy Me a Coffee": "https://bit.ly/o42-kofi",
+    "Medium membership": "https://bit.ly/o42-medium"
+  } 
 }
