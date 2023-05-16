@@ -71,8 +71,6 @@ const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
     const filePath = target.getAttribute("data-snw-filepath");
     const lineNu = target.getAttribute("snw-data-line-number");
 
-    console.log("processHtmlDecorationReferenceEvent", refType, realLink, key, filePath, lineNu);
-
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath", target,realLink, key,refType, filePath);
 

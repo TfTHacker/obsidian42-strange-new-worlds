@@ -66,6 +66,7 @@ export function buildLinksAndReferences(): void {
         }
     }) 
 
+
     // START: Remove file exclusions for frontmatter snw-index-exclude
     const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e)=>{
         return e[1]?.frontmatter?.["snw-index-exclude"]
@@ -88,33 +89,36 @@ export function buildLinksAndReferences(): void {
     }
     // END: Exclusions
 
+
+
     const refs = allLinkResolutions.reduce((acc: {[x:string]: Link[]}, link : Link): { [x:string]: Link[] } => {
         let keyBasedOnLink = "";
-        let keyBasedOnFullPath = ""
+        // let keyBasedOnFullPath = ""
 
         keyBasedOnLink = link.reference.link;
-        if(link?.resolvedFile)
-            keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
-        else
-            keyBasedOnFullPath = link.ghostLink;
+        // if(link?.resolvedFile)
+        //     keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
+        // else
+        //     keyBasedOnFullPath = link.ghostLink;
 
-        if(keyBasedOnLink===keyBasedOnFullPath) {
-            keyBasedOnFullPath=null;
-        }
+        // if(keyBasedOnLink===keyBasedOnFullPath) {
+        //     keyBasedOnFullPath=null;
+        // }
 
         if(!acc[keyBasedOnLink]) {  
             acc[keyBasedOnLink] = [];
         }
         acc[keyBasedOnLink].push(link);
 
-        if(keyBasedOnFullPath!=null) {
-            if(!acc[keyBasedOnFullPath]) {
-                acc[keyBasedOnFullPath] = [];
-            }
-            acc[keyBasedOnFullPath].push(link)
-        } 
+        // if(keyBasedOnFullPath!=null) {
+        //     if(!acc[keyBasedOnFullPath]) {
+        //         acc[keyBasedOnFullPath] = [];
+        //     }
+        //     acc[keyBasedOnFullPath].push(link)
+        // } 
         return acc;
     }, {});
+
 
     references = refs;
     // @ts-ignore
