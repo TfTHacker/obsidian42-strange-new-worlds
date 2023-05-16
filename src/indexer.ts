@@ -40,11 +40,13 @@ export function buildLinksAndReferences(): void {
             const ghlink = resolvedTFile===null ?  resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
             const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/");
 
-            if (thePlugin.settings.enableIngoredFiles) {
-                if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path)) {
+            if(thePlugin.settings.enableIgnoreObsExcludeFoldersLinksFrom) 
+                if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path)) 
                     return;
-                }
-            }
+
+            if(thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo) 
+                if (thePlugin.app.metadataCache.isUserIgnored(fileLink)) 
+                    return;
             
             allLinkResolutions.push(
                 {
@@ -62,7 +64,7 @@ export function buildLinksAndReferences(): void {
                 }
             )
         }
-    })
+    }) 
 
     // START: Remove file exclusions for frontmatter snw-index-exclude
     const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e)=>{

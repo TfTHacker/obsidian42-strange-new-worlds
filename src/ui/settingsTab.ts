@@ -20,7 +20,8 @@ export interface Settings {
 	enableRenderingLinksInLivePreview:		boolean;
 	enableRenderingHeadersInLivePreview:	boolean;
 	enableRenderingEmbedsInLivePreview:		boolean;
-	enableIngoredFiles:						boolean;
+	enableIgnoreObsExcludeFoldersLinksFrom:	boolean; //Use Obsidians Excllude Files from folder - links from those files outgoing to other files
+	enableIgnoreObsExcludeFoldersLinksTo:	boolean; //Use Obsidians Excllude Files from folder - links to those "excluded" files
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,7 +43,8 @@ export const DEFAULT_SETTINGS: Settings = {
 	enableRenderingLinksInLivePreview: 		true,
 	enableRenderingHeadersInLivePreview:	true,
 	enableRenderingEmbedsInLivePreview: 	true,
-	enableIngoredFiles:						false,
+	enableIgnoreObsExcludeFoldersLinksFrom: false,
+	enableIgnoreObsExcludeFoldersLinksTo:	false
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -294,17 +296,29 @@ export class SettingsTab extends PluginSettingTab {
 				.setDynamicTooltip()
 			)
 
-		containerEl.createEl("h2", { text: "Index" });
+		containerEl.createEl("h2", { text: "Use Obsidian's Excluded Files list (Settings > Files & Links)" });
 
 		new Setting(containerEl)
-			.setName("Enable Obsidian ingored files")
-			.setDesc("If enabled, will respect the general obsidian ignored files settings")
+			.setName("Outgoing links")
+			.setDesc("If enabled, links FROM files in the excluded folder will not be included in SNW's reference counters. May require restarting Obsidian.")
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.thePlugin.settings.enableIngoredFiles);
+				cb.setValue(this.thePlugin.settings.enableIgnoreObsExcludeFoldersLinksFrom);
 				cb.onChange(async (value: boolean) => {
-					this.thePlugin.settings.enableIngoredFiles = value;
+					this.thePlugin.settings.enableIgnoreObsExcludeFoldersLinksFrom = value;
 					await this.thePlugin.saveSettings();
 				});
 			});
+
+		new Setting(containerEl)
+			.setName("Incoming links")
+			.setDesc("If enabled, links TO files in the excluded folder will not be included in SNW's reference counters.  May require restarting Obsidian.")
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo = value;
+					await this.thePlugin.saveSettings();
+				});
+			});
+
 	}
 }
