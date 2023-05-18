@@ -147,7 +147,11 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     const res = Array.from(elems).find(
         (v) => v.textContent == ref.reference.displayText
     );
-    res.addClass("search-result-file-matched-text");
+    try { // this fails in some edge cases, so in that case, just ignore
+        res.addClass("search-result-file-matched-text");
+    } catch (error) {
+        //@ts-ignore
+     }
 
     return container;
 };

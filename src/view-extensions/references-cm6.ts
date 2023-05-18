@@ -91,18 +91,20 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                             from: to,
                             to: to 
                         });
-                        // this was not working with mobile from 0.16.4 so had to convert it to a string
-                        const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
-                        if(linksinHeader)
-                            for (const l of linksinHeader) {
-                                widgetsToAdd.push({
-                                    key: l.replace("![[","").replace("[[","").replace("]]",""), //change this to match the references cache
-                                    transformedCachedItem: l.startsWith("!") ? transformedCache.embeds : transformedCache.links,
-                                    refType: "link",
-                                    from: (to - match[0].length) + (match[0].indexOf(l) + l.length),
-                                    to: (to - match[0].length) + (match[0].indexOf(l) + l.length)
-                                });
-                            }                        
+                        if(thePlugin.settings.enableRenderingLinksInLivePreview)  {
+                            // this was not working with mobile from 0.16.4 so had to convert it to a string
+                            const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
+                            if(linksinHeader)
+                                for (const l of linksinHeader) {
+                                    widgetsToAdd.push({
+                                        key: l.replace("![[","").replace("[[","").replace("]]",""), //change this to match the references cache
+                                        transformedCachedItem: l.startsWith("!") ? transformedCache.embeds : transformedCache.links,
+                                        refType: "link",
+                                        from: (to - match[0].length) + (match[0].indexOf(l) + l.length),
+                                        to: (to - match[0].length) + (match[0].indexOf(l) + l.length)
+                                    });
+                                }                        
+                        }
                     }
 
                     for (const ref of widgetsToAdd.sort((a,b)=>a.to-b.to) ) {

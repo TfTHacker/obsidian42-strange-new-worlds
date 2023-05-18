@@ -247,3 +247,9 @@ body {
 .snw-tippy .tippy-content {
     padding: 0px;
 }
+
+.snw-tippy .tippy-arrow {
+    width:0px;
+    height:0px;
+    color: transparent;
+}
