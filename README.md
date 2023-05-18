@@ -5,9 +5,9 @@ The basic idea is we want to see when links, block references and embeds have as
 
 ![](media/SNW.gif)
 
-Documentation for this plugin can be found at: https://publish.obsidian.md/tfthacker/SNW
+Documentation for this plugin can be found at: https://tfthacker.com/SNW
 
-See videos on how to use Strange New Worlds: https://publish.obsidian.md/tfthacker/SNW-videos
+See videos on how to use Strange New Worlds: https://tfthacker.com/SNW-videos
 
 
 ## Say Thank You
