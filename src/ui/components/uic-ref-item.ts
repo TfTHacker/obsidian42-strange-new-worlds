@@ -26,9 +26,13 @@ const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
     itemEl.addClass("snw-ref-item-info");
     itemEl.addClass("search-result-file-match");
 
+    let startLine = "0"; 
+    if(ref.reference.position !== undefined) //added because of properties - need to fix later
+        startLine = ref.reference.position.start.line.toString()    
+
     itemEl.setAttribute(
         "snw-data-line-number",
-        ref.reference.position.start.line.toString()
+        startLine
     );
     itemEl.setAttribute(
         "snw-data-file-name",
@@ -112,10 +116,13 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
         const sectionContainingLink =
             contextBuilder.getSectionContaining(linkPosition);
 
-        const blockContents = getTextAtPosition(
-            fileContents,
-            sectionContainingLink.position
-        );
+        let blockContents = "";
+        
+        if(sectionContainingLink?.position!==undefined)
+            blockContents = getTextAtPosition(
+                fileContents,
+                sectionContainingLink.position
+            );
 
         await MarkdownRenderer.renderMarkdown(
             blockContents,

@@ -1,5 +1,8 @@
-# 1.2.0 (2023-05-13)
+# 1.2.3 (2023-11-04)
+- Update of dependencies and new version of esbuild
+- small bug fixes from when properties was added (though this doesn't really make SNW work with properties properly yet)
 
+# 1.2.0 (2023-05-13)
 ## New
 + Breadcrumbs: Add context around links inside the previews of SNW. Many thanks for PR by @@ivan-lednev (https://github.com/TfTHacker/obsidian42-strange-new-worlds/pull/90)
 + Respect Obsidian's global excluded files. Many thanks for PR by @sk91 (https://github.com/TfTHacker/obsidian42-strange-new-worlds/pull/88)

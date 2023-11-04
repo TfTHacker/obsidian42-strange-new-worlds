@@ -146,6 +146,7 @@ export class ContextBuilder {
     }
 
     private getIndexOfHeadingAbove(position: Pos) {
+        if(position===undefined) return -1; //added because of properties - need to fix later
         return this.headings.reduce(
             (previousIndex, lookingAtHeading, index) =>
                 lookingAtHeading.position.start.line < position.start.line
@@ -156,6 +157,7 @@ export class ContextBuilder {
     }
 
     private getHeadingIndexContaining(position: Pos) {
+        if(position===undefined) return -1; //added because of properties - need to fix later
         return this.headings.findIndex(
             (heading) => heading.position.start.line === position.start.line
         );

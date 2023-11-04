@@ -131,8 +131,16 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
 
 const sortRefCache = async (refCache: Link[]): Promise<Link[]> => {
-    return refCache.sort((a,b)=>{
+    return refCache.sort((a,b)=>{ 
+        let positionA = 0; //added because of properties - need to fix later
+        if(a.reference.position!==undefined) 
+            positionA = Number(a.reference.position.start.line) 
+
+        let positionB = 0; //added because of properties - need to fix later
+        if(b.reference.position!==undefined) 
+            positionB = Number(b.reference.position.start.line)
+
         return a.sourceFile.basename.localeCompare(b.sourceFile.basename) ||
-               Number(a.reference.position.start.line) - Number(b.reference.position.start.line);
+               Number(positionA) - Number(positionB);
     });
 }
