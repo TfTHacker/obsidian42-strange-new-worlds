@@ -14,7 +14,7 @@ export function setPluginVariableForCM6Gutter(plugin: SNWPlugin) {
 const referenceGutterMarker = class extends GutterMarker {
     referenceCount: number;
     referenceType: string;
-    key: string;    //a unique identifer for the reference
+    key: string;    //a unique identifier for the reference
     realLink: string;
     filePath: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
@@ -47,20 +47,20 @@ const ReferenceGutterExtension = gutter({
 
         const mdView = editorView.state.field( editorInfoField );
         
-        if(!mdView.file) return;
+        if(!mdView.file) return null;
         const transformedCache = getSNWCacheByFile(mdView.file);
 
         // check if the page is to be ignored
-        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) return;
-        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"]===true) return;
+        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) return null;
+        if(transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"]===true) return null;
 
         const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
-
-        if(embedsFromMetaDataCache?.length >= thePlugin.settings.minimumRefCountThreshold) {
+        if(!embedsFromMetaDataCache) return null;
+        if(embedsFromMetaDataCache?.length ?? 0 >= thePlugin.settings.minimumRefCountThreshold) {
             const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
             for (const embed of embedsFromMetaDataCache) {
                 if(embed.position.start.line +1 === lineNumberInFile) {
-                    for (const ref of transformedCache.embeds) {
+                    for (const ref of transformedCache?.embeds ?? []) {
                         if(ref?.references[0]?.excludedFile!=true && ref?.references.length>0 && ref?.pos.start.line+1 === lineNumberInFile) {
                             const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim(); 
                             if(lineToAnalyze.startsWith("!")){
@@ -74,7 +74,7 @@ const ReferenceGutterExtension = gutter({
                                 if( lineFromFile === ref.key) {
                                     if(thePlugin.snwAPI.enableDebugging.GutterEmbedCounter) 
                                         thePlugin.snwAPI.console("ReferenceGutterExtension New gutter", ref.references.length, "embed", ref.key, ref.key, "snw-embed-special" );
-                                    return new referenceGutterMarker(ref.references.length, "embed", ref.references[0].realLink, ref.key, ref.references[0].resolvedFile.path.replace(".md",""), "snw-embed-special");
+                                    return new referenceGutterMarker(ref.references.length, "embed", ref.references[0].realLink, ref.key, (ref.references[0].resolvedFile?.path ?? '').replace(".md",""), "snw-embed-special");
                                 }
                             }
                         }
@@ -82,6 +82,7 @@ const ReferenceGutterExtension = gutter({
                 }
             }
         }
+        return null;
     }, 
     initialSpacer: () => emptyMarker
 })

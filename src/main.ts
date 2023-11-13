@@ -25,7 +25,7 @@ export default class SNWPlugin extends Plugin {
     lastSelectedReferenceFilePath : string;
     lastSelectedLineNumber: number;
     snwAPI: SnwAPI;
-    markdownPostProcessor: MarkdownPostProcessor = null;
+    markdownPostProcessor: MarkdownPostProcessor | null = null;
     editorExtensions: Extension[] = [];
     commands: PluginCommands;
 
@@ -135,7 +135,11 @@ export default class SNWPlugin extends Plugin {
         if(this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor===null) {
             this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
         } else {
-            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            if(!this.markdownPostProcessor) {
+                console.log("Markdown post processor is not registered");
+            } else {
+                MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            }
             this.markdownPostProcessor=null;
         }
     }
@@ -203,7 +207,11 @@ export default class SNWPlugin extends Plugin {
     onunload(): void {
         console.log("unloading " + this.appName)
         try {
-            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            if(!this.markdownPostProcessor) {
+                console.log("Markdown post processor is not registered");
+            } else {
+                MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            }
             this.app.workspace.unregisterHoverLinkSource(this.appID);
         } catch (error) { /* don't do anything */ }
     }

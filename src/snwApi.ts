@@ -38,7 +38,7 @@ export default class SnwAPI {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getMetaInfoByCurrentFile = async (): Promise<any> => {
-        return this.getMetaInfoByFileName(app.workspace.getActiveFile().path)
+        return this.getMetaInfoByFileName(app.workspace.getActiveFile()?.path || "")
     }
 
     /**
@@ -51,8 +51,8 @@ export default class SnwAPI {
         const currentFile = app.metadataCache.getFirstLinkpathDest(fileName, "/")
         return {
             TFile: currentFile,
-            metadataCache: app.metadataCache.getFileCache(currentFile),
-            SnwTransformedCache: getSNWCacheByFile(currentFile),
+            metadataCache: currentFile ? app.metadataCache.getFileCache(currentFile) : null,
+            SnwTransformedCache: currentFile ? getSNWCacheByFile(currentFile) : null,
         } 
     }
 }

@@ -11,7 +11,7 @@ export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
 }
 
 /**
- * Shared function between refrences-cm6.ts and references-preview.s
+ * Shared function between references-cm6.ts and references-preview.s
  * This decoration is just the html box drawn into the document with the count of references.
  * It is used in the header as well as inline in the document. If a user clicks on this element,
  * the function processHtmlDecorationReferenceEvent is called
@@ -21,7 +21,7 @@ export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
  * @param {string} referenceType    The type of references (block, embed, link, header)
  * @param {string} key              Unique key used to identify this reference based on its type
  * @param {string} filePath         File path in file in vault
- * @param {string} attachCSSClass   if special class is need for the elment
+ * @param {string} attachCSSClass   if special class is need for the element
  * @return {*}  {HTMLElement}
  */
 export function htmlDecorationForReferencesElement(count: number, referenceType: string, realLink: string, key: string, filePath: string, attachCSSClass: string, lineNu: number): HTMLElement {
@@ -65,11 +65,11 @@ export /**
  * @param {HTMLElement} target
  */
 const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
-    const refType = target.getAttribute("data-snw-type");
-    const realLink = target.getAttribute("data-snw-realLink");
-    const key = target.getAttribute("data-snw-key");
-    const filePath = target.getAttribute("data-snw-filepath");
-    const lineNu = target.getAttribute("snw-data-line-number");
+    const refType = target.getAttribute("data-snw-type") ?? "";
+    const realLink = target.getAttribute("data-snw-realLink") ?? "";
+    const key = target.getAttribute("data-snw-key") ?? "";
+    const filePath = target.getAttribute("data-snw-filepath") ?? "";
+    const lineNu = target.getAttribute("snw-data-line-number") ?? "";
 
     if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath", target,realLink, key,refType, filePath);

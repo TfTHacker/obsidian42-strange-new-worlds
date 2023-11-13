@@ -47,46 +47,48 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
             regexp: new RegExp(this.regxPattern, "g"),
             decorate: (add, from, to, match, view) => {         
                 const mdView = view.state.field( editorInfoField );
+                // TODO: should handle check for TFile better than non-null! assertion
+                const mdViewFile = mdView.file!;
                 const firstCharacterMatch = match[0].charAt(0);
-                const transformedCache = getSNWCacheByFile(mdView.file);  
+                const transformedCache = getSNWCacheByFile(mdViewFile);  
                 if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]!=true && 
                    transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"]!=true) {
-                    const widgetsToAdd: {key: string, transformedCachedItem: TransformedCachedItem[], refType: string, from: number, to: number}[] = []
-                    if(firstCharacterMatch===" " && transformedCache?.blocks?.length>0) {
+                    const widgetsToAdd: {key: string, transformedCachedItem: TransformedCachedItem[] | null, refType: string, from: number, to: number}[] = []
+                    if(firstCharacterMatch===" " && (transformedCache?.blocks?.length ?? 0) > 0) {
                         widgetsToAdd.push({         //blocks
-                            key: mdView.file.path.replace(".md","") + match[0].replace(" ^",""), //change this to match the references cache
-                            transformedCachedItem: transformedCache.blocks,
+                            key: mdViewFile.path.replace(".md","") + match[0].replace(" ^",""), //change this to match the references cache
+                            transformedCachedItem: transformedCache.blocks ?? null,
                             refType: "block",
                             from: to,
                             to: to
                         });
-                    } else if(firstCharacterMatch==="!" && transformedCache?.embeds?.length>0) { //embeds
+                    } else if(firstCharacterMatch==="!" && (transformedCache?.embeds?.length ?? 0) > 0) { //embeds
                         let newEmbed =match[0].replace("![[","").replace("]]","");
                         if(newEmbed.startsWith("#")) //link to an internal page link, add page name
-                            newEmbed = mdView.file.path.replace(".md","") + stripHeading(newEmbed);
+                            newEmbed = mdViewFile.path.replace(".md","") + stripHeading(newEmbed);
                         widgetsToAdd.push({
                             key: newEmbed,
-                            transformedCachedItem: transformedCache.embeds,
+                            transformedCachedItem: transformedCache.embeds ?? null,
                             refType:"embed",
                             from: to,
                             to: to
                         });                                       
-                    } else if(firstCharacterMatch==="[" && transformedCache?.links?.length>0) { //link
+                    } else if(firstCharacterMatch==="[" && (transformedCache?.links?.length ?? 0) > 0) { //link
                         let newLink = match[0].replace("[[","").replace("]]","");
                         if(newLink.startsWith("#")) //link to an internal page link, add page name
-                            newLink = mdView.file.path.replace(".md","") + newLink;
+                            newLink = mdViewFile.path.replace(".md","") + newLink;
                         widgetsToAdd.push({
                             key: newLink,
-                            transformedCachedItem: transformedCache.links,
+                            transformedCachedItem: transformedCache.links ?? null,
                             refType: "link",
                             from: to,
                             to: to
                         });
-                    } else if(firstCharacterMatch==="#" && transformedCache?.headings?.length>0) { //heading
+                    } else if(firstCharacterMatch==="#" && (transformedCache?.headings?.length ?? 0) > 0) { //heading
                         widgetsToAdd.push({
                             // @ts-ignore
                             key: stripHeading(match[0].replace(/^#+/,"").substring(1)),
-                            transformedCachedItem: transformedCache.headings,
+                            transformedCachedItem: transformedCache.headings ?? null,
                             refType: "heading",
                             from: to,
                             to: to 
@@ -98,7 +100,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
                                 for (const l of linksinHeader) {
                                     widgetsToAdd.push({
                                         key: l.replace("![[","").replace("[[","").replace("]]",""), //change this to match the references cache
-                                        transformedCachedItem: l.startsWith("!") ? transformedCache.embeds : transformedCache.links,
+                                        transformedCachedItem: l.startsWith("!") ? transformedCache.embeds ?? null : transformedCache.links ?? null,
                                         refType: "link",
                                         from: (to - match[0].length) + (match[0].indexOf(l) + l.length),
                                         to: (to - match[0].length) + (match[0].indexOf(l) + l.length)
@@ -109,7 +111,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 
                     for (const ref of widgetsToAdd.sort((a,b)=>a.to-b.to) ) {
                         if(ref.key!="") {
-                            const wdgt = constructWidgetForInlineReference(ref.refType, ref.key, ref.transformedCachedItem, mdView.file.path);
+                            const wdgt = constructWidgetForInlineReference(ref.refType, ref.key, ref.transformedCachedItem ?? [], mdViewFile.path);
                             if(wdgt!=null) {
                                 add(ref.from, ref.to, Decoration.widget({widget: wdgt, side: 1}));    
                             }
@@ -135,20 +137,20 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(class {
 
 
 /**
- * Helper function for preparting the Widget for displaying the reference count
+ * Helper function for preparing the Widget for displaying the reference count
  *
  * @param {string} key  - Unique reference key
  * @param {TransformedCachedItem[]} references - list of references 
  * @param {string} filePath - file path for file being modified
  * @return {*}  {InlineReferenceWidget}
  */
-const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget => {
+const constructWidgetForInlineReference = (refType: string, key: string, references: TransformedCachedItem[], filePath: string): InlineReferenceWidget | null => {
 
     for (let i = 0; i < references.length; i++) {
         const ref = references[i];
         let matchKey = ref.key;
         if(refType==="heading") {
-            matchKey = stripHeading(ref.headerMatch); // headers require special comparison
+            matchKey = stripHeading(ref.headerMatch ?? ''); // headers require special comparison
             key = key.replace(/^\s+|\s+$/g,''); // should be not leading spaces
         }
 
@@ -166,11 +168,12 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
             const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace(".md","") : key;
             if( ref?.references[0]?.excludedFile!=true &&
                 ref?.references.length>=thePlugin.settings.minimumRefCountThreshold)
-                return new InlineReferenceWidget(ref.references.length, ref.type, ref.references[0].realLink, ref.key, filePath, null, ref.pos.start.line);
+                return new InlineReferenceWidget(ref.references.length, ref.type, ref.references[0].realLink, ref.key, filePath, '', ref.pos.start.line);
             else
                 return null;
         }
     }
+    return null;
 }
 
 
@@ -184,7 +187,7 @@ const constructWidgetForInlineReference = (refType: string, key: string, referen
     referenceCount: number;
     referenceType: string;
     realLink: string;
-    key: string;    //a unique identifer for the reference
+    key: string;    //a unique identifier for the reference
     filePath: string;
     addCssClass: string; //if a reference need special treatment, this class can be assigned
     lineNu: number; //number of line within the file

@@ -17,7 +17,7 @@ export function setPluginVariableForHeaderRefCount(plugin: SNWPlugin) {
 
 
 /**
- * Iterates all open documents to see if they are markdown file, and if so callsed processHeader
+ * Iterates all open documents to see if they are markdown file, and if so called processHeader
  *
  * @export
  */
@@ -39,19 +39,21 @@ export default function setHeaderWithReferenceCounts() {
 function processHeader(mdView: MarkdownView) {
     if(thePlugin.snwAPI.enableDebugging?.LinkCountInHeader) 
         thePlugin.snwAPI.console("headerImageCount.processHeader(ThePlugin, MarkdownView)", thePlugin, mdView);
+    // TODO: should handle check for TFile better than non-null! assertion
+    const mdViewFile = mdView.file!;
 
     const allLinks: Link[] = getSnwAllLinksResolutions(); 
     if(allLinks==undefined) return;
 
     const incomingLinks = allLinks.filter(f=>{
         if(!f?.resolvedFile) return false;
-        return f?.resolvedFile?.path===mdView.file.path;
+        return f?.resolvedFile?.path===mdViewFile.path;
     });
 
     let incomingLinksCount = incomingLinks.length;
 
     // check if the page is to be ignored
-    const transformedCache = getSNWCacheByFile(mdView.file);
+    const transformedCache = getSNWCacheByFile(mdViewFile);
     if(transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"]===true) incomingLinksCount=0;
 
     // check if headers for this file are excluded
@@ -60,14 +62,14 @@ function processHeader(mdView: MarkdownView) {
     // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
     if (incomingLinksCount < thePlugin.settings.minimumRefCountThreshold) {
         if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) 
-        mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
+        mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
         return;
     }
         
-    let snwTitleRefCountDisplayCountEl: HTMLElement = mdView.contentEl.querySelector(".snw-header-count");
+    let snwTitleRefCountDisplayCountEl: HTMLElement | null = mdView.contentEl.querySelector(".snw-header-count");
 
     // header count is already displayed, just update information.
-    if( snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdView.file.basename ) {
+    if( snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdViewFile.basename ) {
         snwTitleRefCountDisplayCountEl.innerText =  " " + incomingLinks.length.toString() + " ";
         return
     }
@@ -75,9 +77,9 @@ function processHeader(mdView: MarkdownView) {
     const containerViewContent: HTMLElement = mdView.contentEl;
 
     if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) 
-        mdView.contentEl.querySelector(".snw-header-count-wrapper").remove();
+        mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
 
-    let wrapper: HTMLElement = containerViewContent.querySelector(".snw-header-count-wrapper");
+    let wrapper: HTMLElement | null = containerViewContent.querySelector(".snw-header-count-wrapper");
 
     if (!wrapper) {
         wrapper = createDiv({cls: "snw-header-count-wrapper"});
@@ -88,17 +90,17 @@ function processHeader(mdView: MarkdownView) {
         snwTitleRefCountDisplayCountEl = containerViewContent.querySelector(".snw-header-count");
     }
 
-    snwTitleRefCountDisplayCountEl.innerText = " " + incomingLinks.length.toString() + " ";
-    if(Platform.isDesktop || Platform.isDesktopApp) {
-            snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent)=> {
+    if(snwTitleRefCountDisplayCountEl) snwTitleRefCountDisplayCountEl.innerText = " " + incomingLinks.length.toString() + " ";
+    if((Platform.isDesktop || Platform.isDesktopApp) && snwTitleRefCountDisplayCountEl) {
+        snwTitleRefCountDisplayCountEl.onclick = (e : MouseEvent)=> {
             e.stopPropagation();
-            processHtmlDecorationReferenceEvent(wrapper)
+            if(wrapper) processHtmlDecorationReferenceEvent(wrapper)
         };
     }
-    wrapper.setAttribute("data-snw-reallink", mdView.file.basename);
-    wrapper.setAttribute("data-snw-key", mdView.file.basename);
+    wrapper.setAttribute("data-snw-reallink", mdViewFile.basename);
+    wrapper.setAttribute("data-snw-key", mdViewFile.basename);
     wrapper.setAttribute("data-snw-type", "File");
-    wrapper.setAttribute("data-snw-filepath", mdView.file.path);
+    wrapper.setAttribute("data-snw-filepath", mdViewFile.path);
     // if(Platform.isDesktop || Platform.isDesktopApp) {
         wrapper.onclick = (e : MouseEvent) => {
             e.stopPropagation();
