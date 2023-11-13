@@ -43,15 +43,34 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
 
+    // TODO: add a SNW setting toggle to enable/disable the modifier key instead of hardcoding it to true
+    const requireModifierKey = true as boolean;
+    // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
+    let showTippy = true;
     const tippyObject =  tippy(element, {
         interactive: true,
         appendTo: () => document.body,
         allowHTML: true,
         zIndex: 9999,
         placement: "auto-end",
-        onShow(instance) { setTimeout( async () => {
-            await getUIC_Hoverview(instance)
-        }, 1); } 
+        // trigger: "click", // on click is another option instead of hovering at all
+        onTrigger(instance, event) {
+            const mouseEvent = event as MouseEvent;
+            if(requireModifierKey === false) return;
+            if(mouseEvent.ctrlKey || mouseEvent.metaKey) {
+                showTippy = true;
+            } else {
+                showTippy = false;
+            }
+        },
+        onShow(instance) {
+            // returning false will cancel the show (coming from onTrigger)
+            if(!showTippy) return false;
+
+            setTimeout( async () => {
+                await getUIC_Hoverview(instance)
+            }, 1);
+        } 
     });
     
     tippyObject.popper.classList.add("snw-tippy");
