@@ -101,15 +101,12 @@ function processHeader(mdView: MarkdownView) {
     wrapper.setAttribute("data-snw-key", mdViewFile.basename);
     wrapper.setAttribute("data-snw-type", "File");
     wrapper.setAttribute("data-snw-filepath", mdViewFile.path);
-    // if(Platform.isDesktop || Platform.isDesktopApp) {
-        wrapper.onclick = (e : MouseEvent) => {
-            e.stopPropagation();
-            processHtmlDecorationReferenceEvent(e.target as HTMLElement);
-        }
-    // }
+    wrapper.onclick = (e : MouseEvent) => {
+        e.stopPropagation();
+        processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+    }
 
-    // TODO: add a SNW setting toggle to enable/disable the modifier key instead of hardcoding it to true
-    const requireModifierKey = true as boolean;
+    const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
     // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
     let showTippy = true;
     const tippyObject =  tippy(wrapper, {

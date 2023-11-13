@@ -1,3 +1,9 @@
+# 1.2.4 (2023-11-??)
+Thanks to the help of @GitMurf, SNW has made some nice steps forward
+- New toggle to control if a modifier key is needed to hover an SNW counter when hovering over it. This can be turned off/on in settings.
+- Performance optimizations focused on preventing delays while typing in a document
+- Typescriptifying the codebase where it wasn't Typescripty
+
 # 1.2.3 (2023-11-04)
 - Update of dependencies and new version of esbuild
 - small bug fixes from when properties was added (though this doesn't really make SNW work with properties properly yet)

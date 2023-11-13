@@ -43,8 +43,7 @@ export function htmlDecorationForReferencesElement(count: number, referenceType:
     if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
         thePlugin.snwAPI.console("returned element", element);
 
-    // TODO: add a SNW setting toggle to enable/disable the modifier key instead of hardcoding it to true
-    const requireModifierKey = true as boolean;
+    const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
     // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
     let showTippy = true;
     const tippyObject =  tippy(element, {

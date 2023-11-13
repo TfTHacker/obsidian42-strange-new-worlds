@@ -20,8 +20,9 @@ export interface Settings {
 	enableRenderingLinksInLivePreview:		boolean;
 	enableRenderingHeadersInLivePreview:	boolean;
 	enableRenderingEmbedsInLivePreview:		boolean;
-	enableIgnoreObsExcludeFoldersLinksFrom:	boolean; //Use Obsidians Excllude Files from folder - links from those files outgoing to other files
-	enableIgnoreObsExcludeFoldersLinksTo:	boolean; //Use Obsidians Excllude Files from folder - links to those "excluded" files
+	enableIgnoreObsExcludeFoldersLinksFrom:	boolean; //Use Obsidians Exclude Files from folder - links from those files outgoing to other files
+	enableIgnoreObsExcludeFoldersLinksTo:	boolean; //Use Obsidians Exclude Files from folder - links to those "excluded" files
+	requireModifierKeyToActivateSNWView:		boolean; //require CTRL hover to activate SNW view
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -44,7 +45,8 @@ export const DEFAULT_SETTINGS: Settings = {
 	enableRenderingHeadersInLivePreview:	true,
 	enableRenderingEmbedsInLivePreview: 	true,
 	enableIgnoreObsExcludeFoldersLinksFrom: false,
-	enableIgnoreObsExcludeFoldersLinksTo:	false
+	enableIgnoreObsExcludeFoldersLinksTo:	false,
+	requireModifierKeyToActivateSNWView:	false
 }
 
 export class SettingsTab extends PluginSettingTab {
@@ -61,6 +63,18 @@ export class SettingsTab extends PluginSettingTab {
 
 		containerEl.createEl('h2', { text: this.thePlugin.appName });
 
+		containerEl.createEl("h2", { text: "SNW Activation" });
+		new Setting(containerEl)
+			.setName("Require modifier key to activate SNW")
+			.setDesc(`If enabled, SNW will only activate when the modifier key is pressed when hovering the mouse over an SNW counter.  
+						Otherwise, SNW will activate on a mouse hover. May require reopening open files to take effect.`)
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.thePlugin.settings.requireModifierKeyToActivateSNWView);
+				cb.onChange(async (value: boolean) => {
+					this.thePlugin.settings.requireModifierKeyToActivateSNWView = value;
+					await this.thePlugin.saveSettings();
+				});
+			});
 
 		containerEl.createEl("h2", { text: "Thresholds" });
 		new Setting(containerEl)
