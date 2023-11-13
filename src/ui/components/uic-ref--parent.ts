@@ -5,7 +5,7 @@ import { scrollResultsIntoView } from 'src/utils';
 import { getUIC_Ref_Area } from "./uic-ref-area";
 import { setPluginVariableUIC_RefItem } from './uic-ref-item';
 
-let thePlugin: SNWPlugin = null;
+let thePlugin: SNWPlugin;
 
 export function setPluginVariableForUIC(plugin: SNWPlugin) {
     thePlugin = plugin;

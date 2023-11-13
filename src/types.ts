@@ -51,11 +51,11 @@ export interface Link {
         displayText: string
         position: Pos
     }
-    resolvedFile: TFile
+    resolvedFile: TFile | null
     // resolvedPaths: string[]
     ghostLink: string
-    realLink: string  //the real link in the markdonw
-    sourceFile: TFile 
+    realLink: string  //the real link in the markdown
+    sourceFile: TFile | null
     excludedFile: boolean;
 }
 

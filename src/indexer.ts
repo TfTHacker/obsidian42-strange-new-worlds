@@ -36,12 +36,12 @@ export function buildLinksAndReferences(): void {
         if(resolvedFilePath.path==="") resolvedFilePath.path = src.replace(".md","");
         if(resolvedFilePath?.path) {
             const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
-            const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + stripHeading(resolvedFilePath.subpath); // file doesnt exist, empthy link
+            const fileLink = resolvedTFile===null ?  "" : resolvedTFile.path.replace(".md","") + stripHeading(resolvedFilePath.subpath); // file doesnt exist, empty link
             const ghlink = resolvedTFile===null ?  resolvedFilePath.path : ""; // file doesnt exist, its a ghost link
             const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, "/");
 
             if(thePlugin.settings.enableIgnoreObsExcludeFoldersLinksFrom) 
-                if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path)) 
+                if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path ?? '')) 
                     return;
 
             if(thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo) 
@@ -51,7 +51,7 @@ export function buildLinksAndReferences(): void {
             allLinkResolutions.push(
                 {
                     reference: {
-                        displayText: refs.displayText,
+                        displayText: refs.displayText ?? '',
                         // link: refs.link, // old approach
                         link: fileLink!="" ? fileLink : ghlink,
                         position: refs.position
@@ -71,14 +71,17 @@ export function buildLinksAndReferences(): void {
     const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e)=>{
         return e[1]?.frontmatter?.["snw-index-exclude"]
     });
+    // TODO: should resolve these ts-expect-errors by declaring the types for non-exposed API items
+    // @ts-expect-error - fileCache is not exposed in the API
     const snwIndexExceptions = Object.entries(app.metadataCache.fileCache).filter((e)=>{
+        // @ts-expect-error - fileCache is not exposed in the API
         return snwIndexExceptionsList.find(f=>f[0]===e[1].hash);
     });
 
     for (let i = 0; i < allLinkResolutions.length; i++) {
         allLinkResolutions[i].excludedFile = false;
         if(allLinkResolutions[i]?.resolvedFile?.path){
-            const fileName = allLinkResolutions[i].resolvedFile.path;
+            const fileName = allLinkResolutions[i].resolvedFile?.path ?? '';
             for (let e = 0; e < snwIndexExceptions.length; e++) {
                 if(fileName==snwIndexExceptions[e][0]) {
                     allLinkResolutions[i].excludedFile = true;
@@ -141,13 +144,16 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     
     if(cacheCurrentPages.has(file.path)) {
         const cachedPage = cacheCurrentPages.get(file.path);
-        // Check if references have been updated since last cache update, and if cache is old
-        if( (lastUpdateToReferences < cachedPage.createDate) && ((cachedPage.createDate+thePlugin.settings.cacheUpdateInMilliseconds) > Date.now()) ) {
-            return cachedPage;
+        if(cachedPage) {
+            const cachedPageCreateDate = cachedPage.createDate ?? 0;
+            // Check if references have been updated since last cache update, and if cache is old
+            if( (lastUpdateToReferences < cachedPageCreateDate) && ((cachedPageCreateDate + thePlugin.settings.cacheUpdateInMilliseconds) > Date.now()) ) {
+                return cachedPage;
+            }
         }
     }
 
-    if(thePlugin.showCountsActive!=true) return;
+    if(thePlugin.showCountsActive!=true) return {};
 
     const transformedCache: TransformedCache = {};
     const cachedMetaData = thePlugin.app.metadataCache.getFileCache(file);

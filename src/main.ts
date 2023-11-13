@@ -25,7 +25,7 @@ export default class SNWPlugin extends Plugin {
     lastSelectedReferenceFilePath : string;
     lastSelectedLineNumber: number;
     snwAPI: SnwAPI;
-    markdownPostProcessor: MarkdownPostProcessor = null;
+    markdownPostProcessor: MarkdownPostProcessor | null = null;
     editorExtensions: Extension[] = [];
     commands: PluginCommands;
 
@@ -64,7 +64,9 @@ export default class SNWPlugin extends Plugin {
             buildLinksAndReferences()
         }, 1000, true);
 
+        // TODO: probably still want to keep metadataCache.on("resolve") in case non-editor change triggers a file update
         this.registerEvent(this.app.metadataCache.on("resolve", indexDebounce ));
+        this.registerEvent(this.app.workspace.on("editor-change", indexDebounce ));
 
         this.app.workspace.registerHoverLinkSource(this.appID, {
             display: this.appName,
@@ -135,7 +137,11 @@ export default class SNWPlugin extends Plugin {
         if(this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor===null) {
             this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
         } else {
-            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            if(!this.markdownPostProcessor) {
+                console.log("Markdown post processor is not registered");
+            } else {
+                MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            }
             this.markdownPostProcessor=null;
         }
     }
@@ -203,7 +209,11 @@ export default class SNWPlugin extends Plugin {
     onunload(): void {
         console.log("unloading " + this.appName)
         try {
-            MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            if(!this.markdownPostProcessor) {
+                console.log("Markdown post processor is not registered");
+            } else {
+                MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
+            }
             this.app.workspace.unregisterHoverLinkSource(this.appID);
         } catch (error) { /* don't do anything */ }
     }
