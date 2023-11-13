@@ -64,7 +64,9 @@ export default class SNWPlugin extends Plugin {
             buildLinksAndReferences()
         }, 1000, true);
 
+        // TODO: probably still want to keep metadataCache.on("resolve") in case non-editor change triggers a file update
         this.registerEvent(this.app.metadataCache.on("resolve", indexDebounce ));
+        this.registerEvent(this.app.workspace.on("editor-change", indexDebounce ));
 
         this.app.workspace.registerHoverLinkSource(this.appID, {
             display: this.appName,
