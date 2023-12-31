@@ -9,14 +9,7 @@ Documentation for this plugin can be found at: https://tfthacker.com/SNW
 
 See videos on how to use Strange New Worlds: https://tfthacker.com/SNW-videos
 
+You might also be interested in a few products I have made for Obsidian:
 
-## Say Thank You
-If you are interested in reading articles written by me, please check out my articles on Medium: https://bit.ly/o42-medium.
-
-If you are enjoying this plugin then feel free to buying me a coffee on [https://ko-fi/TfTHacker](https://ko-fi.com/TfTHacker).
-
-Please also help spread the word by sharing your enthusiasim for this plugin on Twitter, Reddit, or any other social media platform you regularly use. 
-
-You can find me on Twitter [@TfTHacker](https://twitter.com/TfTHacker)
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N16TNFD)
+- [Canvas Candy](https://tfthacker.com/canvas-candy) - The Canvas Candy Vault is a set of tools specially designed for use with the canvas feature of Obsidian. With over 40+ decorations, you can add new dimensions to the cards on your canvas.
+- [Cornell Notes Learning Vault](https://tfthacker.com/cornell-notes) - This vault teaches you how to use the Cornell Note-Taking System in your Obsidian vault. It includes learning material, samples, and Obsidian configuration files to enable Cornell Notes in your vault.
