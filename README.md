@@ -1,4 +1,5 @@
 # Strange New Worlds of networked thought
+
 This plugin helps you to see the connections between the different parts of your vault.
 
 The basic idea is we want to see when links, block references and embeds have associations with other files in the vault. The problem is you have to search, open backlinks, and so on to find out what is going on. But there are so many strange new worlds of networked thought to discover in our vault. This plugin attempts to resurface those connections and not be too intrusive (or not too intrusive) in doing so.

@@ -6,10 +6,10 @@
   "description": "Revealing networked thought and the strange new worlds created by your vault",
   "author": "TfTHacker",
   "authorUrl": "https://twitter.com/TfTHacker",
-	"helpUrl": "https://tfthacker.com/SNW",
-	"isDesktopOnly": false,
-	"fundingUrl": {
-        "Buy Me a Coffee": "https://bit.ly/o42-kofi",
-        "Vist my site": "https://tfthacker.com"
-    }
+  "helpUrl": "https://tfthacker.com/SNW",
+  "isDesktopOnly": false,
+  "fundingUrl": {
+    "Buy Me a Coffee": "https://bit.ly/o42-kofi",
+    "Vist my site": "https://tfthacker.com"
+  }
 }

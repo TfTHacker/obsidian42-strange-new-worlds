@@ -6,25 +6,29 @@
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "build2": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
     "lint": "eslint . --ext .ts"
   },
   "author": "TfTHacker",
   "license": "MIT",
   "devDependencies": {
+    "typescript": "5.3.3",
+    "tslib": "^2.6.2",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "builtin-modules": "3.3.0",
+    "esbuild": "0.19.11",
+    "eslint": "^8.56.0",
     "@codemirror/commands": "^6.3.3",
     "@codemirror/language": "^6.10.0",
     "@codemirror/search": "^6.5.5",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.23.0",
-    "@types/node": "^20.10.6",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
-    "builtin-modules": "3.3.0",
-    "eslint": "^8.56.0",
-    "esbuild": "0.19.11",
-    "obsidian": "latest",
-    "tslib": "^2.6.2",
-    "typescript": "5.3.3"
+    "prettier": "^3.1.1",
+    "@types/obsidian-typings": "github:Fevol/obsidian-typings",
+    "obsidian": "1.4.11"
   },
   "dependencies": {
     "tippy.js": "^6.3.7"

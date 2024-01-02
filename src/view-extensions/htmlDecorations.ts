@@ -1,13 +1,13 @@
-import SNWPlugin from "../main";
+import SNWPlugin from '../main';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
-import { getUIC_Hoverview } from "src/ui/components/uic-ref--parent";
-import { Platform } from "obsidian";
+import { getUIC_Hoverview } from 'src/ui/components/uic-ref--parent';
+import { Platform } from 'obsidian';
 
 let thePlugin: SNWPlugin;
 
 export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
-    thePlugin = plugin;
+  thePlugin = plugin;
 }
 
 /**
@@ -24,57 +24,75 @@ export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
  * @param {string} attachCSSClass   if special class is need for the element
  * @return {*}  {HTMLElement}
  */
-export function htmlDecorationForReferencesElement(count: number, referenceType: string, realLink: string, key: string, filePath: string, attachCSSClass: string, lineNu: number): HTMLElement {
-    if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, realLink, key, filePath)", thePlugin, count,referenceType,realLink,key,filePath);
+export function htmlDecorationForReferencesElement(
+  count: number,
+  referenceType: string,
+  realLink: string,
+  key: string,
+  filePath: string,
+  attachCSSClass: string,
+  lineNu: number
+): HTMLElement {
+  if (thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements)
+    thePlugin.snwAPI.console(
+      'htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, realLink, key, filePath)',
+      thePlugin,
+      count,
+      referenceType,
+      realLink,
+      key,
+      filePath
+    );
 
-    const element = createDiv({cls: "snw-reference snw-" + referenceType });
-    element.innerText= count.toString();
-    element.setAttribute("data-snw-type", referenceType);
-    element.setAttribute("data-snw-reallink", realLink);
-    element.setAttribute("data-snw-key", key);
-    element.setAttribute("data-snw-filepath", filePath);
-    element.setAttribute("snw-data-line-number", lineNu.toString());
-    if(attachCSSClass) element.addClass(attachCSSClass);
+  const element = createDiv({ cls: 'snw-reference snw-' + referenceType });
+  element.innerText = count.toString();
+  element.setAttribute('data-snw-type', referenceType);
+  element.setAttribute('data-snw-reallink', realLink);
+  element.setAttribute('data-snw-key', key);
+  element.setAttribute('data-snw-filepath', filePath);
+  element.setAttribute('snw-data-line-number', lineNu.toString());
+  if (attachCSSClass) element.addClass(attachCSSClass);
 
-    if(Platform.isDesktop || Platform.isDesktopApp) //click is default to desktop, otherwise mobile behaves differently
-        element.onclick = async (e: MouseEvent ) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+  if (Platform.isDesktop || Platform.isDesktopApp)
+    //click is default to desktop, otherwise mobile behaves differently
+    element.onclick = async (e: MouseEvent) =>
+      processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
-    if(thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("returned element", element);
+  if (thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements)
+    thePlugin.snwAPI.console('returned element', element);
 
-    const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
-    // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
-    let showTippy = true;
-    const tippyObject =  tippy(element, {
-        interactive: true,
-        appendTo: () => document.body,
-        allowHTML: true,
-        zIndex: 9999,
-        placement: "auto-end",
-        // trigger: "click", // on click is another option instead of hovering at all
-        onTrigger(instance, event) {
-            const mouseEvent = event as MouseEvent;
-            if(requireModifierKey === false) return;
-            if(mouseEvent.ctrlKey || mouseEvent.metaKey) {
-                showTippy = true;
-            } else {
-                showTippy = false;
-            }
-        },
-        onShow(instance) {
-            // returning false will cancel the show (coming from onTrigger)
-            if(!showTippy) return false;
+  const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
+  // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
+  let showTippy = true;
+  const tippyObject = tippy(element, {
+    interactive: true,
+    appendTo: () => document.body,
+    allowHTML: true,
+    zIndex: 9999,
+    placement: 'auto-end',
+    // trigger: "click", // on click is another option instead of hovering at all
+    onTrigger(instance, event) {
+      const mouseEvent = event as MouseEvent;
+      if (requireModifierKey === false) return;
+      if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
+        showTippy = true;
+      } else {
+        showTippy = false;
+      }
+    },
+    onShow(instance) {
+      // returning false will cancel the show (coming from onTrigger)
+      if (!showTippy) return false;
 
-            setTimeout( async () => {
-                await getUIC_Hoverview(instance)
-            }, 1);
-        } 
-    });
-    
-    tippyObject.popper.classList.add("snw-tippy");
+      setTimeout(async () => {
+        await getUIC_Hoverview(instance);
+      }, 1);
+    },
+  });
 
-    return element;
+  tippyObject.popper.classList.add('snw-tippy');
+
+  return element;
 }
 
 export /**
@@ -83,15 +101,21 @@ export /**
  * @param {HTMLElement} target
  */
 const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
-    const refType = target.getAttribute("data-snw-type") ?? "";
-    const realLink = target.getAttribute("data-snw-realLink") ?? "";
-    const key = target.getAttribute("data-snw-key") ?? "";
-    const filePath = target.getAttribute("data-snw-filepath") ?? "";
-    const lineNu = target.getAttribute("snw-data-line-number") ?? "";
+  const refType = target.getAttribute('data-snw-type') ?? '';
+  const realLink = target.getAttribute('data-snw-realLink') ?? '';
+  const key = target.getAttribute('data-snw-key') ?? '';
+  const filePath = target.getAttribute('data-snw-filepath') ?? '';
+  const lineNu = target.getAttribute('snw-data-line-number') ?? '';
 
-    if(thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements) 
-        thePlugin.snwAPI.console("htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath", target,realLink, key,refType, filePath);
+  if (thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements)
+    thePlugin.snwAPI.console(
+      'htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath',
+      target,
+      realLink,
+      key,
+      refType,
+      filePath
+    );
 
-    thePlugin.activateView(refType, realLink, key, filePath, Number(lineNu));
-
-}
+  thePlugin.activateView(refType, realLink, key, filePath, Number(lineNu));
+};
