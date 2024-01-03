@@ -13,24 +13,25 @@
   "author": "TfTHacker",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "5.3.3",
-    "tslib": "^2.6.2",
-    "@types/node": "^20.10.6",
-    "@typescript-eslint/eslint-plugin": "^6.17.0",
-    "@typescript-eslint/parser": "^6.17.0",
-    "builtin-modules": "3.3.0",
-    "esbuild": "0.19.11",
-    "eslint": "^8.56.0",
     "@codemirror/commands": "^6.3.3",
     "@codemirror/language": "^6.10.0",
     "@codemirror/search": "^6.5.5",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.23.0",
-    "prettier": "^3.1.1",
+    "@types/node": "^20.10.6",
     "@types/obsidian-typings": "github:Fevol/obsidian-typings",
-    "obsidian": "1.4.11"
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "builtin-modules": "3.3.0",
+    "esbuild": "0.19.11",
+    "eslint": "^8.56.0",
+    "obsidian": "1.4.11",
+    "prettier": "^3.1.1",
+    "tslib": "^2.6.2",
+    "typescript": "5.3.3"
   },
   "dependencies": {
+    "preact": "^10.19.3",
     "tippy.js": "^6.3.7"
   }
 }

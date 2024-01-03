@@ -1,4 +1,11 @@
 import { CachedMetadata, ListItemCache, Pos, TFile } from 'obsidian';
+import SnwAPI from './snwApi';
+
+declare global {
+  interface Window {
+    snwAPI?: SnwAPI;
+  }
+}
 
 declare module 'obsidian' {
   interface Workspace {

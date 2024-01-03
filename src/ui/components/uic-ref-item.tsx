@@ -1,3 +1,5 @@
+// Component creates an individual reference item
+
 import { MarkdownRenderer } from 'obsidian';
 import SNWPlugin from 'src/main';
 import { Link } from '../../types';
@@ -8,6 +10,7 @@ import {
   formatListWithDescendants,
 } from './context/formatting-utils';
 import { getTextAtPosition } from './context/position-utils';
+import { render } from 'preact';
 
 let thePlugin: SNWPlugin;
 
@@ -15,29 +18,24 @@ export function setPluginVariableUIC_RefItem(plugin: SNWPlugin) {
   thePlugin = plugin;
 }
 
-export /**
- * Creats an individual reference item
- *
- * @param {Link} ref
- * @return {*}  {Promise<string>}
- */
-const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
+export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
+  let startLine =
+    ref.reference.position !== undefined ?
+      ref.reference.position.start.line.toString()
+    : '0';
+
+  const itemElJsx = (
+    <div
+      className="snw-ref-item-info search-result-file-match"
+      snw-data-line-number={startLine}
+      snw-data-file-name={ref?.sourceFile?.path.replace('.md', '')}
+      data-href={ref?.sourceFile?.path.replace('.md', '')}
+      dangerouslySetInnerHTML={{ __html: (await grabChunkOfFile(ref)).innerHTML }}
+    />
+  );
+
   const itemEl = createDiv();
-  itemEl.addClass('snw-ref-item-info');
-  itemEl.addClass('search-result-file-match');
-
-  let startLine = '0';
-  if (ref.reference.position !== undefined)
-    //added because of properties - need to fix later
-    startLine = ref.reference.position.start.line.toString();
-
-  itemEl.setAttribute('snw-data-line-number', startLine);
-  itemEl.setAttribute('snw-data-file-name', ref.sourceFile.path.replace('.md', ''));
-  itemEl.setAttribute('data-href', ref.sourceFile.path.replace('.md', ''));
-
-  const fileChuncksEl = await grabChunkOfFile(ref);
-
-  itemEl.appendChild(fileChuncksEl);
+  render(itemElJsx, itemEl);
 
   return itemEl;
 };
@@ -86,7 +84,8 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
       contextEl.createEl('span', { text: 'L' });
 
-      await MarkdownRenderer.renderMarkdown(
+      await MarkdownRenderer.render(
+        thePlugin.app,
         formatListBreadcrumbs(fileContents, listBreadcrumbs),
         contextEl,
         ref.sourceFile.path,
@@ -99,7 +98,8 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     );
 
     const contextEl = container.createDiv();
-    await MarkdownRenderer.renderMarkdown(
+    await MarkdownRenderer.render(
+      thePlugin.app,
       formatListWithDescendants(fileContents, listItemWithDescendants),
       contextEl,
       ref.sourceFile.path,
@@ -113,7 +113,8 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     if (sectionContainingLink?.position !== undefined)
       blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
 
-    await MarkdownRenderer.renderMarkdown(
+    await MarkdownRenderer.render(
+      thePlugin.app,
       blockContents,
       container,
       ref.sourceFile.path,
@@ -128,7 +129,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     );
     if (firstSectionPosition) {
       const contextEl = container.createDiv();
-      await MarkdownRenderer.renderMarkdown(
+      await MarkdownRenderer..render(thePlugin.app,
         getTextAtPosition(fileContents, firstSectionPosition.position),
         contextEl,
         ref.sourceFile.path,

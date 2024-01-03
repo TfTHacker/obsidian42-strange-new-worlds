@@ -5,6 +5,7 @@ import { scrollResultsIntoView } from 'src/utils';
 import { getReferencesCache } from '../indexer';
 import SNWPlugin from '../main';
 import { getUIC_SidePane } from './components/uic-ref--parent';
+import { render } from 'preact';
 
 export const VIEW_TYPE_SNW = 'Strange New Worlds';
 
@@ -29,16 +30,15 @@ export class SideBarPaneView extends ItemView {
   }
 
   async onOpen() {
-    const container: HTMLElement = this.containerEl;
-    const loadingEL: HTMLElement = container.createSpan({ cls: 'snw-sidepane-loading' });
-    const bannerEl: HTMLElement = createDiv({ cls: 'snw-sidepane-loading-banner' });
-    bannerEl.innerText = `Discovering Strange New Worlds...`;
-    loadingEL.appendChild(bannerEl);
-    const pendingTextEl: HTMLElement = createDiv({ cls: 'snw-sidepane-loading-subtext' });
-    pendingTextEl.innerText = `Click a reference counter in the main document for information to appear here.`;
-    loadingEL.appendChild(pendingTextEl);
-    container.empty();
-    container.appendChild(loadingEL);
+    render(
+      <div class="snw-sidepane-loading">
+        <div class="snw-sidepane-loading-banner">Discovering Strange New Worlds...</div>
+        <div class="snw-sidepane-loading-subtext">
+          Click a reference counter in the main document for information to appear here.
+        </div>
+      </div>,
+      this.containerEl
+    );
   }
 
   async updateView() {

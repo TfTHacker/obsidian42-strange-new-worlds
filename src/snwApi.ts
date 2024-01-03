@@ -1,6 +1,5 @@
 import { getSNWCacheByFile } from './indexer';
 import SNWPlugin from './main';
-import { Settings } from './ui/settingsTab';
 
 /**
  * Provide a simple API for use with Templater, Dataview and debugging the complexities of various pages.
@@ -11,7 +10,6 @@ import { Settings } from './ui/settingsTab';
  */
 export default class SnwAPI {
   plugin: SNWPlugin;
-  settings: Settings;
   enableDebugging = {
     CM6Extension: false,
     PreviewRendering: false,

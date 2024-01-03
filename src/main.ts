@@ -31,17 +31,18 @@ import { setPluginVariableUIC_RefArea } from './ui/components/uic-ref-area';
 export default class SNWPlugin extends Plugin {
   appName = this.manifest.name;
   appID = this.manifest.id;
-  settings: Settings;
-  showCountsActive: boolean; //controls global state if the plugin is showing counters
-  lastSelectedReferenceType: string;
-  lastSelectedReferenceRealLink: string;
-  lastSelectedReferenceKey: string;
-  lastSelectedReferenceFilePath: string;
-  lastSelectedLineNumber: number;
-  snwAPI: SnwAPI;
+  settings: Settings = DEFAULT_SETTINGS;
+  //controls global state if the plugin is showing counters
+  showCountsActive: boolean = DEFAULT_SETTINGS.enableOnStartupDesktop;
+  lastSelectedReferenceType: string = '';
+  lastSelectedReferenceRealLink: string = '';
+  lastSelectedReferenceKey: string = '';
+  lastSelectedReferenceFilePath: string = '';
+  lastSelectedLineNumber: number = 0;
+  snwAPI: SnwAPI = new SnwAPI(this);
   markdownPostProcessor: MarkdownPostProcessor | null = null;
   editorExtensions: Extension[] = [];
-  commands: PluginCommands;
+  commands: PluginCommands = new PluginCommands(this);
 
   async onload(): Promise<void> {
     console.log('loading ' + this.appName);
@@ -55,9 +56,7 @@ export default class SNWPlugin extends Plugin {
     setPluginVariableForCM6InlineReferences(this);
     setPluginVariableForUIC(this);
 
-    this.snwAPI = new SnwAPI(this);
-    // @ts-ignore
-    globalThis.snwAPI = this.snwAPI; // API access to SNW for Templater, Dataviewjs and the console debugger
+    window.snwAPI = this.snwAPI; // API access to SNW for Templater, Dataviewjs and the console debugger
 
     await this.loadSettings();
     this.addSettingTab(new SettingsTab(this.app, this));
@@ -66,8 +65,6 @@ export default class SNWPlugin extends Plugin {
     if (Platform.isMobile || Platform.isMobileApp)
       this.showCountsActive = this.settings.enableOnStartupMobile;
     else this.showCountsActive = this.settings.enableOnStartupDesktop;
-
-    this.commands = new PluginCommands(this);
 
     this.registerView(VIEW_TYPE_SNW, (leaf) => new SideBarPaneView(leaf, this));
 

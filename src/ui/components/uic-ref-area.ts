@@ -35,7 +35,7 @@ const getUIC_Ref_Area = async (
 
   //get title header for this reference area
   refAreaContainerEl.append(
-    await getUIC_Ref_Title_Div(
+    getUIC_Ref_Title_Div(
       refType,
       realLink,
       key,

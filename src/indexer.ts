@@ -81,10 +81,7 @@ export function buildLinksAndReferences(): void {
       return e[1]?.frontmatter?.['snw-index-exclude'];
     }
   );
-  // TODO: should resolve these ts-expect-errors by declaring the types for non-exposed API items
-  // @ts-expect-error - fileCache is not exposed in the API
   const snwIndexExceptions = Object.entries(app.metadataCache.fileCache).filter((e) => {
-    // @ts-expect-error - fileCache is not exposed in the API
     return snwIndexExceptionsList.find((f) => f[0] === e[1].hash);
   });
 
