@@ -1,3 +1,8 @@
+# 1.2.6 (2024-04-05)
+
+- Dependency updates
+- Added Github action to automate the release process
+
 # 1.2.4 (2023-11-??)
 
 Thanks to the help of @GitMurf, SNW has made some nice steps forward
