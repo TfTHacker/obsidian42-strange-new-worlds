@@ -3,6 +3,7 @@ import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getUIC_Hoverview } from 'src/ui/components/uic-ref--parent';
 import { Platform } from 'obsidian';
+import { render } from 'preact';
 
 let thePlugin: SNWPlugin;
 
@@ -44,27 +45,32 @@ export function htmlDecorationForReferencesElement(
       filePath
     );
 
-  const element = createDiv({ cls: 'snw-reference snw-' + referenceType });
-  element.innerText = count.toString();
-  element.setAttribute('data-snw-type', referenceType);
-  element.setAttribute('data-snw-reallink', realLink);
-  element.setAttribute('data-snw-key', key);
-  element.setAttribute('data-snw-filepath', filePath);
-  element.setAttribute('snw-data-line-number', lineNu.toString());
-  if (attachCSSClass) element.addClass(attachCSSClass);
+  const referenceElementJsx = (
+    <div
+      className={'snw-reference snw-' + referenceType + ' ' + attachCSSClass}
+      data-snw-type={referenceType}
+      data-snw-reallink={realLink}
+      data-snw-key={key}
+      data-snw-filepath={filePath}
+      snw-data-line-number={lineNu.toString()}>
+      {count.toString()}
+    </div>
+  );
+
+  const refenceElement = createDiv();
+  render(referenceElementJsx, refenceElement);
+  const refCountBox = refenceElement.firstElementChild as HTMLElement;
 
   if (Platform.isDesktop || Platform.isDesktopApp)
     //click is default to desktop, otherwise mobile behaves differently
-    element.onclick = async (e: MouseEvent) =>
-      processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+    refCountBox.onclick = async (e: MouseEvent) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
-  if (thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements)
-    thePlugin.snwAPI.console('returned element', element);
+  if (thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) thePlugin.snwAPI.console('returned element', refenceElement);
 
   const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
   // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
   let showTippy = true;
-  const tippyObject = tippy(element, {
+  const tippyObject = tippy(refCountBox, {
     interactive: true,
     appendTo: () => document.body,
     allowHTML: true,
@@ -87,12 +93,12 @@ export function htmlDecorationForReferencesElement(
       setTimeout(async () => {
         await getUIC_Hoverview(instance);
       }, 1);
-    },
+    }
   });
 
   tippyObject.popper.classList.add('snw-tippy');
 
-  return element;
+  return refenceElement;
 }
 
 export /**

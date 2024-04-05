@@ -1,32 +1,19 @@
 import { Extension } from '@codemirror/state';
-import {
-  debounce,
-  MarkdownPostProcessor,
-  MarkdownPreviewRenderer,
-  Platform,
-  Plugin,
-} from 'obsidian';
+import { debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plugin } from 'obsidian';
 import { buildLinksAndReferences, setPluginVariableForIndexer } from './indexer';
-import {
-  InlineReferenceExtension,
-  setPluginVariableForCM6InlineReferences,
-} from './view-extensions/references-cm6';
+import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from './view-extensions/references-cm6';
 import { setPluginVariableForHtmlDecorations } from './view-extensions/htmlDecorations';
 import markdownPreviewProcessor, {
-  setPluginVariableForMarkdownPreviewProcessor,
+  setPluginVariableForMarkdownPreviewProcessor
 } from './view-extensions/references-preview';
-import ReferenceGutterExtension, {
-  setPluginVariableForCM6Gutter,
-} from './view-extensions/gutters-cm6';
-import setHeaderWithReferenceCounts, {
-  setPluginVariableForHeaderRefCount,
-} from './ui/headerRefCount';
+import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from './view-extensions/gutters-cm6';
+import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from './ui/headerRefCount';
 import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/sidebar-pane';
 import { SettingsTab, Settings, DEFAULT_SETTINGS } from './ui/settingsTab';
 import SnwAPI from './snwApi';
 import { setPluginVariableForUIC } from './ui/components/uic-ref--parent';
-import PluginCommands from './pluginCommands';
 import { setPluginVariableUIC_RefArea } from './ui/components/uic-ref-area';
+import PluginCommands from './PluginCommands';
 
 export default class SNWPlugin extends Plugin {
   appName = this.manifest.name;
@@ -62,8 +49,7 @@ export default class SNWPlugin extends Plugin {
     this.addSettingTab(new SettingsTab(this.app, this));
 
     // set current state based on startup parameters
-    if (Platform.isMobile || Platform.isMobileApp)
-      this.showCountsActive = this.settings.enableOnStartupMobile;
+    if (Platform.isMobile || Platform.isMobileApp) this.showCountsActive = this.settings.enableOnStartupMobile;
     else this.showCountsActive = this.settings.enableOnStartupDesktop;
 
     this.registerView(VIEW_TYPE_SNW, (leaf) => new SideBarPaneView(leaf, this));
@@ -83,7 +69,7 @@ export default class SNWPlugin extends Plugin {
 
     this.app.workspace.registerHoverLinkSource(this.appID, {
       display: this.appName,
-      defaultMod: true,
+      defaultMod: true
     });
 
     this.snwAPI.settings = this.settings;
@@ -97,9 +83,7 @@ export default class SNWPlugin extends Plugin {
 
     this.app.workspace.onLayoutReady(async () => {
       if (!this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length) {
-        await this.app.workspace
-          .getRightLeaf(false)
-          .setViewState({ type: VIEW_TYPE_SNW, active: false });
+        await this.app.workspace.getRightLeaf(false).setViewState({ type: VIEW_TYPE_SNW, active: false });
       }
       const resolved = this.app.metadataCache.on('resolved', async () => {
         buildLinksAndReferences();
@@ -121,21 +105,13 @@ export default class SNWPlugin extends Plugin {
    * @param {number} lineNu
    * @memberof ThePlugin
    */
-  async activateView(
-    refType: string,
-    realLink: string,
-    key: string,
-    filePath: string,
-    lineNu: number
-  ) {
+  async activateView(refType: string, realLink: string, key: string, filePath: string, lineNu: number) {
     this.lastSelectedReferenceType = refType;
     this.lastSelectedReferenceRealLink = realLink;
     this.lastSelectedReferenceKey = key;
     this.lastSelectedReferenceFilePath = filePath;
     this.lastSelectedLineNumber = lineNu;
-    await (
-      this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView
-    ).updateView();
+    await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
     this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
   }
 
@@ -156,14 +132,8 @@ export default class SNWPlugin extends Plugin {
    * @memberof ThePlugin
    */
   toggleStateSNWMarkdownPreview(): void {
-    if (
-      this.settings.displayInlineReferencesMarkdown &&
-      this.showCountsActive &&
-      this.markdownPostProcessor === null
-    ) {
-      this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) =>
-        markdownPreviewProcessor(el, ctx)
-      );
+    if (this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor === null) {
+      this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
     } else {
       if (!this.markdownPostProcessor) {
         console.log('Markdown post processor is not registered');
@@ -211,11 +181,7 @@ export default class SNWPlugin extends Plugin {
    * @param {Extension} extension
    * @memberof ThePlugin
    */
-  updateCMExtensionState(
-    extensionIdentifier: string,
-    extensionState: boolean,
-    extension: Extension
-  ) {
+  updateCMExtensionState(extensionIdentifier: string, extensionState: boolean, extension: Extension) {
     if (extensionState == true) {
       this.editorExtensions.push(extension);
       // @ts-ignore

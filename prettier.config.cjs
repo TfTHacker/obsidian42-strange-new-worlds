@@ -1,4 +1,3 @@
-// eslint-disable-next-line tsdoc/syntax -- ignore for prettier config
 /** @type {import("prettier").Config} */
 const config = {
   plugins: [

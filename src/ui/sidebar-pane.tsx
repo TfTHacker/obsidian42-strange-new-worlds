@@ -33,9 +33,7 @@ export class SideBarPaneView extends ItemView {
     render(
       <div class="snw-sidepane-loading">
         <div class="snw-sidepane-loading-banner">Discovering Strange New Worlds...</div>
-        <div class="snw-sidepane-loading-subtext">
-          Click a reference counter in the main document for information to appear here.
-        </div>
+        <div class="snw-sidepane-loading-subtext">Click a reference counter in the main document for information to appear here.</div>
       </div>,
       this.containerEl
     );
@@ -49,22 +47,11 @@ export class SideBarPaneView extends ItemView {
     const lineNu = this.thePlugin.lastSelectedLineNumber;
 
     if (this.thePlugin.snwAPI.enableDebugging.SidePane) {
-      this.thePlugin.snwAPI.console(
-        'sidepane.open() refType, realLink, key, filePath',
-        refType,
-        realLink,
-        key,
-        filePath
-      );
-      this.thePlugin.snwAPI.console(
-        'sidepane.open() getReferencesCache()',
-        getReferencesCache()
-      );
+      this.thePlugin.snwAPI.console('sidepane.open() refType, realLink, key, filePath', refType, realLink, key, filePath);
+      this.thePlugin.snwAPI.console('sidepane.open() getReferencesCache()', getReferencesCache());
     }
 
-    this.containerEl.replaceChildren(
-      await getUIC_SidePane(refType, realLink, key, filePath, lineNu)
-    );
+    this.containerEl.replaceChildren(await getUIC_SidePane(refType, realLink, key, filePath, lineNu));
 
     scrollResultsIntoView(this.containerEl);
   }
