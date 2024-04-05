@@ -1,6 +1,6 @@
-import { FunctionComponent, render } from 'preact';
+import { FunctionComponent } from 'preact';
 
-export const IconMoreDetails: FunctionComponent<{}> = () => {
+export const IconMoreDetails: FunctionComponent<object> = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

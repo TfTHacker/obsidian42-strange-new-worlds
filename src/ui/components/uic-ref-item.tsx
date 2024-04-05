@@ -19,7 +19,7 @@ export function setPluginVariableUIC_RefItem(plugin: SNWPlugin) {
 }
 
 export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
-  let startLine =
+  const startLine =
     ref.reference.position !== undefined ?
       ref.reference.position.start.line.toString()
     : '0';
@@ -129,7 +129,8 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     );
     if (firstSectionPosition) {
       const contextEl = container.createDiv();
-      await MarkdownRenderer..render(thePlugin.app,
+      await MarkdownRenderer.render(
+        thePlugin.app,
         getTextAtPosition(fileContents, firstSectionPosition.position),
         contextEl,
         ref.sourceFile.path,

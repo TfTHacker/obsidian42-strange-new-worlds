@@ -131,7 +131,7 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Incoming links')
+      .setName('Incoming links') 
       .setDesc(
         "If enabled, links TO files in the excluded folder will not be included in SNW's reference counters.  May require restarting Obsidian."
       )

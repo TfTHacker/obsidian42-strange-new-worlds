@@ -37,14 +37,15 @@ const context = await esbuild.context({
 });
 
 if (prod) {
+  console.log('Building for production');
   await context.rebuild();
+  process.exit(0);
+} else {
   fs.copyFile('manifest.json', 'build/manifest.json', (err) => {
     if (err) console.log(err);
   });
   fs.copyFile('styles.css', 'build/styles.css', (err) => {
     if (err) console.log(err);
   });
-  process.exit(0);
-} else {
   await context.watch();
 }

@@ -5,3 +5,5 @@ dist/
 .vscode/
 out/
 .tmp/
+build/
+node_modules/

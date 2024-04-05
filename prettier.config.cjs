@@ -6,14 +6,14 @@ const config = {
     // 'prettier-plugin-tailwindcss',
   ],
   semi: true,
-  trailingComma: 'es5',
+  trailingComma: 'none',
   singleQuote: true,
-  printWidth: 90,
+  printWidth: 140,
   tabWidth: 2,
   useTabs: false,
   endOfLine: 'lf',
   arrowParens: 'always',
-  bracketSameLine: false,
+  bracketSameLine: true,
   bracketSpacing: true,
   htmlWhitespaceSensitivity: 'css',
   jsxSingleQuote: false,
@@ -25,16 +25,16 @@ const config = {
     {
       files: '*.html',
       options: {
-        parser: 'html',
-      },
+        parser: 'html'
+      }
     },
     {
       files: '*.css',
       options: {
-        parser: 'css',
-      },
-    },
-  ],
+        parser: 'css'
+      }
+    }
+  ]
 };
 
 module.exports = config;
