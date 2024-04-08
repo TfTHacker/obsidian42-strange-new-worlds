@@ -81,12 +81,16 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
   const wrapperEl = createDiv();
 
-  let maxItemsToShow = uniqueFileKeys.length;
+  let maxItemsToShow = plugin.settings.maxFileCountToDisplay;
 
-  if (plugin.settings.maxFileCountToDisplay != 1000 && maxItemsToShow >= plugin.settings.maxFileCountToDisplay)
-    maxItemsToShow = plugin.settings.maxFileCountToDisplay;
+  if (countOfRefs < maxItemsToShow) {
+    maxItemsToShow = countOfRefs;
+  }
 
-  for (let index = 0; index < maxItemsToShow; index++) {
+  let itemsDisplayedCounter = 0;
+
+  for (let index = 0; index < uniqueFileKeys.length; index++) {
+    if (itemsDisplayedCounter > maxItemsToShow) continue;
     const file_path = uniqueFileKeys[index];
     const responseItemContainerEl = createDiv();
     responseItemContainerEl.addClass('snw-ref-item-container');
@@ -126,7 +130,8 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     responseItemContainerEl.appendChild(refItemsCollectionE);
 
     for (const ref of linksToLoop) {
-      if (file_path.sourceFile.path === ref.sourceFile.path) {
+      if (file_path.sourceFile.path === ref.sourceFile.path && itemsDisplayedCounter < maxItemsToShow) {
+        itemsDisplayedCounter += 1;
         refItemsCollectionE.appendChild(await getUIC_Ref_Item(ref));
       }
     }
