@@ -47,83 +47,94 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
   const container = createDiv();
   container.setAttribute('uic', 'uic'); //used to track if this is UIC element.
 
-  const contextBuilder = new ContextBuilder(fileContents, fileCache);
-
-  const headingBreadcrumbs = contextBuilder.getHeadingBreadcrumbs(linkPosition);
-  if (headingBreadcrumbs.length > 0) {
-    const headingBreadcrumbsEl = container.createDiv();
-    headingBreadcrumbsEl.addClass('snw-breadcrumbs');
-
-    headingBreadcrumbsEl.createEl('span', { text: 'H' });
-
-    await MarkdownRenderer.renderMarkdown(formatHeadingBreadCrumbs(headingBreadcrumbs), headingBreadcrumbsEl, ref.sourceFile.path, plugin);
-  }
-
-  const indexOfListItemContainingLink = contextBuilder.getListItemIndexContaining(linkPosition);
-  const isLinkInListItem = indexOfListItemContainingLink >= 0;
-
-  if (isLinkInListItem) {
-    const listBreadcrumbs = contextBuilder.getListBreadcrumbs(linkPosition);
-
-    if (listBreadcrumbs.length > 0) {
-      const contextEl = container.createDiv();
-      contextEl.addClass('snw-breadcrumbs');
-
-      contextEl.createEl('span', { text: 'L' });
-
-      await MarkdownRenderer.render(
-        plugin.app,
-        formatListBreadcrumbs(fileContents, listBreadcrumbs),
-        contextEl,
-        ref.sourceFile.path,
-        plugin
-      );
-    }
-
-    const listItemWithDescendants = contextBuilder.getListItemWithDescendants(indexOfListItemContainingLink);
-
-    const contextEl = container.createDiv();
-    await MarkdownRenderer.render(
-      plugin.app,
-      formatListWithDescendants(fileContents, listItemWithDescendants),
-      contextEl,
-      ref.sourceFile.path,
-      plugin
-    );
+  if (ref.reference?.key) {
+    console.log('key');
+    container.innerText = 'Used in property: ' + ref.reference.key;
+    return container;
   } else {
-    const sectionContainingLink = contextBuilder.getSectionContaining(linkPosition);
+    const contextBuilder = new ContextBuilder(fileContents, fileCache);
 
-    let blockContents = '';
+    const headingBreadcrumbs = contextBuilder.getHeadingBreadcrumbs(linkPosition);
+    if (headingBreadcrumbs.length > 0) {
+      const headingBreadcrumbsEl = container.createDiv();
+      headingBreadcrumbsEl.addClass('snw-breadcrumbs');
 
-    if (sectionContainingLink?.position !== undefined) blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
+      headingBreadcrumbsEl.createEl('span', { text: 'H' });
 
-    await MarkdownRenderer.render(plugin.app, blockContents, container, ref.sourceFile.path, plugin);
-  }
-
-  const headingThatContainsLink = contextBuilder.getHeadingContaining(linkPosition);
-  if (headingThatContainsLink) {
-    const firstSectionPosition = contextBuilder.getFirstSectionUnder(headingThatContainsLink.position);
-    if (firstSectionPosition) {
-      const contextEl = container.createDiv();
-      await MarkdownRenderer.render(
-        plugin.app,
-        getTextAtPosition(fileContents, firstSectionPosition.position),
-        contextEl,
+      await MarkdownRenderer.renderMarkdown(
+        formatHeadingBreadCrumbs(headingBreadcrumbs),
+        headingBreadcrumbsEl,
         ref.sourceFile.path,
         plugin
       );
     }
-  }
 
-  // add highlight to the link
-  const elems = container.querySelectorAll('*');
-  const res = Array.from(elems).find((v) => v.textContent == ref.reference.displayText);
-  try {
-    // this fails in some edge cases, so in that case, just ignore
-    res.addClass('search-result-file-matched-text');
-  } catch (error) {
-    //@ts-ignore
-  }
+    const indexOfListItemContainingLink = contextBuilder.getListItemIndexContaining(linkPosition);
+    const isLinkInListItem = indexOfListItemContainingLink >= 0;
 
-  return container;
+    if (isLinkInListItem) {
+      const listBreadcrumbs = contextBuilder.getListBreadcrumbs(linkPosition);
+
+      if (listBreadcrumbs.length > 0) {
+        const contextEl = container.createDiv();
+        contextEl.addClass('snw-breadcrumbs');
+
+        contextEl.createEl('span', { text: 'L' });
+
+        await MarkdownRenderer.render(
+          plugin.app,
+          formatListBreadcrumbs(fileContents, listBreadcrumbs),
+          contextEl,
+          ref.sourceFile.path,
+          plugin
+        );
+      }
+
+      const listItemWithDescendants = contextBuilder.getListItemWithDescendants(indexOfListItemContainingLink);
+
+      const contextEl = container.createDiv();
+      await MarkdownRenderer.render(
+        plugin.app,
+        formatListWithDescendants(fileContents, listItemWithDescendants),
+        contextEl,
+        ref.sourceFile.path,
+        plugin
+      );
+    } else {
+      const sectionContainingLink = contextBuilder.getSectionContaining(linkPosition);
+
+      let blockContents = '';
+
+      if (sectionContainingLink?.position !== undefined) blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
+
+      await MarkdownRenderer.render(plugin.app, blockContents, container, ref.sourceFile.path, plugin);
+    }
+
+    const headingThatContainsLink = contextBuilder.getHeadingContaining(linkPosition);
+    if (headingThatContainsLink) {
+      const firstSectionPosition = contextBuilder.getFirstSectionUnder(headingThatContainsLink.position);
+      if (firstSectionPosition) {
+        const contextEl = container.createDiv();
+        await MarkdownRenderer.render(
+          plugin.app,
+          getTextAtPosition(fileContents, firstSectionPosition.position),
+          contextEl,
+          ref.sourceFile.path,
+          plugin
+        );
+      }
+    }
+
+    // add highlight to the link
+    const elems = container.querySelectorAll('*');
+    const res = Array.from(elems).find((v) => v.textContent == ref.reference.displayText);
+    try {
+      // this fails in some edge cases, so in that case, just ignore
+      res.addClass('search-result-file-matched-text');
+    } catch (error) {
+      //@ts-ignore
+    }
+
+    return container;
+  }
 };

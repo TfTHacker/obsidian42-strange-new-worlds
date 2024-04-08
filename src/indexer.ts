@@ -33,7 +33,7 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
   if (plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom && file?.path && plugin.app.metadataCache.isUserIgnored(file?.path)) {
     return;
   }
-  for (const item of [cache?.links, cache?.embeds]) {
+  for (const item of [cache?.links, cache?.embeds, cache?.frontmatterLinks]) {
     if (!item) continue;
     for (const ref of item) {
       const { path, subpath } = parseLinktext(ref.link);
