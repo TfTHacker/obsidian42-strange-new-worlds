@@ -16,11 +16,24 @@ export function getIndexedReferences() {
   return indexedReferences;
 }
 
-const getLinkReferencesForFile = (file: TFile, fileCache: CachedMetadata) => {
+// removes existing references from the map, used with getLinkReferencesForFile to rebuild the refeences
+export const removeLinkReferencesForFile = async (file: TFile) => {
+  for (const [key, items] of indexedReferences.entries()) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      const item = items[i];
+      if (item?.sourceFile && item?.sourceFile?.path === file.path) {
+        items.splice(i, 1);
+      }
+    }
+    indexedReferences.set(key, items);
+  }
+};
+
+export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => {
   if (plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom && file?.path && plugin.app.metadataCache.isUserIgnored(file?.path)) {
     return;
   }
-  for (const item of [fileCache?.links, fileCache?.embeds]) {
+  for (const item of [cache?.links, cache?.embeds]) {
     if (!item) continue;
     for (const ref of item) {
       const { path, subpath } = parseLinktext(ref.link);
@@ -39,9 +52,7 @@ const getLinkReferencesForFile = (file: TFile, fileCache: CachedMetadata) => {
 
       if (!indexedReferences.has(linkWithFullPath)) indexedReferences.set(linkWithFullPath, []);
       indexedReferences.get(linkWithFullPath).push({
-        ghostLink: '',
         realLink: ref.link,
-        sub: { path, subpath },
         reference: ref,
         resolvedFile: tfileDestination,
         sourceFile: file

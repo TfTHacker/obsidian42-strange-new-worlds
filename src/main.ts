@@ -1,6 +1,6 @@
 import { Extension } from '@codemirror/state';
-import { debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plugin } from 'obsidian';
-import { buildLinksAndReferences, setPluginVariableForIndexer } from './indexer';
+import { CachedMetadata, debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plugin, TFile } from 'obsidian';
+import { buildLinksAndReferences, getLinkReferencesForFile, removeLinkReferencesForFile, setPluginVariableForIndexer } from './indexer';
 import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from './view-extensions/references-cm6';
 import { setPluginVariableForHtmlDecorations } from './view-extensions/htmlDecorations';
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from './view-extensions/references-preview';
@@ -53,8 +53,8 @@ export default class SNWPlugin extends Plugin {
 
     this.registerView(VIEW_TYPE_SNW, (leaf) => new SideBarPaneView(leaf, this));
 
-    //initial index building
-    const indexDebounce = debounce(
+    //Build the full index of the vault of references
+    const indexFullUpdateDebounce = debounce(
       () => {
         buildLinksAndReferences();
       },
@@ -62,9 +62,31 @@ export default class SNWPlugin extends Plugin {
       true
     );
 
-    this.registerEvent(this.app.metadataCache.on('resolve', indexDebounce));
-    this.registerEvent(this.app.vault.on('rename', indexDebounce));
-    this.registerEvent(this.app.vault.on('delete', indexDebounce));
+    // Updates reference index for a single file by removing and re-adding the references
+    const indexFileUpdateDebounce = debounce(
+      async (file: TFile, data: string, cache: CachedMetadata) => {
+        console.time(this.APP_ABBREVIARTION + ' update: ' + file.basename);
+        await removeLinkReferencesForFile(file);
+        getLinkReferencesForFile(file, cache);
+        console.timeEnd(this.APP_ABBREVIARTION + ' update: ' + file.basename);
+      },
+      3000,
+      true
+    );
+
+    // this.registerEvent(this.app.metadataCache.on('resolve', indexDebounce));
+    this.registerEvent(this.app.vault.on('rename', indexFullUpdateDebounce));
+    this.registerEvent(this.app.vault.on('delete', indexFullUpdateDebounce));
+
+    this.registerEvent(
+      this.app.metadataCache.on('resolved', () => {
+        console.log('resolved');
+        // indexDebounce();
+      })
+    );
+
+    this.registerEvent(this.app.metadataCache.on('changed', indexFileUpdateDebounce));
+
     // this.registerEvent(this.app.workspace.on('editor-change', indexDebounce)); // this is unlikely to be needed
 
     this.app.workspace.registerHoverLinkSource(this.appID, {
