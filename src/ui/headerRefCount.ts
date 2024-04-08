@@ -22,10 +22,7 @@ export function setPluginVariableForHeaderRefCount(plugin: SNWPlugin) {
  */
 export default function setHeaderWithReferenceCounts() {
   if (thePlugin.snwAPI.enableDebugging?.LinkCountInHeader)
-    thePlugin.snwAPI.console(
-      'headerImageCount.setHeaderWithReferenceCounts(thePlugin)',
-      SNWPlugin
-    );
+    thePlugin.snwAPI.console('headerImageCount.setHeaderWithReferenceCounts(thePlugin)', SNWPlugin);
 
   thePlugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
     if (leaf.view.getViewType() === 'markdown') processHeader(leaf.view as MarkdownView);
@@ -39,11 +36,7 @@ export default function setHeaderWithReferenceCounts() {
  */
 function processHeader(mdView: MarkdownView) {
   if (thePlugin.snwAPI.enableDebugging?.LinkCountInHeader)
-    thePlugin.snwAPI.console(
-      'headerImageCount.processHeader(ThePlugin, MarkdownView)',
-      thePlugin,
-      mdView
-    );
+    thePlugin.snwAPI.console('headerImageCount.processHeader(ThePlugin, MarkdownView)', thePlugin, mdView);
   // TODO: should handle check for TFile better than non-null! assertion
   const mdViewFile = mdView.file!;
 
@@ -59,40 +52,30 @@ function processHeader(mdView: MarkdownView) {
 
   // check if the page is to be ignored
   const transformedCache = getSNWCacheByFile(mdViewFile);
-  if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true)
-    incomingLinksCount = 0;
+  if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true) incomingLinksCount = 0;
 
   // check if headers for this file are excluded
   if (incomingLinks[0]?.excludedFile === true) incomingLinksCount = 0;
 
   // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
   if (incomingLinksCount < thePlugin.settings.minimumRefCountThreshold) {
-    if (mdView.contentEl.querySelector('.snw-header-count-wrapper'))
-      mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();
+    if (mdView.contentEl.querySelector('.snw-header-count-wrapper')) mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();
     return;
   }
 
-  let snwTitleRefCountDisplayCountEl: HTMLElement | null =
-    mdView.contentEl.querySelector('.snw-header-count');
+  let snwTitleRefCountDisplayCountEl: HTMLElement | null = mdView.contentEl.querySelector('.snw-header-count');
 
   // header count is already displayed, just update information.
-  if (
-    snwTitleRefCountDisplayCountEl &&
-    snwTitleRefCountDisplayCountEl.getAttribute('data-snw-key') === mdViewFile.basename
-  ) {
-    snwTitleRefCountDisplayCountEl.innerText =
-      ' ' + incomingLinks.length.toString() + ' ';
+  if (snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute('data-snw-key') === mdViewFile.basename) {
+    snwTitleRefCountDisplayCountEl.innerText = ' ' + incomingLinks.length.toString() + ' ';
     return;
   }
 
   const containerViewContent: HTMLElement = mdView.contentEl;
 
-  if (mdView.contentEl.querySelector('.snw-header-count-wrapper'))
-    mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();
+  if (mdView.contentEl.querySelector('.snw-header-count-wrapper')) mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();
 
-  let wrapper: HTMLElement | null = containerViewContent.querySelector(
-    '.snw-header-count-wrapper'
-  );
+  let wrapper: HTMLElement | null = containerViewContent.querySelector('.snw-header-count-wrapper');
 
   if (!wrapper) {
     wrapper = createDiv({ cls: 'snw-header-count-wrapper' });
@@ -100,13 +83,10 @@ function processHeader(mdView: MarkdownView) {
     wrapper.appendChild(snwTitleRefCountDisplayCountEl);
     containerViewContent.prepend(wrapper);
   } else {
-    snwTitleRefCountDisplayCountEl =
-      containerViewContent.querySelector('.snw-header-count');
+    snwTitleRefCountDisplayCountEl = containerViewContent.querySelector('.snw-header-count');
   }
 
-  if (snwTitleRefCountDisplayCountEl)
-    snwTitleRefCountDisplayCountEl.innerText =
-      ' ' + incomingLinks.length.toString() + ' ';
+  if (snwTitleRefCountDisplayCountEl) snwTitleRefCountDisplayCountEl.innerText = ' ' + incomingLinks.length.toString() + ' ';
   if ((Platform.isDesktop || Platform.isDesktopApp) && snwTitleRefCountDisplayCountEl) {
     snwTitleRefCountDisplayCountEl.onclick = (e: MouseEvent) => {
       e.stopPropagation();
@@ -147,14 +127,11 @@ function processHeader(mdView: MarkdownView) {
       setTimeout(async () => {
         await getUIC_Hoverview(instance);
       }, 1);
-    },
+    }
   });
 
   tippyObject.popper.classList.add('snw-tippy');
 
   if (thePlugin.snwAPI.enableDebugging?.LinkCountInHeader)
-    thePlugin.snwAPI.console(
-      'snwTitleRefCountDisplayCountEl',
-      snwTitleRefCountDisplayCountEl
-    );
+    thePlugin.snwAPI.console('snwTitleRefCountDisplayCountEl', snwTitleRefCountDisplayCountEl);
 }

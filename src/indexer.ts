@@ -1,13 +1,6 @@
 // This module builds on Obsidians cache to provide more specific link information
 
-import {
-  CachedMetadata,
-  HeadingCache,
-  stripHeading,
-  TFile,
-  Pos,
-  parseLinktext,
-} from 'obsidian';
+import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos, parseLinktext } from 'obsidian';
 import SNWPlugin from './main';
 import { Link, TransformedCache } from './types';
 
@@ -42,45 +35,36 @@ export function buildLinksAndReferences(): void {
     const resolvedFilePath = parseLinktext(refs.link);
     if (resolvedFilePath.path === '') resolvedFilePath.path = src.replace('.md', '');
     if (resolvedFilePath?.path) {
-      const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(
-        resolvedFilePath.path,
-        '/'
-      );
-      const fileLink =
-        resolvedTFile === null ? '' : (
-          resolvedTFile.path.replace('.md', '') + stripHeading(resolvedFilePath.subpath)
-        ); // file doesnt exist, empty link
+      const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, '/');
+      const fileLink = resolvedTFile === null ? '' : resolvedTFile.path.replace('.md', '') + stripHeading(resolvedFilePath.subpath); // file doesnt exist, empty link
       const ghlink = resolvedTFile === null ? resolvedFilePath.path : ''; // file doesnt exist, its a ghost link
       const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, '/');
 
       if (thePlugin.settings.enableIgnoreObsExcludeFoldersLinksFrom)
         if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path ?? '')) return;
 
-      if (thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo)
-        if (thePlugin.app.metadataCache.isUserIgnored(fileLink)) return;
+      if (thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo) if (thePlugin.app.metadataCache.isUserIgnored(fileLink)) return;
 
       allLinkResolutions.push({
         reference: {
           displayText: refs.displayText ?? '',
           // link: refs.link, // old approach
           link: fileLink != '' ? fileLink : ghlink,
-          position: refs.position,
+          position: refs.position
         },
         resolvedFile: resolvedTFile,
         ghostLink: ghlink,
         realLink: refs.link,
         sourceFile: sourceFile,
-        excludedFile: false,
+        excludedFile: false
       });
     }
   });
 
   // START: Remove file exclusions for frontmatter snw-index-exclude
-  const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter(
-    (e) => {
-      return e[1]?.frontmatter?.['snw-index-exclude'];
-    }
-  );
+  const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e) => {
+    return e[1]?.frontmatter?.['snw-index-exclude'];
+  });
   const snwIndexExceptions = Object.entries(app.metadataCache.fileCache).filter((e) => {
     return snwIndexExceptionsList.find((f) => f[0] === e[1].hash);
   });
@@ -99,36 +83,33 @@ export function buildLinksAndReferences(): void {
   }
   // END: Exclusions
 
-  const refs = allLinkResolutions.reduce(
-    (acc: { [x: string]: Link[] }, link: Link): { [x: string]: Link[] } => {
-      let keyBasedOnLink = '';
-      // let keyBasedOnFullPath = ""
+  const refs = allLinkResolutions.reduce((acc: { [x: string]: Link[] }, link: Link): { [x: string]: Link[] } => {
+    let keyBasedOnLink = '';
+    // let keyBasedOnFullPath = ""
 
-      keyBasedOnLink = link.reference.link;
-      // if(link?.resolvedFile)
-      //     keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
-      // else
-      //     keyBasedOnFullPath = link.ghostLink;
+    keyBasedOnLink = link.reference.link;
+    // if(link?.resolvedFile)
+    //     keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
+    // else
+    //     keyBasedOnFullPath = link.ghostLink;
 
-      // if(keyBasedOnLink===keyBasedOnFullPath) {
-      //     keyBasedOnFullPath=null;
-      // }
+    // if(keyBasedOnLink===keyBasedOnFullPath) {
+    //     keyBasedOnFullPath=null;
+    // }
 
-      if (!acc[keyBasedOnLink]) {
-        acc[keyBasedOnLink] = [];
-      }
-      acc[keyBasedOnLink].push(link);
+    if (!acc[keyBasedOnLink]) {
+      acc[keyBasedOnLink] = [];
+    }
+    acc[keyBasedOnLink].push(link);
 
-      // if(keyBasedOnFullPath!=null) {
-      //     if(!acc[keyBasedOnFullPath]) {
-      //         acc[keyBasedOnFullPath] = [];
-      //     }
-      //     acc[keyBasedOnFullPath].push(link)
-      // }
-      return acc;
-    },
-    {}
-  );
+    // if(keyBasedOnFullPath!=null) {
+    //     if(!acc[keyBasedOnFullPath]) {
+    //         acc[keyBasedOnFullPath] = [];
+    //     }
+    //     acc[keyBasedOnFullPath].push(link)
+    // }
+    return acc;
+  }, {});
 
   references = refs;
   // @ts-ignore
@@ -173,9 +154,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     buildLinksAndReferences();
   }
 
-  const headings: string[] = Object.values(
-    thePlugin.app.metadataCache.metadataCache
-  ).reduce((acc: string[], file: CachedMetadata) => {
+  const headings: string[] = Object.values(thePlugin.app.metadataCache.metadataCache).reduce((acc: string[], file: CachedMetadata) => {
     const headings = file.headings;
     if (headings) {
       headings.forEach((heading: HeadingCache) => {
@@ -192,25 +171,21 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
       pos: block.position,
       page: file.basename,
       type: 'block',
-      references: references[filePath + block.id] || [],
+      references: references[filePath + block.id] || []
     }));
   }
 
   if (cachedMetaData?.headings) {
-    transformedCache.headings = cachedMetaData.headings.map(
-      (header: { heading: string; position: Pos; level: number }) => ({
-        original: '#'.repeat(header.level) + ' ' + header.heading,
-        key: `${file.path.replace('.md', '')}${stripHeading(header.heading)}`,
-        headerMatch: header.heading,
-        headerMatch2: file.basename + '#' + header.heading,
-        pos: header.position,
-        page: file.basename,
-        type: 'heading',
-        references:
-          references[`${file.path.replace('.md', '')}${stripHeading(header.heading)}`] ||
-          [],
-      })
-    );
+    transformedCache.headings = cachedMetaData.headings.map((header: { heading: string; position: Pos; level: number }) => ({
+      original: '#'.repeat(header.level) + ' ' + header.heading,
+      key: `${file.path.replace('.md', '')}${stripHeading(header.heading)}`,
+      headerMatch: header.heading,
+      headerMatch2: file.basename + '#' + header.heading,
+      pos: header.position,
+      page: file.basename,
+      type: 'heading',
+      references: references[`${file.path.replace('.md', '')}${stripHeading(header.heading)}`] || []
+    }));
   }
 
   if (cachedMetaData?.links) {
@@ -233,15 +208,13 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
         type: 'link',
         pos: link.position,
         page: file.basename,
-        references: references[newLinkPath] || [],
+        references: references[newLinkPath] || []
       };
     });
     if (transformedCache.links) {
       transformedCache.links = transformedCache.links.map((link) => {
         if (link.key.includes('#') && !link.key.includes('#^')) {
-          const heading = headings.filter(
-            (heading: string) => stripHeading(heading) === link.key.split('#')[1]
-          )[0];
+          const heading = headings.filter((heading: string) => stripHeading(heading) === link.key.split('#')[1])[0];
           link.original = heading ? heading : undefined;
         }
         return link;
@@ -254,10 +227,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
       let newEmbedPath = parseLinkTextToFullPath(embed.link);
 
       // if newEmbedPath is empty, then this is a link on the same page
-      if (
-        newEmbedPath === '' &&
-        (embed.link.startsWith('#^') || embed.link.startsWith('#'))
-      ) {
+      if (newEmbedPath === '' && (embed.link.startsWith('#^') || embed.link.startsWith('#'))) {
         newEmbedPath = file.path.replace('.md', '') + stripHeading(embed.link);
       }
 
@@ -266,20 +236,14 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
         page: file.basename,
         type: 'embed',
         pos: embed.position,
-        references: references[newEmbedPath] || [],
+        references: references[newEmbedPath] || []
       };
       return output;
     });
     if (transformedCache.embeds) {
       transformedCache.embeds = transformedCache.embeds.map((embed) => {
-        if (
-          embed.key.includes('#') &&
-          !embed.key.includes('#^') &&
-          transformedCache.headings
-        ) {
-          const heading = headings.filter((heading: string) =>
-            heading.includes(embed.key.split('#')[1])
-          )[0];
+        if (embed.key.includes('#') && !embed.key.includes('#^') && transformedCache.headings) {
+          const heading = headings.filter((heading: string) => heading.includes(embed.key.split('#')[1]))[0];
           embed.original = heading ? heading : undefined;
         }
 
@@ -301,11 +265,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
 export function parseLinkTextToFullPath(link: string): string {
   const resolvedFilePath = parseLinktext(link);
-  const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(
-    resolvedFilePath.path,
-    '/'
-  );
+  const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, '/');
   if (resolvedTFile === null) return '';
-  else
-    return resolvedTFile.path.replace('.md', '') + stripHeading(resolvedFilePath.subpath);
+  else return resolvedTFile.path.replace('.md', '') + stripHeading(resolvedFilePath.subpath);
 }

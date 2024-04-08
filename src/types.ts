@@ -19,10 +19,6 @@ declare module 'obsidian' {
     unregisterHoverLinkSource: (appID: string) => void;
   }
 
-  interface FileManager {
-    getAllLinkResolutions: () => Link[];
-  }
-
   interface MetadataCache {
     metadataCache: {
       [x: string]: CachedMetadata;
@@ -33,9 +29,7 @@ declare module 'obsidian' {
         position: Pos;
       };
     };
-    iterateReferences: (
-      cb: (sourcePath: string, reference: ReferenceCache) => void
-    ) => void;
+    iterateReferences: (cb: (sourcePath: string, reference: ReferenceCache) => void) => void;
     isUserIgnored(path: string): boolean;
   }
 

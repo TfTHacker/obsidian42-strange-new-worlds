@@ -16,7 +16,7 @@ export default class SnwAPI {
     LinkCountInHeader: false,
     GutterEmbedCounter: false,
     HtmlDecorationElements: false,
-    SidePane: false,
+    SidePane: false
   };
 
   constructor(plugin: SNWPlugin) {
@@ -49,7 +49,7 @@ export default class SnwAPI {
     return {
       TFile: currentFile,
       metadataCache: currentFile ? app.metadataCache.getFileCache(currentFile) : null,
-      SnwTransformedCache: currentFile ? getSNWCacheByFile(currentFile) : null,
+      SnwTransformedCache: currentFile ? getSNWCacheByFile(currentFile) : null
     };
   };
 }

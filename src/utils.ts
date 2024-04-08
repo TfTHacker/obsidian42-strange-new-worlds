@@ -10,23 +10,19 @@ const getScrollParent = (element: HTMLElement, includeHidden: boolean): HTMLElem
     if (excludeStaticParent && style.position === 'static') {
       continue;
     }
-    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX))
-      return parent;
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) return parent;
   }
 
   return document.body;
 };
 
 const scrollResultsIntoView = (resultContainerEl: HTMLElement): void => {
-  const searchResults = resultContainerEl.querySelectorAll(
-    '.search-result-file-matched-text'
-  );
+  const searchResults = resultContainerEl.querySelectorAll('.search-result-file-matched-text');
   for (const searchResult of Array.from(searchResults)) {
     if (searchResult instanceof HTMLElement) {
       const scrollParent = getScrollParent(searchResult, true) as HTMLElement;
       if (scrollParent) {
-        scrollParent.scrollTop =
-          searchResult.offsetTop - scrollParent.offsetTop - scrollParent.offsetHeight / 2;
+        scrollParent.scrollTop = searchResult.offsetTop - scrollParent.offsetTop - scrollParent.offsetHeight / 2;
       }
     }
   }

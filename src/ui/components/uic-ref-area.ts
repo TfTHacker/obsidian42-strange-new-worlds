@@ -34,18 +34,7 @@ const getUIC_Ref_Area = async (
   const refAreaContainerEl = createDiv();
 
   //get title header for this reference area
-  refAreaContainerEl.append(
-    getUIC_Ref_Title_Div(
-      refType,
-      realLink,
-      key,
-      filePath,
-      refAreaItems.refCount,
-      lineNu,
-      isHoverView,
-      thePlugin
-    )
-  );
+  refAreaContainerEl.append(getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, thePlugin));
 
   const refAreaEl = createDiv({ cls: 'snw-ref-area' });
   refAreaEl.append(refAreaItems.response);
@@ -62,11 +51,7 @@ const getUIC_Ref_Area = async (
  * @param {string} filePath
  * @return {*}  {Promise<{response: string, refCount: number}>}
  */
-const getRefAreaItems = async (
-  refType: string,
-  key: string,
-  filePath: string
-): Promise<{ response: HTMLElement; refCount: number }> => {
+const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{ response: HTMLElement; refCount: number }> => {
   let countOfRefs = 0;
   let linksToLoop: Link[] = null;
 
@@ -87,9 +72,7 @@ const getRefAreaItems = async (
   }
 
   // get the unique file names for files in thie refeernces
-  const uniqueFileKeys: Link[] = Array.from(
-    new Set(linksToLoop.map((a) => a.sourceFile.path))
-  ).map((file_path) => {
+  const uniqueFileKeys: Link[] = Array.from(new Set(linksToLoop.map((a) => a.sourceFile.path))).map((file_path) => {
     return linksToLoop.find((a) => a.sourceFile.path === file_path);
   });
 
@@ -97,10 +80,7 @@ const getRefAreaItems = async (
 
   let maxItemsToShow = uniqueFileKeys.length;
 
-  if (
-    thePlugin.settings.maxFileCountToDisplay != 1000 &&
-    maxItemsToShow >= thePlugin.settings.maxFileCountToDisplay
-  )
+  if (thePlugin.settings.maxFileCountToDisplay != 1000 && maxItemsToShow >= thePlugin.settings.maxFileCountToDisplay)
     maxItemsToShow = thePlugin.settings.maxFileCountToDisplay;
 
   for (let index = 0; index < maxItemsToShow; index++) {
@@ -117,10 +97,7 @@ const getRefAreaItems = async (
     refItemFileEl.addClass('search-result-file-title');
     refItemFileEl.addClass('is-clickable');
     refItemFileEl.setAttribute('snw-data-line-number', '-1');
-    refItemFileEl.setAttribute(
-      'snw-data-file-name',
-      file_path.sourceFile.path.replace('.md', '')
-    );
+    refItemFileEl.setAttribute('snw-data-file-name', file_path.sourceFile.path.replace('.md', ''));
     refItemFileEl.setAttribute('data-href', file_path.sourceFile.path);
     refItemFileEl.setAttribute('href', file_path.sourceFile.path);
 
@@ -158,16 +135,11 @@ const getRefAreaItems = async (
 const sortRefCache = async (refCache: Link[]): Promise<Link[]> => {
   return refCache.sort((a, b) => {
     let positionA = 0; //added because of properties - need to fix later
-    if (a.reference.position !== undefined)
-      positionA = Number(a.reference.position.start.line);
+    if (a.reference.position !== undefined) positionA = Number(a.reference.position.start.line);
 
     let positionB = 0; //added because of properties - need to fix later
-    if (b.reference.position !== undefined)
-      positionB = Number(b.reference.position.start.line);
+    if (b.reference.position !== undefined) positionB = Number(b.reference.position.start.line);
 
-    return (
-      a.sourceFile.basename.localeCompare(b.sourceFile.basename) ||
-      Number(positionA) - Number(positionB)
-    );
+    return a.sourceFile.basename.localeCompare(b.sourceFile.basename) || Number(positionA) - Number(positionB);
   });
 };

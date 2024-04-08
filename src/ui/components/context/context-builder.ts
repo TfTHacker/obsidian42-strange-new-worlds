@@ -16,15 +16,11 @@ export class ContextBuilder {
   }
 
   getListItemIndexContaining = (searchedForPosition: Pos) => {
-    return this.listItems.findIndex(({ position }) =>
-      doesPositionIncludeAnother(position, searchedForPosition)
-    );
+    return this.listItems.findIndex(({ position }) => doesPositionIncludeAnother(position, searchedForPosition));
   };
 
   getSectionContaining = (searchedForPosition: Pos) => {
-    return this.sections.find(({ position }) =>
-      doesPositionIncludeAnother(position, searchedForPosition)
-    );
+    return this.sections.find(({ position }) => doesPositionIncludeAnother(position, searchedForPosition));
   };
 
   getListItemWithDescendants = (listItemIndex: number) => {
@@ -81,9 +77,7 @@ export class ContextBuilder {
   }
 
   getFirstSectionUnder(position: Pos) {
-    return this.sections.find(
-      (section) => section.position.start.line > position.start.line
-    );
+    return this.sections.find((section) => section.position.start.line > position.start.line);
   }
 
   getHeadingContaining(position: Pos) {
@@ -139,18 +133,13 @@ export class ContextBuilder {
   private getIndexOfHeadingAbove(position: Pos) {
     if (position === undefined) return -1; //added because of properties - need to fix later
     return this.headings.reduce(
-      (previousIndex, lookingAtHeading, index) =>
-        lookingAtHeading.position.start.line < position.start.line ?
-          index
-        : previousIndex,
+      (previousIndex, lookingAtHeading, index) => (lookingAtHeading.position.start.line < position.start.line ? index : previousIndex),
       -1
     );
   }
 
   private getHeadingIndexContaining(position: Pos) {
     if (position === undefined) return -1; //added because of properties - need to fix later
-    return this.headings.findIndex(
-      (heading) => heading.position.start.line === position.start.line
-    );
+    return this.headings.findIndex((heading) => heading.position.start.line === position.start.line);
   }
 }

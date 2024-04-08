@@ -1,10 +1,4 @@
-import {
-  MarkdownPostProcessorContext,
-  MarkdownRenderChild,
-  MarkdownSectionInformation,
-  TFile,
-  stripHeading,
-} from 'obsidian';
+import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile, stripHeading } from 'obsidian';
 import { htmlDecorationForReferencesElement } from './htmlDecorations';
 import { getSNWCacheByFile, parseLinkTextToFullPath } from '../indexer';
 import SNWPlugin from '../main';
@@ -26,10 +20,7 @@ export function setPluginVariableForMarkdownPreviewProcessor(plugin: SNWPlugin) 
  * @param {SNWPlugin} thePlugin
  * @return {*}
  */
-export default function markdownPreviewProcessor(
-  el: HTMLElement,
-  ctx: MarkdownPostProcessorContext
-) {
+export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
   if (thePlugin.snwAPI.enableDebugging.PreviewRendering)
     thePlugin.snwAPI.console(
       'markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext,ctx.getSectionInfo',
@@ -53,11 +44,7 @@ export default function markdownPreviewProcessor(
   // check for incompatibility with other plugins
   const fileCache = thePlugin.app.metadataCache.getFileCache(currentFile);
   // @ts-ignore
-  if (
-    fileCache?.frontmatter?.['kanban-plugin'] ||
-    ctx.el.parentElement?.classList.contains('kanban-plugin__markdown-preview-view')
-  )
-    return; //no support for kanban board
+  if (fileCache?.frontmatter?.['kanban-plugin'] || ctx.el.parentElement?.classList.contains('kanban-plugin__markdown-preview-view')) return; //no support for kanban board
 
   try {
     ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile));
@@ -71,11 +58,7 @@ class snwChildComponent extends MarkdownRenderChild {
   sectionInfo: MarkdownSectionInformation;
   currentFile: TFile;
 
-  constructor(
-    containerEl: HTMLElement,
-    sectionInfo: MarkdownSectionInformation,
-    currentFile: TFile
-  ) {
+  constructor(containerEl: HTMLElement, sectionInfo: MarkdownSectionInformation, currentFile: TFile) {
     super(containerEl);
     this.containerEl = containerEl;
     this.sectionInfo = sectionInfo;
@@ -97,26 +80,15 @@ class snwChildComponent extends MarkdownRenderChild {
     const minRefCountThreshold = thePlugin.settings.minimumRefCountThreshold;
     const transformedCache = getSNWCacheByFile(this.currentFile);
 
-    if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true)
-      return;
+    if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true) return;
 
-    if (
-      transformedCache?.blocks ||
-      transformedCache.embeds ||
-      transformedCache.headings ||
-      transformedCache.links
-    ) {
-      if (
-        thePlugin.settings.enableRenderingBlockIdInMarkdown &&
-        transformedCache?.blocks
-      ) {
+    if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
+      if (thePlugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
         let isThisAnEmbed = false;
         try {
           // we don't want to proccess embeds
           // @ts-ignore
-          isThisAnEmbed = ctx.containerEl
-            .closest('.snw-embed-preview')
-            .nextSibling.classList.contains('snw-reference');
+          isThisAnEmbed = ctx.containerEl.closest('.snw-embed-preview').nextSibling.classList.contains('snw-reference');
         } catch (error) {
           /* nothing to do here */
         }
@@ -139,20 +111,14 @@ class snwChildComponent extends MarkdownRenderChild {
               value.pos.start.line
             );
             let blockElement: HTMLElement = this.containerEl.querySelector('p');
-            const valueLineInSection: number =
-              value.pos.start.line - this.sectionInfo.lineStart;
+            const valueLineInSection: number = value.pos.start.line - this.sectionInfo.lineStart;
             if (!blockElement) {
-              blockElement = this.containerEl.querySelector(
-                `li[data-line="${valueLineInSection}"]`
-              );
-              if (blockElement.querySelector('ul'))
-                blockElement.querySelector('ul').before(referenceElement);
+              blockElement = this.containerEl.querySelector(`li[data-line="${valueLineInSection}"]`);
+              if (blockElement.querySelector('ul')) blockElement.querySelector('ul').before(referenceElement);
               else blockElement.append(referenceElement);
             } else {
               if (!blockElement) {
-                blockElement = this.containerEl.querySelector(
-                  `ol[data-line="${valueLineInSection}"]`
-                );
+                blockElement = this.containerEl.querySelector(`ol[data-line="${valueLineInSection}"]`);
                 blockElement.append(referenceElement);
               } else {
                 blockElement.append(referenceElement);
@@ -169,40 +135,33 @@ class snwChildComponent extends MarkdownRenderChild {
         }
       }
 
-      if (
-        thePlugin.settings.enableRenderingEmbedsInMarkdown &&
-        transformedCache?.embeds
-      ) {
-        this.containerEl
-          .querySelectorAll('.internal-embed:not(.snw-embed-preview)')
-          .forEach((element) => {
-            let embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
-            if (embedKey === '') {
-              embedKey =
-                this.currentFile.path.replace('.md', '') +
-                stripHeading(element.getAttribute('src'));
+      if (thePlugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
+        this.containerEl.querySelectorAll('.internal-embed:not(.snw-embed-preview)').forEach((element) => {
+          let embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
+          if (embedKey === '') {
+            embedKey = this.currentFile.path.replace('.md', '') + stripHeading(element.getAttribute('src'));
+          }
+          for (const value of transformedCache.embeds) {
+            if (
+              value.references[0]?.excludedFile != true &&
+              value.references.length >= minRefCountThreshold &&
+              embedKey.endsWith(value.key)
+            ) {
+              const referenceElement = htmlDecorationForReferencesElement(
+                value.references.length,
+                'embed',
+                value.references[0].realLink,
+                value.key,
+                value.references[0]?.resolvedFile?.path.replace('.md', ''),
+                '',
+                value.pos.start.line
+              );
+              referenceElement.addClass('snw-embed-preview');
+              element.after(referenceElement);
+              break;
             }
-            for (const value of transformedCache.embeds) {
-              if (
-                value.references[0]?.excludedFile != true &&
-                value.references.length >= minRefCountThreshold &&
-                embedKey.endsWith(value.key)
-              ) {
-                const referenceElement = htmlDecorationForReferencesElement(
-                  value.references.length,
-                  'embed',
-                  value.references[0].realLink,
-                  value.key,
-                  value.references[0]?.resolvedFile?.path.replace('.md', ''),
-                  '',
-                  value.pos.start.line
-                );
-                referenceElement.addClass('snw-embed-preview');
-                element.after(referenceElement);
-                break;
-              }
-            }
-          });
+          }
+        });
       }
 
       if (thePlugin.settings.enableRenderingHeadersInMarkdown) {
@@ -225,9 +184,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 value.pos.start.line
               );
               referenceElement.addClass('snw-heading-preview');
-              this.containerEl
-                .querySelector('h1,h2,h3,h4,h5,h6')
-                .insertAdjacentElement('beforeend', referenceElement);
+              this.containerEl.querySelector('h1,h2,h3,h4,h5,h6').insertAdjacentElement('beforeend', referenceElement);
               break;
             }
           }
@@ -235,32 +192,29 @@ class snwChildComponent extends MarkdownRenderChild {
       }
 
       if (thePlugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
-        this.containerEl
-          .querySelectorAll('a.internal-link:not(.snw-link-preview)')
-          .forEach((element) => {
-            const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
-            for (const value of transformedCache.links) {
-              if (
-                value.references[0]?.excludedFile != true &&
-                value.references.length >= minRefCountThreshold &&
-                (value.key === link ||
-                  (value?.original != undefined && value?.original.contains(link)))
-              ) {
-                const referenceElement = htmlDecorationForReferencesElement(
-                  value.references.length,
-                  'link',
-                  value.references[0].realLink,
-                  value.key,
-                  value.references[0]?.resolvedFile?.path.replace('.md', ''),
-                  '',
-                  value.pos.start.line
-                );
-                referenceElement.addClass('snw-link-preview');
-                element.after(referenceElement);
-                break;
-              }
+        this.containerEl.querySelectorAll('a.internal-link:not(.snw-link-preview)').forEach((element) => {
+          const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
+          for (const value of transformedCache.links) {
+            if (
+              value.references[0]?.excludedFile != true &&
+              value.references.length >= minRefCountThreshold &&
+              (value.key === link || (value?.original != undefined && value?.original.contains(link)))
+            ) {
+              const referenceElement = htmlDecorationForReferencesElement(
+                value.references.length,
+                'link',
+                value.references[0].realLink,
+                value.key,
+                value.references[0]?.resolvedFile?.path.replace('.md', ''),
+                '',
+                value.pos.start.line
+              );
+              referenceElement.addClass('snw-link-preview');
+              element.after(referenceElement);
+              break;
             }
-          });
+          }
+        });
       }
     }
   }

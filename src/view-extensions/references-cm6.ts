@@ -5,15 +5,7 @@
  *
  */
 
-import {
-  EditorView,
-  Decoration,
-  MatchDecorator,
-  ViewUpdate,
-  ViewPlugin,
-  DecorationSet,
-  WidgetType,
-} from '@codemirror/view';
+import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType } from '@codemirror/view';
 import { editorInfoField, stripHeading } from 'obsidian';
 import { getSNWCacheByFile, parseLinkTextToFullPath } from 'src/indexer';
 import { TransformedCachedItem } from '../types';
@@ -39,14 +31,12 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
     regxPattern = '';
 
     constructor(public view: EditorView) {
-      if (thePlugin.settings.enableRenderingBlockIdInLivePreview)
-        this.regxPattern = '(\\s\\^)(\\S+)$';
+      if (thePlugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = '(\\s\\^)(\\S+)$';
       if (thePlugin.settings.enableRenderingEmbedsInLivePreview)
         this.regxPattern += (this.regxPattern != '' ? '|' : '') + '!\\[\\[(.*?)\\]\\]';
       if (thePlugin.settings.enableRenderingLinksInLivePreview)
         this.regxPattern += (this.regxPattern != '' ? '|' : '') + '\\[\\[(.*?)\\]\\]';
-      if (thePlugin.settings.enableRenderingHeadersInLivePreview)
-        this.regxPattern += (this.regxPattern != '' ? '|' : '') + '^#+\\s.+';
+      if (thePlugin.settings.enableRenderingHeadersInLivePreview) this.regxPattern += (this.regxPattern != '' ? '|' : '') + '^#+\\s.+';
 
       //if there is no regex pattern, then don't go further
       if (this.regxPattern === '') return;
@@ -61,8 +51,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
           const transformedCache = getSNWCacheByFile(mdViewFile);
           if (
             transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] != true &&
-            transformedCache?.cacheMetaData?.frontmatter?.['snw-canvas-exclude-edit'] !=
-              true
+            transformedCache?.cacheMetaData?.frontmatter?.['snw-canvas-exclude-edit'] != true
           ) {
             const widgetsToAdd: {
               key: string;
@@ -71,22 +60,16 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
               from: number;
               to: number;
             }[] = [];
-            if (
-              firstCharacterMatch === ' ' &&
-              (transformedCache?.blocks?.length ?? 0) > 0
-            ) {
+            if (firstCharacterMatch === ' ' && (transformedCache?.blocks?.length ?? 0) > 0) {
               widgetsToAdd.push({
                 //blocks
                 key: mdViewFile.path.replace('.md', '') + match[0].replace(' ^', ''), //change this to match the references cache
                 transformedCachedItem: transformedCache.blocks ?? null,
                 refType: 'block',
                 from: to,
-                to: to,
+                to: to
               });
-            } else if (
-              firstCharacterMatch === '!' &&
-              (transformedCache?.embeds?.length ?? 0) > 0
-            ) {
+            } else if (firstCharacterMatch === '!' && (transformedCache?.embeds?.length ?? 0) > 0) {
               //embeds
               let newEmbed = match[0].replace('![[', '').replace(']]', '');
               if (newEmbed.startsWith('#'))
@@ -97,12 +80,9 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
                 transformedCachedItem: transformedCache.embeds ?? null,
                 refType: 'embed',
                 from: to,
-                to: to,
+                to: to
               });
-            } else if (
-              firstCharacterMatch === '[' &&
-              (transformedCache?.links?.length ?? 0) > 0
-            ) {
+            } else if (firstCharacterMatch === '[' && (transformedCache?.links?.length ?? 0) > 0) {
               //link
               let newLink = match[0].replace('[[', '').replace(']]', '');
               if (newLink.startsWith('#'))
@@ -113,12 +93,9 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
                 transformedCachedItem: transformedCache.links ?? null,
                 refType: 'link',
                 from: to,
-                to: to,
+                to: to
               });
-            } else if (
-              firstCharacterMatch === '#' &&
-              (transformedCache?.headings?.length ?? 0) > 0
-            ) {
+            } else if (firstCharacterMatch === '#' && (transformedCache?.headings?.length ?? 0) > 0) {
               //heading
               widgetsToAdd.push({
                 // @ts-ignore
@@ -126,7 +103,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
                 transformedCachedItem: transformedCache.headings ?? null,
                 refType: 'heading',
                 from: to,
-                to: to,
+                to: to
               });
               if (thePlugin.settings.enableRenderingLinksInLivePreview) {
                 // this was not working with mobile from 0.16.4 so had to convert it to a string
@@ -135,13 +112,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
                   for (const l of linksinHeader) {
                     widgetsToAdd.push({
                       key: l.replace('![[', '').replace('[[', '').replace(']]', ''), //change this to match the references cache
-                      transformedCachedItem:
-                        l.startsWith('!') ?
-                          transformedCache.embeds ?? null
-                        : transformedCache.links ?? null,
+                      transformedCachedItem: l.startsWith('!') ? transformedCache.embeds ?? null : transformedCache.links ?? null,
                       refType: 'link',
                       from: to - match[0].length + (match[0].indexOf(l) + l.length),
-                      to: to - match[0].length + (match[0].indexOf(l) + l.length),
+                      to: to - match[0].length + (match[0].indexOf(l) + l.length)
                     });
                   }
               }
@@ -149,19 +123,14 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 
             for (const ref of widgetsToAdd.sort((a, b) => a.to - b.to)) {
               if (ref.key != '') {
-                const wdgt = constructWidgetForInlineReference(
-                  ref.refType,
-                  ref.key,
-                  ref.transformedCachedItem ?? [],
-                  mdViewFile.path
-                );
+                const wdgt = constructWidgetForInlineReference(ref.refType, ref.key, ref.transformedCachedItem ?? [], mdViewFile.path);
                 if (wdgt != null) {
                   add(ref.from, ref.to, Decoration.widget({ widget: wdgt, side: 1 }));
                 }
               }
             } // end for
           }
-        },
+        }
       });
 
       if (this.regxPattern != '') this.decorations = this.decorator.createDeco(view);
@@ -174,7 +143,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
     }
   },
   {
-    decorations: (v) => v.decorations,
+    decorations: (v) => v.decorations
   }
 );
 
@@ -213,14 +182,8 @@ const constructWidgetForInlineReference = (
     }
 
     if (matchKey === key) {
-      const filePath =
-        ref?.references[0]?.resolvedFile ?
-          ref.references[0].resolvedFile.path.replace('.md', '')
-        : key;
-      if (
-        ref?.references[0]?.excludedFile != true &&
-        ref?.references.length >= thePlugin.settings.minimumRefCountThreshold
-      )
+      const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace('.md', '') : key;
+      if (ref?.references[0]?.excludedFile != true && ref?.references.length >= thePlugin.settings.minimumRefCountThreshold)
         return new InlineReferenceWidget(
           ref.references.length,
           ref.type,
@@ -251,15 +214,7 @@ export class InlineReferenceWidget extends WidgetType {
   addCssClass: string; //if a reference need special treatment, this class can be assigned
   lineNu: number; //number of line within the file
 
-  constructor(
-    refCount: number,
-    cssclass: string,
-    realLink: string,
-    key: string,
-    filePath: string,
-    addCSSClass: string,
-    lineNu: number
-  ) {
+  constructor(refCount: number, cssclass: string, realLink: string, key: string, filePath: string, addCSSClass: string, lineNu: number) {
     super();
     this.referenceCount = refCount;
     this.referenceType = cssclass;

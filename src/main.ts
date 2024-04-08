@@ -3,9 +3,7 @@ import { debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plu
 import { buildLinksAndReferences, setPluginVariableForIndexer } from './indexer';
 import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from './view-extensions/references-cm6';
 import { setPluginVariableForHtmlDecorations } from './view-extensions/htmlDecorations';
-import markdownPreviewProcessor, {
-  setPluginVariableForMarkdownPreviewProcessor
-} from './view-extensions/references-preview';
+import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from './view-extensions/references-preview';
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from './view-extensions/gutters-cm6';
 import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from './ui/headerRefCount';
 import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/sidebar-pane';
@@ -121,8 +119,7 @@ export default class SNWPlugin extends Plugin {
    * @memberof ThePlugin
    */
   toggleStateHeaderCount(): void {
-    if (this.settings.displayIncomingFilesheader && this.showCountsActive)
-      this.app.workspace.on('layout-change', this.layoutChangeEvent);
+    if (this.settings.displayIncomingFilesheader && this.showCountsActive) this.app.workspace.on('layout-change', this.layoutChangeEvent);
     else this.app.workspace.off('layout-change', this.layoutChangeEvent);
   }
 

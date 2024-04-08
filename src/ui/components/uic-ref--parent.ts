@@ -22,9 +22,7 @@ export const getUIC_Hoverview = async (instance: Instance) => {
   const popoverEl = createDiv();
   popoverEl.addClass('snw-popover-container');
   popoverEl.addClass('search-result-container');
-  popoverEl.appendChild(
-    await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, true)
-  );
+  popoverEl.appendChild(await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, true));
   instance.setContent(popoverEl);
   setTimeout(async () => {
     await setFileLinkHandlers(false, popoverEl);
@@ -40,19 +38,11 @@ export /**
  * @param {string} filePath
  * @return {*}  {Promise<string>}
  */
-const getUIC_SidePane = async (
-  refType: string,
-  realLink: string,
-  key: string,
-  filePath: string,
-  lineNu: number
-): Promise<HTMLElement> => {
+const getUIC_SidePane = async (refType: string, realLink: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> => {
   const sidepaneEL = createDiv();
   sidepaneEL.addClass('snw-sidepane-container');
   sidepaneEL.addClass('search-result-container');
-  sidepaneEL.append(
-    await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, false)
-  );
+  sidepaneEL.append(await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, false));
 
   setTimeout(async () => {
     await setFileLinkHandlers(false, sidepaneEL);
@@ -66,10 +56,7 @@ const getUIC_SidePane = async (
  *
  * @param {boolean} isHoverView
  */
-export const setFileLinkHandlers = async (
-  isHoverView: boolean,
-  rootElementForViewEl: HTMLElement
-) => {
+export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForViewEl: HTMLElement) => {
   const linksToFiles: NodeList = rootElementForViewEl.querySelectorAll(
     '.snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover'
   );
@@ -93,9 +80,7 @@ export const setFileLinkHandlers = async (
         if (titleKey) {
           if (titleKey.contains('#^')) {
             // links to a block id
-            const destinationBlocks = Object.entries(
-              thePlugin.app.metadataCache.getFileCache(fileT)?.blocks
-            );
+            const destinationBlocks = Object.entries(thePlugin.app.metadataCache.getFileCache(fileT)?.blocks);
             if (destinationBlocks) {
               const blockID = titleKey
                 .match(/#\^(.+)$/g)[0]
@@ -106,8 +91,7 @@ export const setFileLinkHandlers = async (
             }
           } else if (titleKey.contains('#')) {
             // possibly links to a header
-            const destinationHeadings =
-              thePlugin.app.metadataCache.getFileCache(fileT)?.headings;
+            const destinationHeadings = thePlugin.app.metadataCache.getFileCache(fileT)?.headings;
             if (destinationHeadings) {
               const headingKey = titleKey.match(/#(.+)/g)[0].replace('#', '');
               const l = destinationHeadings.find((h) => h.heading === headingKey);
@@ -120,9 +104,7 @@ export const setFileLinkHandlers = async (
           setTimeout(() => {
             // jumps to the line of the file where the reference is located
             try {
-              thePlugin.app.workspace
-                .getActiveViewOfType(MarkdownView)
-                .setEphemeralState({ line: lineNu });
+              thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({ line: lineNu });
             } catch (error) {
               /* Do nothing */
             }
@@ -136,32 +118,16 @@ export const setFileLinkHandlers = async (
           e.preventDefault();
           // @ts-ignore
           const hoverMetaKeyRequired =
-            (
-              app.internalPlugins.plugins['page-preview'].instance.overrides[
-                'obsidian42-strange-new-worlds'
-              ] == false
-            ) ?
-              false
-            : true;
-          if (
-            hoverMetaKeyRequired === false ||
-            (hoverMetaKeyRequired === true && Keymap.isModifier(e, 'Mod'))
-          ) {
+            app.internalPlugins.plugins['page-preview'].instance.overrides['obsidian42-strange-new-worlds'] == false ? false : true;
+          if (hoverMetaKeyRequired === false || (hoverMetaKeyRequired === true && Keymap.isModifier(e, 'Mod'))) {
             const target = e.target as HTMLElement;
             const previewLocation = {
-              scroll: Number(target.getAttribute('snw-data-line-number')),
+              scroll: Number(target.getAttribute('snw-data-line-number'))
             };
             const filePath = target.getAttribute('snw-data-file-name');
             if (filePath) {
               // parameter signature for link-hover parent: HoverParent, targetEl: HTMLElement, linkText: string, sourcePath: string, eState: EphemeralState
-              app.workspace.trigger(
-                'link-hover',
-                {},
-                target,
-                filePath,
-                '',
-                previewLocation
-              );
+              app.workspace.trigger('link-hover', {}, target, filePath, '', previewLocation);
             }
           }
         });
@@ -196,6 +162,6 @@ const getDataElements = async (
     realLink: realLink,
     key: key,
     filePath: path,
-    lineNu: lineNum,
+    lineNu: lineNum
   };
 };

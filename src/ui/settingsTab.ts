@@ -46,7 +46,7 @@ export const DEFAULT_SETTINGS: Settings = {
   enableRenderingEmbedsInLivePreview: true,
   enableIgnoreObsExcludeFoldersLinksFrom: false,
   enableIgnoreObsExcludeFoldersLinksTo: false,
-  requireModifierKeyToActivateSNWView: false,
+  requireModifierKeyToActivateSNWView: false
 };
 
 export class SettingsTab extends PluginSettingTab {
@@ -114,7 +114,7 @@ export class SettingsTab extends PluginSettingTab {
       );
 
     containerEl.createEl('h2', {
-      text: "Use Obsidian's Excluded Files list (Settings > Files & Links)",
+      text: "Use Obsidian's Excluded Files list (Settings > Files & Links)"
     });
 
     new Setting(containerEl)
@@ -131,7 +131,7 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Incoming links') 
+      .setName('Incoming links')
       .setDesc(
         "If enabled, links TO files in the excluded folder will not be included in SNW's reference counters.  May require restarting Obsidian."
       )
@@ -146,9 +146,7 @@ export class SettingsTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'Enable on startup' });
     new Setting(containerEl)
       .setName('Enable upon startup (Desktop)')
-      .setDesc(
-        'If disabled, SNW will not show block counters from startup until enabled from the command palette.'
-      )
+      .setDesc('If disabled, SNW will not show block counters from startup until enabled from the command palette.')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableOnStartupDesktop);
         cb.onChange(async (value: boolean) => {
@@ -159,9 +157,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Enable startup (Mobile)')
-      .setDesc(
-        'If disabled, SNW will not show block counters from startup until enabled from the command palette.'
-      )
+      .setDesc('If disabled, SNW will not show block counters from startup until enabled from the command palette.')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableOnStartupMobile);
         cb.onChange(async (value: boolean) => {
@@ -186,9 +182,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Show SNW indicators in Live Preview Editor')
-      .setDesc(
-        'While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds.'
-      )
+      .setDesc('While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds.')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.displayInlineReferencesLivePreview);
         cb.onChange(async (value: boolean) => {
@@ -231,9 +225,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Embed references in Gutter in Live Preview Mode (Mobile)')
-      .setDesc(
-        `This is off by default on mobile since the gutter takes up some space in the left margin.`
-      )
+      .setDesc(`This is off by default on mobile since the gutter takes up some space in the left margin.`)
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.displayEmbedReferencesInGutterMobile);
         cb.onChange(async (value: boolean) => {
@@ -245,14 +237,12 @@ export class SettingsTab extends PluginSettingTab {
 
     containerEl.createEl('h2', { text: 'Enable Reference Types in Reading mode' });
     containerEl.createEl('sup', {
-      text: '(requires reopening documents to take effect)',
+      text: '(requires reopening documents to take effect)'
     });
 
     new Setting(containerEl)
       .setName('Block ID')
-      .setDesc(
-        "Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block."
-      )
+      .setDesc("Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.")
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableRenderingBlockIdInMarkdown);
         cb.onChange(async (value: boolean) => {
@@ -263,9 +253,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Embeds')
-      .setDesc(
-        'Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].'
-      )
+      .setDesc('Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableRenderingEmbedsInMarkdown);
         cb.onChange(async (value: boolean) => {
@@ -287,9 +275,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Headers')
-      .setDesc(
-        'Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.'
-      )
+      .setDesc('Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableRenderingHeadersInMarkdown);
         cb.onChange(async (value: boolean) => {
@@ -300,14 +286,12 @@ export class SettingsTab extends PluginSettingTab {
 
     containerEl.createEl('h2', { text: 'Enable Reference Types in Live Preview Mode' });
     containerEl.createEl('sup', {
-      text: '(requires reopening documents to take effect)',
+      text: '(requires reopening documents to take effect)'
     });
 
     new Setting(containerEl)
       .setName('Block ID')
-      .setDesc(
-        "Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block."
-      )
+      .setDesc("Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.")
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableRenderingBlockIdInLivePreview);
         cb.onChange(async (value: boolean) => {
@@ -318,9 +302,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Embeds')
-      .setDesc(
-        'Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].'
-      )
+      .setDesc('Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableRenderingEmbedsInLivePreview);
         cb.onChange(async (value: boolean) => {
@@ -342,9 +324,7 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Headers')
-      .setDesc(
-        'Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.'
-      )
+      .setDesc('Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.')
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.thePlugin.settings.enableRenderingHeadersInLivePreview);
         cb.onChange(async (value: boolean) => {

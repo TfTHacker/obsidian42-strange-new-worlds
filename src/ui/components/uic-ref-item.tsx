@@ -4,11 +4,7 @@ import { MarkdownRenderer } from 'obsidian';
 import SNWPlugin from 'src/main';
 import { Link } from '../../types';
 import { ContextBuilder } from './context/context-builder';
-import {
-  formatHeadingBreadCrumbs,
-  formatListBreadcrumbs,
-  formatListWithDescendants,
-} from './context/formatting-utils';
+import { formatHeadingBreadCrumbs, formatListBreadcrumbs, formatListWithDescendants } from './context/formatting-utils';
 import { getTextAtPosition } from './context/position-utils';
 import { render } from 'preact';
 
@@ -19,10 +15,7 @@ export function setPluginVariableUIC_RefItem(plugin: SNWPlugin) {
 }
 
 export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
-  const startLine =
-    ref.reference.position !== undefined ?
-      ref.reference.position.start.line.toString()
-    : '0';
+  const startLine = ref.reference.position !== undefined ? ref.reference.position.start.line.toString() : '0';
 
   const itemElJsx = (
     <div
@@ -71,8 +64,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     );
   }
 
-  const indexOfListItemContainingLink =
-    contextBuilder.getListItemIndexContaining(linkPosition);
+  const indexOfListItemContainingLink = contextBuilder.getListItemIndexContaining(linkPosition);
   const isLinkInListItem = indexOfListItemContainingLink >= 0;
 
   if (isLinkInListItem) {
@@ -93,9 +85,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
       );
     }
 
-    const listItemWithDescendants = contextBuilder.getListItemWithDescendants(
-      indexOfListItemContainingLink
-    );
+    const listItemWithDescendants = contextBuilder.getListItemWithDescendants(indexOfListItemContainingLink);
 
     const contextEl = container.createDiv();
     await MarkdownRenderer.render(
@@ -110,23 +100,14 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
     let blockContents = '';
 
-    if (sectionContainingLink?.position !== undefined)
-      blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
+    if (sectionContainingLink?.position !== undefined) blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
 
-    await MarkdownRenderer.render(
-      thePlugin.app,
-      blockContents,
-      container,
-      ref.sourceFile.path,
-      thePlugin
-    );
+    await MarkdownRenderer.render(thePlugin.app, blockContents, container, ref.sourceFile.path, thePlugin);
   }
 
   const headingThatContainsLink = contextBuilder.getHeadingContaining(linkPosition);
   if (headingThatContainsLink) {
-    const firstSectionPosition = contextBuilder.getFirstSectionUnder(
-      headingThatContainsLink.position
-    );
+    const firstSectionPosition = contextBuilder.getFirstSectionUnder(headingThatContainsLink.position);
     if (firstSectionPosition) {
       const contextEl = container.createDiv();
       await MarkdownRenderer.render(

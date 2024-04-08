@@ -11,16 +11,15 @@ export default class PluginCommands {
       showInRibbon: true,
       callback: async () => {
         this.thePlugin.showCountsActive = !this.thePlugin.showCountsActive;
-        let msg =
-          'SNW toggled ' + (this.thePlugin.showCountsActive ? 'ON\n\n' : 'OFF\n\n');
+        let msg = 'SNW toggled ' + (this.thePlugin.showCountsActive ? 'ON\n\n' : 'OFF\n\n');
         msg += 'Tabs may require reloading for this change to take effect.';
         new Notice(msg);
         this.thePlugin.toggleStateHeaderCount();
         this.thePlugin.toggleStateSNWMarkdownPreview();
         this.thePlugin.toggleStateSNWLivePreview();
         this.thePlugin.toggleStateSNWGutters();
-      },
-    },
+      }
+    }
   ];
 
   constructor(plugin: SNWPlugin) {
@@ -33,7 +32,7 @@ export default class PluginCommands {
         icon: item.icon,
         callback: async () => {
           await item.callback();
-        },
+        }
       });
     });
   }

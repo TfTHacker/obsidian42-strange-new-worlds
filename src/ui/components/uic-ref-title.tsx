@@ -17,15 +17,12 @@ export const getUIC_Ref_Title_Div = (
 ): HTMLElement => {
   const titleElJsx = (
     <div
-      className={`${
-        isPopover ? 'snw-ref-title-popover' : 'snw-ref-title-side-pane'
-      } tree-item-self is-clickable`}
+      className={`${isPopover ? 'snw-ref-title-popover' : 'snw-ref-title-side-pane'} tree-item-self is-clickable`}
       snw-ref-title-type={refType}
       snw-ref-title-reallink={realLink}
       snw-ref-title-key={key}
       snw-data-file-name={filePath}
-      snw-data-line-number={lineNu.toString()}
-    >
+      snw-data-line-number={lineNu.toString()}>
       <div className="snw-ref-title-popover-label">{realLink}</div>
       <span
         className="snw-ref-title-popover-open-sidepane-icon"
@@ -33,8 +30,7 @@ export const getUIC_Ref_Title_Div = (
         snw-ref-title-reallink={realLink}
         snw-ref-title-key={key}
         snw-data-file-name={filePath}
-        snw-data-line-number={lineNu.toString()}
-      >
+        snw-data-line-number={lineNu.toString()}>
         {isPopover && (
           <span
             className="snw-ref-title-popover-icon"
@@ -42,8 +38,7 @@ export const getUIC_Ref_Title_Div = (
               e.stopPropagation();
               hideAll({ duration: 0 }); // hide popup
               thePlugin.activateView(refType, realLink, key, filePath, Number(lineNu));
-            }}
-          >
+            }}>
             <IconMoreDetails />
           </span>
         )}
