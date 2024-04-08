@@ -1,3 +1,14 @@
+# Pending
+
+## New
+
+- Added indexing properties as part of the link counting
+
+# Updated
+
+- Major rewrite of the internal indexer - significant performance improvements
+- Removed the cacheing tuning feature - this wasn't proving to be of help in peforamnce
+
 # 1.2.6 (2024-04-05)
 
 - Dependency updates

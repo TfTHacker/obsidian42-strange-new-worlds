@@ -100,7 +100,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     if (cachedPage) {
       const cachedPageCreateDate = cachedPage.createDate ?? 0;
       // Check if references have been updated since last cache update, and if cache is old
-      if (lastUpdateToReferences < cachedPageCreateDate && cachedPageCreateDate + plugin.settings.cacheUpdateInMilliseconds > Date.now()) {
+      if (lastUpdateToReferences < cachedPageCreateDate && cachedPageCreateDate + 500 > Date.now()) {
         return cachedPage;
       }
     }
