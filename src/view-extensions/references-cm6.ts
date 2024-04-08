@@ -12,10 +12,10 @@ import { TransformedCachedItem } from '../types';
 import { htmlDecorationForReferencesElement } from './htmlDecorations';
 import SNWPlugin from 'src/main';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableForCM6InlineReferences(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForCM6InlineReferences(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
 /**
@@ -31,12 +31,11 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
     regxPattern = '';
 
     constructor(public view: EditorView) {
-      if (thePlugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = '(\\s\\^)(\\S+)$';
-      if (thePlugin.settings.enableRenderingEmbedsInLivePreview)
+      if (plugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = '(\\s\\^)(\\S+)$';
+      if (plugin.settings.enableRenderingEmbedsInLivePreview)
         this.regxPattern += (this.regxPattern != '' ? '|' : '') + '!\\[\\[(.*?)\\]\\]';
-      if (thePlugin.settings.enableRenderingLinksInLivePreview)
-        this.regxPattern += (this.regxPattern != '' ? '|' : '') + '\\[\\[(.*?)\\]\\]';
-      if (thePlugin.settings.enableRenderingHeadersInLivePreview) this.regxPattern += (this.regxPattern != '' ? '|' : '') + '^#+\\s.+';
+      if (plugin.settings.enableRenderingLinksInLivePreview) this.regxPattern += (this.regxPattern != '' ? '|' : '') + '\\[\\[(.*?)\\]\\]';
+      if (plugin.settings.enableRenderingHeadersInLivePreview) this.regxPattern += (this.regxPattern != '' ? '|' : '') + '^#+\\s.+';
 
       //if there is no regex pattern, then don't go further
       if (this.regxPattern === '') return;
@@ -105,7 +104,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
                 from: to,
                 to: to
               });
-              if (thePlugin.settings.enableRenderingLinksInLivePreview) {
+              if (plugin.settings.enableRenderingLinksInLivePreview) {
                 // this was not working with mobile from 0.16.4 so had to convert it to a string
                 const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
                 if (linksinHeader)
@@ -183,7 +182,7 @@ const constructWidgetForInlineReference = (
 
     if (matchKey === key) {
       const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace('.md', '') : key;
-      if (ref?.references[0]?.excludedFile != true && ref?.references.length >= thePlugin.settings.minimumRefCountThreshold)
+      if (ref?.references[0]?.excludedFile != true && ref?.references.length >= plugin.settings.minimumRefCountThreshold)
         return new InlineReferenceWidget(
           ref.references.length,
           ref.type,

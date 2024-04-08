@@ -2,7 +2,7 @@ import { Notice } from 'obsidian';
 import SNWPlugin from './main';
 
 export default class PluginCommands {
-  thePlugin: SNWPlugin;
+  plugin: SNWPlugin;
   snwCommands = [
     {
       id: 'SNW-ToggleActiveState',
@@ -10,23 +10,23 @@ export default class PluginCommands {
       name: 'Toggle active state of SNW plugin on/off',
       showInRibbon: true,
       callback: async () => {
-        this.thePlugin.showCountsActive = !this.thePlugin.showCountsActive;
-        let msg = 'SNW toggled ' + (this.thePlugin.showCountsActive ? 'ON\n\n' : 'OFF\n\n');
+        this.plugin.showCountsActive = !this.plugin.showCountsActive;
+        let msg = 'SNW toggled ' + (this.plugin.showCountsActive ? 'ON\n\n' : 'OFF\n\n');
         msg += 'Tabs may require reloading for this change to take effect.';
         new Notice(msg);
-        this.thePlugin.toggleStateHeaderCount();
-        this.thePlugin.toggleStateSNWMarkdownPreview();
-        this.thePlugin.toggleStateSNWLivePreview();
-        this.thePlugin.toggleStateSNWGutters();
+        this.plugin.toggleStateHeaderCount();
+        this.plugin.toggleStateSNWMarkdownPreview();
+        this.plugin.toggleStateSNWLivePreview();
+        this.plugin.toggleStateSNWGutters();
       }
     }
   ];
 
   constructor(plugin: SNWPlugin) {
-    this.thePlugin = plugin;
+    this.plugin = plugin;
 
     this.snwCommands.forEach(async (item) => {
-      this.thePlugin.addCommand({
+      this.plugin.addCommand({
         id: item.id,
         name: item.name,
         icon: item.icon,

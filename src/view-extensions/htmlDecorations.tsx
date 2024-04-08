@@ -5,10 +5,10 @@ import { getUIC_Hoverview } from 'src/ui/components/uic-ref--parent';
 import { Platform } from 'obsidian';
 import { render } from 'preact';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableForHtmlDecorations(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForHtmlDecorations(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
 /**
@@ -34,17 +34,6 @@ export function htmlDecorationForReferencesElement(
   attachCSSClass: string,
   lineNu: number
 ): HTMLElement {
-  if (thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements)
-    thePlugin.snwAPI.console(
-      'htmlDecorations.htmlDecorationForReferencesElement(count, referenceType, realLink, key, filePath)',
-      thePlugin,
-      count,
-      referenceType,
-      realLink,
-      key,
-      filePath
-    );
-
   const referenceElementJsx = (
     <div
       className={'snw-reference snw-' + referenceType + ' ' + attachCSSClass}
@@ -65,9 +54,9 @@ export function htmlDecorationForReferencesElement(
     //click is default to desktop, otherwise mobile behaves differently
     refCountBox.onclick = async (e: MouseEvent) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
-  if (thePlugin?.snwAPI.enableDebugging?.HtmlDecorationElements) thePlugin.snwAPI.console('returned element', refenceElement);
+  if (plugin?.snwAPI.enableDebugging?.HtmlDecorationElements) plugin.snwAPI.console('returned element', refenceElement);
 
-  const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
+  const requireModifierKey = plugin.settings.requireModifierKeyToActivateSNWView;
   // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
   let showTippy = true;
   const tippyObject = tippy(refCountBox, {
@@ -113,8 +102,8 @@ const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
   const filePath = target.getAttribute('data-snw-filepath') ?? '';
   const lineNu = target.getAttribute('snw-data-line-number') ?? '';
 
-  if (thePlugin.snwAPI.enableDebugging?.HtmlDecorationElements)
-    thePlugin.snwAPI.console(
+  if (plugin.snwAPI.enableDebugging?.HtmlDecorationElements)
+    plugin.snwAPI.console(
       'htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath',
       target,
       realLink,
@@ -123,5 +112,5 @@ const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
       filePath
     );
 
-  thePlugin.activateView(refType, realLink, key, filePath, Number(lineNu));
+  plugin.activateView(refType, realLink, key, filePath, Number(lineNu));
 };

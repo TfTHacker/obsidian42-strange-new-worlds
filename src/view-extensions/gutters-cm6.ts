@@ -7,8 +7,8 @@ import SNWPlugin from 'src/main';
 
 let thePlugin: SNWPlugin;
 
-export function setPluginVariableForCM6Gutter(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForCM6Gutter(snwPlugin: SNWPlugin) {
+  thePlugin = snwPlugin;
 }
 
 const referenceGutterMarker = class extends GutterMarker {

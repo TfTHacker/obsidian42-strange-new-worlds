@@ -1,120 +1,76 @@
 // This module builds on Obsidians cache to provide more specific link information
 
-import { CachedMetadata, HeadingCache, stripHeading, TFile, Pos, parseLinktext } from 'obsidian';
+import { CachedMetadata, HeadingCache, TFile, Pos, parseLinktext } from 'obsidian';
 import SNWPlugin from './main';
-import { Link, TransformedCache } from './types';
+import { TransformedCache } from './types';
 
-let references: { [x: string]: Link[] };
-let allLinkResolutions: Link[];
+let indexedReferences = new Map();
 let lastUpdateToReferences = 0;
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableForIndexer(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForIndexer(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
-export function getReferencesCache() {
-  return references;
+export function getIndexedReferences() {
+  return indexedReferences;
 }
 
-export function getSnwAllLinksResolutions() {
-  return allLinkResolutions;
-}
+const getLinkReferencesForFile = (file: TFile, fileCache: CachedMetadata) => {
+  if (plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom && file?.path && plugin.app.metadataCache.isUserIgnored(file?.path)) {
+    return;
+  }
+  for (const item of [fileCache?.links, fileCache?.embeds]) {
+    if (!item) continue;
+    for (const ref of item) {
+      const { path, subpath } = parseLinktext(ref.link);
+      const tfileDestination = app.metadataCache.getFirstLinkpathDest(path, '/');
+      if (
+        plugin.settings.enableIgnoreObsExcludeFoldersLinksTo &&
+        tfileDestination?.path &&
+        plugin.app.metadataCache.isUserIgnored(tfileDestination.path)
+      ) {
+        return;
+      }
+      const cacheDestination = tfileDestination ? app.metadataCache.getFileCache(tfileDestination) : null;
+      // if the file has a property snw-index-exclude set to true, exclude it from the index
+      if (cacheDestination && cacheDestination?.frontmatter && cacheDestination?.frontmatter['snw-index-exclude'] === true) continue;
+      const linkWithFullPath = tfileDestination ? tfileDestination.path.replace('.' + tfileDestination.extension, '') + subpath : path;
+
+      if (!indexedReferences.has(linkWithFullPath)) indexedReferences.set(linkWithFullPath, []);
+      indexedReferences.get(linkWithFullPath).push({
+        ghostLink: '',
+        realLink: ref.link,
+        sub: { path, subpath },
+        reference: ref,
+        resolvedFile: tfileDestination,
+        sourceFile: file
+      });
+    }
+  }
+};
 
 /**
  * Buildings a optimized list of cache references for resolving the block count.
  * It is only updated when there are data changes to the vault. This is hooked to an event
  * trigger in main.ts
- * @export
  */
 export function buildLinksAndReferences(): void {
-  if (thePlugin.showCountsActive != true) return;
+  if (plugin.showCountsActive != true) return;
 
-  allLinkResolutions = [];
-  thePlugin.app.metadataCache.iterateReferences((src, refs) => {
-    const resolvedFilePath = parseLinktext(refs.link);
-    if (resolvedFilePath.path === '') resolvedFilePath.path = src.replace('.md', '');
-    if (resolvedFilePath?.path) {
-      const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, '/');
-      const fileLink = resolvedTFile === null ? '' : resolvedTFile.path.replace('.md', '') + stripHeading(resolvedFilePath.subpath); // file doesnt exist, empty link
-      const ghlink = resolvedTFile === null ? resolvedFilePath.path : ''; // file doesnt exist, its a ghost link
-      const sourceFile = thePlugin.app.metadataCache.getFirstLinkpathDest(src, '/');
+  console.time(plugin.APP_ABBREVIARTION + ' Vault indexing completed.');
 
-      if (thePlugin.settings.enableIgnoreObsExcludeFoldersLinksFrom)
-        if (thePlugin.app.metadataCache.isUserIgnored(sourceFile?.path ?? '')) return;
-
-      if (thePlugin.settings.enableIgnoreObsExcludeFoldersLinksTo) if (thePlugin.app.metadataCache.isUserIgnored(fileLink)) return;
-
-      allLinkResolutions.push({
-        reference: {
-          displayText: refs.displayText ?? '',
-          // link: refs.link, // old approach
-          link: fileLink != '' ? fileLink : ghlink,
-          position: refs.position
-        },
-        resolvedFile: resolvedTFile,
-        ghostLink: ghlink,
-        realLink: refs.link,
-        sourceFile: sourceFile,
-        excludedFile: false
-      });
-    }
-  });
-
-  // START: Remove file exclusions for frontmatter snw-index-exclude
-  const snwIndexExceptionsList = Object.entries(app.metadataCache.metadataCache).filter((e) => {
-    return e[1]?.frontmatter?.['snw-index-exclude'];
-  });
-  const snwIndexExceptions = Object.entries(app.metadataCache.fileCache).filter((e) => {
-    return snwIndexExceptionsList.find((f) => f[0] === e[1].hash);
-  });
-
-  for (let i = 0; i < allLinkResolutions.length; i++) {
-    allLinkResolutions[i].excludedFile = false;
-    if (allLinkResolutions[i]?.resolvedFile?.path) {
-      const fileName = allLinkResolutions[i].resolvedFile?.path ?? '';
-      for (let e = 0; e < snwIndexExceptions.length; e++) {
-        if (fileName == snwIndexExceptions[e][0]) {
-          allLinkResolutions[i].excludedFile = true;
-          break;
-        }
-      }
-    }
+  indexedReferences = new Map();
+  for (const file of app.vault.getMarkdownFiles()) {
+    const fileCache = app.metadataCache.getFileCache(file);
+    if (fileCache) getLinkReferencesForFile(file, fileCache);
   }
-  // END: Exclusions
 
-  const refs = allLinkResolutions.reduce((acc: { [x: string]: Link[] }, link: Link): { [x: string]: Link[] } => {
-    let keyBasedOnLink = '';
-    // let keyBasedOnFullPath = ""
-
-    keyBasedOnLink = link.reference.link;
-    // if(link?.resolvedFile)
-    //     keyBasedOnFullPath = link.resolvedFile.path.replace(link.resolvedFile.name,"") + link.reference.link;
-    // else
-    //     keyBasedOnFullPath = link.ghostLink;
-
-    // if(keyBasedOnLink===keyBasedOnFullPath) {
-    //     keyBasedOnFullPath=null;
-    // }
-
-    if (!acc[keyBasedOnLink]) {
-      acc[keyBasedOnLink] = [];
-    }
-    acc[keyBasedOnLink].push(link);
-
-    // if(keyBasedOnFullPath!=null) {
-    //     if(!acc[keyBasedOnFullPath]) {
-    //         acc[keyBasedOnFullPath] = [];
-    //     }
-    //     acc[keyBasedOnFullPath].push(link)
-    // }
-    return acc;
-  }, {});
-
-  references = refs;
   // @ts-ignore
-  window.snwAPI.references = references;
+  window.snwAPI.references = indexedReferences;
   lastUpdateToReferences = Date.now();
+
+  console.timeEnd(plugin.APP_ABBREVIARTION + ' Vault indexing completed.');
 }
 
 // following MAP works as a cache for the getCurrentPage call. Based on time elapsed since last update, it just returns a cached transformedCache object
@@ -133,28 +89,25 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     if (cachedPage) {
       const cachedPageCreateDate = cachedPage.createDate ?? 0;
       // Check if references have been updated since last cache update, and if cache is old
-      if (
-        lastUpdateToReferences < cachedPageCreateDate &&
-        cachedPageCreateDate + thePlugin.settings.cacheUpdateInMilliseconds > Date.now()
-      ) {
+      if (lastUpdateToReferences < cachedPageCreateDate && cachedPageCreateDate + plugin.settings.cacheUpdateInMilliseconds > Date.now()) {
         return cachedPage;
       }
     }
   }
 
-  if (thePlugin.showCountsActive != true) return {};
+  if (plugin.showCountsActive != true) return {};
 
   const transformedCache: TransformedCache = {};
-  const cachedMetaData = thePlugin.app.metadataCache.getFileCache(file);
+  const cachedMetaData = plugin.app.metadataCache.getFileCache(file);
   if (!cachedMetaData) {
     return transformedCache;
   }
 
-  if (!references) {
+  if (!indexedReferences) {
     buildLinksAndReferences();
   }
 
-  const headings: string[] = Object.values(thePlugin.app.metadataCache.metadataCache).reduce((acc: string[], file: CachedMetadata) => {
+  const headings: string[] = Object.values(plugin.app.metadataCache.metadataCache).reduce((acc: string[], file: CachedMetadata) => {
     const headings = file.headings;
     if (headings) {
       headings.forEach((heading: HeadingCache) => {
@@ -171,21 +124,24 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
       pos: block.position,
       page: file.basename,
       type: 'block',
-      references: references[filePath + block.id] || []
+      references: indexedReferences.get(filePath + block.id) || []
     }));
   }
 
   if (cachedMetaData?.headings) {
-    transformedCache.headings = cachedMetaData.headings.map((header: { heading: string; position: Pos; level: number }) => ({
-      original: '#'.repeat(header.level) + ' ' + header.heading,
-      key: `${file.path.replace('.md', '')}${stripHeading(header.heading)}`,
-      headerMatch: header.heading,
-      headerMatch2: file.basename + '#' + header.heading,
-      pos: header.position,
-      page: file.basename,
-      type: 'heading',
-      references: references[`${file.path.replace('.md', '')}${stripHeading(header.heading)}`] || []
-    }));
+    transformedCache.headings = cachedMetaData.headings.map((header: { heading: string; position: Pos; level: number }) => {
+      const headingString = '#'.repeat(header.level) + header.heading;
+      const key = `${file.path.replace('.md', '')}#${header.heading.replace(/\[|\]/g, '')}`;
+      return {
+        original: headingString,
+        key: key,
+        headerMatch: header.heading.replaceAll('[', '').replaceAll(']', ''),
+        pos: header.position,
+        page: file.basename,
+        type: 'heading',
+        references: indexedReferences.get(key) || []
+      };
+    });
   }
 
   if (cachedMetaData?.links) {
@@ -199,7 +155,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
       if (newLinkPath.startsWith('#^') || newLinkPath.startsWith('#')) {
         // handles links from same page
-        newLinkPath = file.path.replace('.md', '') + stripHeading(newLinkPath);
+        newLinkPath = file.path.replace('.md', '') + newLinkPath;
       }
 
       return {
@@ -208,13 +164,13 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
         type: 'link',
         pos: link.position,
         page: file.basename,
-        references: references[newLinkPath] || []
+        references: indexedReferences.get(newLinkPath) || []
       };
     });
     if (transformedCache.links) {
       transformedCache.links = transformedCache.links.map((link) => {
         if (link.key.includes('#') && !link.key.includes('#^')) {
-          const heading = headings.filter((heading: string) => stripHeading(heading) === link.key.split('#')[1])[0];
+          const heading = headings.filter((heading: string) => heading === link.key.split('#')[1])[0];
           link.original = heading ? heading : undefined;
         }
         return link;
@@ -228,7 +184,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
       // if newEmbedPath is empty, then this is a link on the same page
       if (newEmbedPath === '' && (embed.link.startsWith('#^') || embed.link.startsWith('#'))) {
-        newEmbedPath = file.path.replace('.md', '') + stripHeading(embed.link);
+        newEmbedPath = file.path.replace('.md', '') + embed.link;
       }
 
       const output = {
@@ -236,7 +192,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
         page: file.basename,
         type: 'embed',
         pos: embed.position,
-        references: references[newEmbedPath] || []
+        references: indexedReferences.get(newEmbedPath) || []
       };
       return output;
     });
@@ -249,7 +205,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
         if (embed.key.startsWith('#^') || embed.key.startsWith('#')) {
           embed.key = `${file.basename}${embed.key}`;
-          embed.references = references[embed.key] || [];
+          embed.references = indexedReferences.get(embed.key) || [];
         }
         return embed;
       });
@@ -265,7 +221,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
 export function parseLinkTextToFullPath(link: string): string {
   const resolvedFilePath = parseLinktext(link);
-  const resolvedTFile = thePlugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, '/');
+  const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, '/');
   if (resolvedTFile === null) return '';
-  else return resolvedTFile.path.replace('.md', '') + stripHeading(resolvedFilePath.subpath);
+  else return resolvedTFile.path.replace('.md', '') + resolvedFilePath.subpath;
 }

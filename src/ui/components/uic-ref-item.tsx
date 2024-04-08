@@ -3,15 +3,15 @@
 import { MarkdownRenderer } from 'obsidian';
 import SNWPlugin from 'src/main';
 import { Link } from '../../types';
-import { ContextBuilder } from './context/context-builder';
+import { ContextBuilder } from './context/ContextBuilder';
 import { formatHeadingBreadCrumbs, formatListBreadcrumbs, formatListWithDescendants } from './context/formatting-utils';
 import { getTextAtPosition } from './context/position-utils';
 import { render } from 'preact';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableUIC_RefItem(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableUIC_RefItem(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
 export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
@@ -40,8 +40,8 @@ export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
  * @return {*}  {Promise<string>}
  */
 const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
-  const fileContents = await thePlugin.app.vault.cachedRead(ref.sourceFile);
-  const fileCache = thePlugin.app.metadataCache.getFileCache(ref.sourceFile);
+  const fileContents = await plugin.app.vault.cachedRead(ref.sourceFile);
+  const fileCache = plugin.app.metadataCache.getFileCache(ref.sourceFile);
   const linkPosition = ref.reference.position;
 
   const container = createDiv();
@@ -56,12 +56,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
     headingBreadcrumbsEl.createEl('span', { text: 'H' });
 
-    await MarkdownRenderer.renderMarkdown(
-      formatHeadingBreadCrumbs(headingBreadcrumbs),
-      headingBreadcrumbsEl,
-      ref.sourceFile.path,
-      thePlugin
-    );
+    await MarkdownRenderer.renderMarkdown(formatHeadingBreadCrumbs(headingBreadcrumbs), headingBreadcrumbsEl, ref.sourceFile.path, plugin);
   }
 
   const indexOfListItemContainingLink = contextBuilder.getListItemIndexContaining(linkPosition);
@@ -77,11 +72,11 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
       contextEl.createEl('span', { text: 'L' });
 
       await MarkdownRenderer.render(
-        thePlugin.app,
+        plugin.app,
         formatListBreadcrumbs(fileContents, listBreadcrumbs),
         contextEl,
         ref.sourceFile.path,
-        thePlugin
+        plugin
       );
     }
 
@@ -89,11 +84,11 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
     const contextEl = container.createDiv();
     await MarkdownRenderer.render(
-      thePlugin.app,
+      plugin.app,
       formatListWithDescendants(fileContents, listItemWithDescendants),
       contextEl,
       ref.sourceFile.path,
-      thePlugin
+      plugin
     );
   } else {
     const sectionContainingLink = contextBuilder.getSectionContaining(linkPosition);
@@ -102,7 +97,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
     if (sectionContainingLink?.position !== undefined) blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
 
-    await MarkdownRenderer.render(thePlugin.app, blockContents, container, ref.sourceFile.path, thePlugin);
+    await MarkdownRenderer.render(plugin.app, blockContents, container, ref.sourceFile.path, plugin);
   }
 
   const headingThatContainsLink = contextBuilder.getHeadingContaining(linkPosition);
@@ -111,11 +106,11 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
     if (firstSectionPosition) {
       const contextEl = container.createDiv();
       await MarkdownRenderer.render(
-        thePlugin.app,
+        plugin.app,
         getTextAtPosition(fileContents, firstSectionPosition.position),
         contextEl,
         ref.sourceFile.path,
-        thePlugin
+        plugin
       );
     }
   }

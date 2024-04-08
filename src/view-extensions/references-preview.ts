@@ -3,10 +3,10 @@ import { htmlDecorationForReferencesElement } from './htmlDecorations';
 import { getSNWCacheByFile, parseLinkTextToFullPath } from '../indexer';
 import SNWPlugin from '../main';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableForMarkdownPreviewProcessor(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForMarkdownPreviewProcessor(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
 /**
@@ -21,8 +21,8 @@ export function setPluginVariableForMarkdownPreviewProcessor(plugin: SNWPlugin) 
  * @return {*}
  */
 export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-  if (thePlugin.snwAPI.enableDebugging.PreviewRendering)
-    thePlugin.snwAPI.console(
+  if (plugin.snwAPI.enableDebugging.PreviewRendering)
+    plugin.snwAPI.console(
       'markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext,ctx.getSectionInfo',
       el,
       ctx,
@@ -38,11 +38,11 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownP
 
   if (el.hasAttribute('uic')) return; // this is a custom component, don't render SNW inside it.
 
-  const currentFile = thePlugin.app.vault.fileMap[ctx.sourcePath];
+  const currentFile = plugin.app.vault.fileMap[ctx.sourcePath];
   if (currentFile === undefined) return;
 
   // check for incompatibility with other plugins
-  const fileCache = thePlugin.app.metadataCache.getFileCache(currentFile);
+  const fileCache = plugin.app.metadataCache.getFileCache(currentFile);
   // @ts-ignore
   if (fileCache?.frontmatter?.['kanban-plugin'] || ctx.el.parentElement?.classList.contains('kanban-plugin__markdown-preview-view')) return; //no support for kanban board
 
@@ -63,8 +63,8 @@ class snwChildComponent extends MarkdownRenderChild {
     this.containerEl = containerEl;
     this.sectionInfo = sectionInfo;
     this.currentFile = currentFile;
-    if (thePlugin.snwAPI.enableDebugging.PreviewRendering)
-      thePlugin.snwAPI.console(
+    if (plugin.snwAPI.enableDebugging.PreviewRendering)
+      plugin.snwAPI.console(
         'snwChildComponent(HTMLElement, MarkdownPostProcessorContext,currentfile',
         containerEl,
         sectionInfo,
@@ -77,13 +77,13 @@ class snwChildComponent extends MarkdownRenderChild {
   }
 
   processMarkdown(): void {
-    const minRefCountThreshold = thePlugin.settings.minimumRefCountThreshold;
+    const minRefCountThreshold = plugin.settings.minimumRefCountThreshold;
     const transformedCache = getSNWCacheByFile(this.currentFile);
 
     if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true) return;
 
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
-      if (thePlugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
+      if (plugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
         let isThisAnEmbed = false;
         try {
           // we don't want to proccess embeds
@@ -135,7 +135,7 @@ class snwChildComponent extends MarkdownRenderChild {
         }
       }
 
-      if (thePlugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
+      if (plugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
         this.containerEl.querySelectorAll('.internal-embed:not(.snw-embed-preview)').forEach((element) => {
           let embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
           if (embedKey === '') {
@@ -164,7 +164,7 @@ class snwChildComponent extends MarkdownRenderChild {
         });
       }
 
-      if (thePlugin.settings.enableRenderingHeadersInMarkdown) {
+      if (plugin.settings.enableRenderingHeadersInMarkdown) {
         const headerKey = this.containerEl.querySelector('[data-heading]');
         if (transformedCache?.headings && headerKey) {
           const textContext = headerKey.getAttribute('data-heading');
@@ -172,7 +172,7 @@ class snwChildComponent extends MarkdownRenderChild {
             if (
               value.references[0]?.excludedFile != true &&
               value.references.length >= minRefCountThreshold &&
-              value.headerMatch === textContext
+              value.headerMatch === textContext!.replace(/\[|\]/g, '')
             ) {
               const referenceElement = htmlDecorationForReferencesElement(
                 value.references.length,
@@ -191,7 +191,7 @@ class snwChildComponent extends MarkdownRenderChild {
         }
       }
 
-      if (thePlugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
+      if (plugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
         this.containerEl.querySelectorAll('a.internal-link:not(.snw-link-preview)').forEach((element) => {
           const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
           for (const value of transformedCache.links) {

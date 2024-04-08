@@ -1,16 +1,16 @@
 //wrapper element for references area. shared between popover and sidepane
 
 import { setIcon } from 'obsidian';
-import { getReferencesCache, getSnwAllLinksResolutions } from 'src/indexer';
+import { getIndexedReferences } from 'src/indexer';
 import SNWPlugin from 'src/main';
 import { Link } from 'src/types';
 import { getUIC_Ref_Item } from './uic-ref-item';
 import { getUIC_Ref_Title_Div } from './uic-ref-title';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableUIC_RefArea(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableUIC_RefArea(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
 export /**
@@ -34,7 +34,7 @@ const getUIC_Ref_Area = async (
   const refAreaContainerEl = createDiv();
 
   //get title header for this reference area
-  refAreaContainerEl.append(getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, thePlugin));
+  refAreaContainerEl.append(getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, plugin));
 
   const refAreaEl = createDiv({ cls: 'snw-ref-area' });
   refAreaEl.append(refAreaItems.response);
@@ -56,16 +56,19 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
   let linksToLoop: Link[] = null;
 
   if (refType === 'File') {
-    const allLinks: Link[] = getSnwAllLinksResolutions();
-    const incomingLinks = allLinks.filter((f) => {
-      if (!f?.resolvedFile) return false;
-      return f?.resolvedFile?.path === filePath;
-    });
+    const allLinks: Link[] = getIndexedReferences();
+    const incomingLinks = [];
+    for (const items of allLinks.values()) {
+      for (const item of items) {
+        if (item?.resolvedFile && item?.resolvedFile?.path === filePath) incomingLinks.push(item);
+      }
+    }
+
     countOfRefs = incomingLinks.length;
     linksToLoop = incomingLinks;
   } else {
-    let refCache: Link[] = getReferencesCache()[key];
-    if (refCache === undefined) refCache = getReferencesCache()[filePath + '#^' + key];
+    let refCache: Link[] = getIndexedReferences().get(key);
+    if (refCache === undefined) refCache = getIndexedReferences().get(key);
     const sortedCache = await sortRefCache(refCache);
     countOfRefs = sortedCache.length;
     linksToLoop = sortedCache;
@@ -80,8 +83,8 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
   let maxItemsToShow = uniqueFileKeys.length;
 
-  if (thePlugin.settings.maxFileCountToDisplay != 1000 && maxItemsToShow >= thePlugin.settings.maxFileCountToDisplay)
-    maxItemsToShow = thePlugin.settings.maxFileCountToDisplay;
+  if (plugin.settings.maxFileCountToDisplay != 1000 && maxItemsToShow >= plugin.settings.maxFileCountToDisplay)
+    maxItemsToShow = plugin.settings.maxFileCountToDisplay;
 
   for (let index = 0; index < maxItemsToShow; index++) {
     const file_path = uniqueFileKeys[index];

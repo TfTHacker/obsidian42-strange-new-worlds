@@ -4,27 +4,23 @@ import { MarkdownView, Platform, WorkspaceLeaf } from 'obsidian';
 import { Link } from '../types';
 import SNWPlugin from '../main';
 import { processHtmlDecorationReferenceEvent } from '../view-extensions/htmlDecorations';
-import { getSnwAllLinksResolutions, getSNWCacheByFile } from '../indexer';
+import { getIndexedReferences, getSNWCacheByFile } from '../indexer';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getUIC_Hoverview } from './components/uic-ref--parent';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableForHeaderRefCount(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForHeaderRefCount(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
 }
 
 /**
  * Iterates all open documents to see if they are markdown file, and if so called processHeader
  *
- * @export
  */
 export default function setHeaderWithReferenceCounts() {
-  if (thePlugin.snwAPI.enableDebugging?.LinkCountInHeader)
-    thePlugin.snwAPI.console('headerImageCount.setHeaderWithReferenceCounts(thePlugin)', SNWPlugin);
-
-  thePlugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+  plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
     if (leaf.view.getViewType() === 'markdown') processHeader(leaf.view as MarkdownView);
   });
 }
@@ -35,19 +31,16 @@ export default function setHeaderWithReferenceCounts() {
  * @param {MarkdownView} mdView
  */
 function processHeader(mdView: MarkdownView) {
-  if (thePlugin.snwAPI.enableDebugging?.LinkCountInHeader)
-    thePlugin.snwAPI.console('headerImageCount.processHeader(ThePlugin, MarkdownView)', thePlugin, mdView);
-  // TODO: should handle check for TFile better than non-null! assertion
   const mdViewFile = mdView.file!;
+  if (!mdViewFile) return;
+  const allLinks = getIndexedReferences();
 
-  const allLinks: Link[] = getSnwAllLinksResolutions();
-  if (allLinks == undefined) return;
-
-  const incomingLinks = allLinks.filter((f) => {
-    if (!f?.resolvedFile) return false;
-    return f?.resolvedFile?.path === mdViewFile.path;
-  });
-
+  const incomingLinks = [];
+  for (const items of allLinks.values()) {
+    for (const item of items) {
+      if (item?.resolvedFile && item?.resolvedFile?.path === mdViewFile.path) incomingLinks.push(item);
+    }
+  }
   let incomingLinksCount = incomingLinks.length;
 
   // check if the page is to be ignored
@@ -58,7 +51,7 @@ function processHeader(mdView: MarkdownView) {
   if (incomingLinks[0]?.excludedFile === true) incomingLinksCount = 0;
 
   // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
-  if (incomingLinksCount < thePlugin.settings.minimumRefCountThreshold) {
+  if (incomingLinksCount < plugin.settings.minimumRefCountThreshold) {
     if (mdView.contentEl.querySelector('.snw-header-count-wrapper')) mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();
     return;
   }
@@ -102,7 +95,7 @@ function processHeader(mdView: MarkdownView) {
     processHtmlDecorationReferenceEvent(e.target as HTMLElement);
   };
 
-  const requireModifierKey = thePlugin.settings.requireModifierKeyToActivateSNWView;
+  const requireModifierKey = plugin.settings.requireModifierKeyToActivateSNWView;
   // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
   let showTippy = true;
   const tippyObject = tippy(wrapper, {
@@ -131,7 +124,4 @@ function processHeader(mdView: MarkdownView) {
   });
 
   tippyObject.popper.classList.add('snw-tippy');
-
-  if (thePlugin.snwAPI.enableDebugging?.LinkCountInHeader)
-    thePlugin.snwAPI.console('snwTitleRefCountDisplayCountEl', snwTitleRefCountDisplayCountEl);
 }

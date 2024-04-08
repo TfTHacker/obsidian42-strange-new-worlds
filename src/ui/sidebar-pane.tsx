@@ -2,7 +2,7 @@
 
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { scrollResultsIntoView } from 'src/utils';
-import { getReferencesCache } from '../indexer';
+import { getIndexedReferences } from '../indexer';
 import SNWPlugin from '../main';
 import { getUIC_SidePane } from './components/uic-ref--parent';
 import { render } from 'preact';
@@ -48,7 +48,7 @@ export class SideBarPaneView extends ItemView {
 
     if (this.thePlugin.snwAPI.enableDebugging.SidePane) {
       this.thePlugin.snwAPI.console('sidepane.open() refType, realLink, key, filePath', refType, realLink, key, filePath);
-      this.thePlugin.snwAPI.console('sidepane.open() getReferencesCache()', getReferencesCache());
+      this.thePlugin.snwAPI.console('sidepane.open() getReferencesCache()', getIndexedReferences());
     }
 
     this.containerEl.replaceChildren(await getUIC_SidePane(refType, realLink, key, filePath, lineNu));

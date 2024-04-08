@@ -1,4 +1,4 @@
-import { getSNWCacheByFile } from './indexer';
+import { getIndexedReferences, getSNWCacheByFile } from './indexer';
 import SNWPlugin from './main';
 
 /**
@@ -19,8 +19,8 @@ export default class SnwAPI {
     SidePane: false
   };
 
-  constructor(plugin: SNWPlugin) {
-    this.plugin = plugin;
+  constructor(snwPlugin: SNWPlugin) {
+    this.plugin = snwPlugin;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,6 +36,14 @@ export default class SnwAPI {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMetaInfoByCurrentFile = async (): Promise<any> => {
     return this.getMetaInfoByFileName(app.workspace.getActiveFile()?.path || '');
+  };
+
+  searchReferencesStartingWith = async (searchString: string) => {
+    for (const [key, value] of getIndexedReferences()) {
+      if (key.startsWith(searchString)) {
+        console.log(key, value);
+      }
+    }
   };
 
   /**

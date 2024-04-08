@@ -5,10 +5,10 @@ import { scrollResultsIntoView } from 'src/utils';
 import { getUIC_Ref_Area } from './uic-ref-area';
 import { setPluginVariableUIC_RefItem } from './uic-ref-item';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
-export function setPluginVariableForUIC(plugin: SNWPlugin) {
-  thePlugin = plugin;
+export function setPluginVariableForUIC(snwPlugin: SNWPlugin) {
+  plugin = snwPlugin;
   setPluginVariableUIC_RefItem(plugin);
 }
 
@@ -73,14 +73,14 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
         const filePath = handlerElement.getAttribute('snw-data-file-name');
         const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
 
-        thePlugin.app.workspace.getLeaf(Keymap.isModEvent(e)).openFile(fileT);
+        plugin.app.workspace.getLeaf(Keymap.isModEvent(e)).openFile(fileT);
 
         // for file titles, the embed handling for titles related to block id's and headers is hard to calculate, so its more efficient to do it here
         const titleKey = handlerElement.getAttribute('snw-ref-title-key');
         if (titleKey) {
           if (titleKey.contains('#^')) {
             // links to a block id
-            const destinationBlocks = Object.entries(thePlugin.app.metadataCache.getFileCache(fileT)?.blocks);
+            const destinationBlocks = Object.entries(plugin.app.metadataCache.getFileCache(fileT)?.blocks);
             if (destinationBlocks) {
               const blockID = titleKey
                 .match(/#\^(.+)$/g)[0]
@@ -91,7 +91,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
             }
           } else if (titleKey.contains('#')) {
             // possibly links to a header
-            const destinationHeadings = thePlugin.app.metadataCache.getFileCache(fileT)?.headings;
+            const destinationHeadings = plugin.app.metadataCache.getFileCache(fileT)?.headings;
             if (destinationHeadings) {
               const headingKey = titleKey.match(/#(.+)/g)[0].replace('#', '');
               const l = destinationHeadings.find((h) => h.heading === headingKey);
@@ -104,7 +104,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
           setTimeout(() => {
             // jumps to the line of the file where the reference is located
             try {
-              thePlugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({ line: lineNu });
+              plugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({ line: lineNu });
             } catch (error) {
               /* Do nothing */
             }
@@ -113,7 +113,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
       });
       // mouseover event
       // @ts-ignore
-      if (thePlugin.app.internalPlugins.plugins['page-preview'].enabled === true) {
+      if (plugin.app.internalPlugins.plugins['page-preview'].enabled === true) {
         node.addEventListener('mouseover', (e: PointerEvent) => {
           e.preventDefault();
           // @ts-ignore

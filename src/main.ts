@@ -16,6 +16,7 @@ import PluginCommands from './PluginCommands';
 export default class SNWPlugin extends Plugin {
   appName = this.manifest.name;
   appID = this.manifest.id;
+  APP_ABBREVIARTION = 'SNW';
   settings: Settings = DEFAULT_SETTINGS;
   //controls global state if the plugin is showing counters
   showCountsActive: boolean = DEFAULT_SETTINGS.enableOnStartupDesktop;
@@ -57,13 +58,14 @@ export default class SNWPlugin extends Plugin {
       () => {
         buildLinksAndReferences();
       },
-      1000,
+      5000,
       true
     );
 
-    // TODO: probably still want to keep metadataCache.on("resolve") in case non-editor change triggers a file update
     this.registerEvent(this.app.metadataCache.on('resolve', indexDebounce));
-    this.registerEvent(this.app.workspace.on('editor-change', indexDebounce));
+    this.registerEvent(this.app.vault.on('rename', indexDebounce));
+    this.registerEvent(this.app.vault.on('delete', indexDebounce));
+    // this.registerEvent(this.app.workspace.on('editor-change', indexDebounce)); // this is unlikely to be needed
 
     this.app.workspace.registerHoverLinkSource(this.appID, {
       display: this.appName,
