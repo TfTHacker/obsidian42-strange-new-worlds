@@ -97,10 +97,7 @@ export default class SNWPlugin extends Plugin {
       if (!this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length) {
         await this.app.workspace.getRightLeaf(false).setViewState({ type: VIEW_TYPE_SNW, active: false });
       }
-      const resolved = this.app.metadataCache.on('resolved', async () => {
-        buildLinksAndReferences();
-        this.app.metadataCache.offref(resolved);
-      });
+      buildLinksAndReferences();
     });
   }
 

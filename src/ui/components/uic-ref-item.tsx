@@ -48,7 +48,6 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
   container.setAttribute('uic', 'uic'); //used to track if this is UIC element.
 
   if (ref.reference?.key) {
-    console.log('key');
     container.innerText = 'Used in property: ' + ref.reference.key;
     return container;
   } else {
