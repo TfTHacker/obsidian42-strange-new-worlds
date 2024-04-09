@@ -5,10 +5,10 @@ import { htmlDecorationForReferencesElement } from 'src/view-extensions/htmlDeco
 import { getSNWCacheByFile, parseLinkTextToFullPath } from 'src/indexer';
 import SNWPlugin from 'src/main';
 
-let thePlugin: SNWPlugin;
+let plugin: SNWPlugin;
 
 export function setPluginVariableForCM6Gutter(snwPlugin: SNWPlugin) {
-  thePlugin = snwPlugin;
+  plugin = snwPlugin;
 }
 
 const referenceGutterMarker = class extends GutterMarker {
@@ -51,9 +51,6 @@ const emptyMarker = new (class extends GutterMarker {
 const ReferenceGutterExtension = gutter({
   class: 'snw-gutter-ref',
   lineMarker(editorView: EditorView, line: BlockInfo) {
-    if (thePlugin.snwAPI.enableDebugging.GutterEmbedCounter)
-      thePlugin.snwAPI.console('ReferenceGutterExtension(EditorView, BlockInfo)', editorView, line);
-
     const mdView = editorView.state.field(editorInfoField);
 
     if (!mdView.file) return null;
@@ -65,7 +62,7 @@ const ReferenceGutterExtension = gutter({
 
     const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
     if (!embedsFromMetaDataCache) return null;
-    if (embedsFromMetaDataCache?.length ?? 0 >= thePlugin.settings.minimumRefCountThreshold) {
+    if (embedsFromMetaDataCache?.length ?? 0 >= plugin.settings.minimumRefCountThreshold) {
       const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
       for (const embed of embedsFromMetaDataCache) {
         if (embed.position.start.line + 1 === lineNumberInFile) {
@@ -81,15 +78,6 @@ const ReferenceGutterExtension = gutter({
                   lineFromFile = parseLinkTextToFullPath(strippedLineToAnalyze);
                 }
                 if (lineFromFile === ref.key) {
-                  if (thePlugin.snwAPI.enableDebugging.GutterEmbedCounter)
-                    thePlugin.snwAPI.console(
-                      'ReferenceGutterExtension New gutter',
-                      ref.references.length,
-                      'embed',
-                      ref.key,
-                      ref.key,
-                      'snw-embed-special'
-                    );
                   return new referenceGutterMarker(
                     ref.references.length,
                     'embed',

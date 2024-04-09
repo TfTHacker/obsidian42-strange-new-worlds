@@ -54,8 +54,6 @@ export function htmlDecorationForReferencesElement(
     //click is default to desktop, otherwise mobile behaves differently
     refCountBox.onclick = async (e: MouseEvent) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
-  if (plugin?.snwAPI.enableDebugging?.HtmlDecorationElements) plugin.snwAPI.console('returned element', refenceElement);
-
   const requireModifierKey = plugin.settings.requireModifierKeyToActivateSNWView;
   // defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
   let showTippy = true;
@@ -90,27 +88,12 @@ export function htmlDecorationForReferencesElement(
   return refenceElement;
 }
 
-export /**
- *  Opens the sidebar SNW pane by calling activateView on main.ts
- *
- * @param {HTMLElement} target
- */
-const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
+//  Opens the sidebar SNW pane by calling activateView on main.ts
+export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
   const refType = target.getAttribute('data-snw-type') ?? '';
   const realLink = target.getAttribute('data-snw-realLink') ?? '';
   const key = target.getAttribute('data-snw-key') ?? '';
   const filePath = target.getAttribute('data-snw-filepath') ?? '';
   const lineNu = target.getAttribute('snw-data-line-number') ?? '';
-
-  if (plugin.snwAPI.enableDebugging?.HtmlDecorationElements)
-    plugin.snwAPI.console(
-      'htmlDecorations.processHtmlDecorationReferenceEvent: target, realLink, key, refType, filePath',
-      target,
-      realLink,
-      key,
-      refType,
-      filePath
-    );
-
   plugin.activateView(refType, realLink, key, filePath, Number(lineNu));
 };

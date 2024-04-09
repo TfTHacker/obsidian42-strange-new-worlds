@@ -9,6 +9,10 @@
 - Major rewrite of the internal indexer - significant performance improvements
 - Removed the cacheing tuning feature - this wasn't proving to be of help in peforamnce
 
+# Fixed
+
+- Fixed max items that can be displayed when reviewing references.
+
 # 1.2.6 (2024-04-05)
 
 - Dependency updates

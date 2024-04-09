@@ -2,7 +2,6 @@
 
 import { ItemView, WorkspaceLeaf } from 'obsidian';
 import { scrollResultsIntoView } from 'src/utils';
-import { getIndexedReferences } from '../indexer';
 import SNWPlugin from '../main';
 import { getUIC_SidePane } from './components/uic-ref--parent';
 import { render } from 'preact';
@@ -10,11 +9,11 @@ import { render } from 'preact';
 export const VIEW_TYPE_SNW = 'Strange New Worlds';
 
 export class SideBarPaneView extends ItemView {
-  thePlugin: SNWPlugin;
+  plugin: SNWPlugin;
 
-  constructor(leaf: WorkspaceLeaf, thePlugin: SNWPlugin) {
+  constructor(leaf: WorkspaceLeaf, snnwPlugin: SNWPlugin) {
     super(leaf);
-    this.thePlugin = thePlugin;
+    this.plugin = snnwPlugin;
   }
 
   getViewType() {
@@ -40,16 +39,11 @@ export class SideBarPaneView extends ItemView {
   }
 
   async updateView() {
-    const refType = this.thePlugin.lastSelectedReferenceType;
-    const realLink = this.thePlugin.lastSelectedReferenceRealLink;
-    const key = this.thePlugin.lastSelectedReferenceKey;
-    const filePath = this.thePlugin.lastSelectedReferenceFilePath;
-    const lineNu = this.thePlugin.lastSelectedLineNumber;
-
-    if (this.thePlugin.snwAPI.enableDebugging.SidePane) {
-      this.thePlugin.snwAPI.console('sidepane.open() refType, realLink, key, filePath', refType, realLink, key, filePath);
-      this.thePlugin.snwAPI.console('sidepane.open() getReferencesCache()', getIndexedReferences());
-    }
+    const refType = this.plugin.lastSelectedReferenceType;
+    const realLink = this.plugin.lastSelectedReferenceRealLink;
+    const key = this.plugin.lastSelectedReferenceKey;
+    const filePath = this.plugin.lastSelectedReferenceFilePath;
+    const lineNu = this.plugin.lastSelectedLineNumber;
 
     this.containerEl.replaceChildren(await getUIC_SidePane(refType, realLink, key, filePath, lineNu));
 

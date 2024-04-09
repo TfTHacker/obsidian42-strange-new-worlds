@@ -4,20 +4,9 @@ import SNWPlugin from './main';
 /**
  * Provide a simple API for use with Templater, Dataview and debugging the complexities of various pages.
  * main.ts will attach this to window.snwAPI
- *
- * @export
- * @class SnwAPI
  */
 export default class SnwAPI {
   plugin: SNWPlugin;
-  enableDebugging = {
-    CM6Extension: false,
-    PreviewRendering: false,
-    LinkCountInHeader: false,
-    GutterEmbedCounter: false,
-    HtmlDecorationElements: false,
-    SidePane: false
-  };
 
   constructor(snwPlugin: SNWPlugin) {
     this.plugin = snwPlugin;
@@ -28,11 +17,7 @@ export default class SnwAPI {
     console.log('SNW: ' + logDescription, outputs);
   };
 
-  /**
-   * For active file return the meta information used by various components of SNW
-   *
-   * @return {*}  {Promise<any>} // Needs to be any since we might return just about anything
-   */
+  // For active file return the meta information used by various components of SNW
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMetaInfoByCurrentFile = async (): Promise<any> => {
     return this.getMetaInfoByFileName(app.workspace.getActiveFile()?.path || '');
@@ -46,12 +31,7 @@ export default class SnwAPI {
     }
   };
 
-  /**
-   * For given file name passed into the function, get the meta info for that file
-   *
-   * @param {string} fileName (or file name path)
-   * @memberof SnwAPI
-   */
+  // For given file name passed into the function, get the meta info for that file
   getMetaInfoByFileName = async (fileName: string) => {
     const currentFile = app.metadataCache.getFirstLinkpathDest(fileName, '/');
     return {

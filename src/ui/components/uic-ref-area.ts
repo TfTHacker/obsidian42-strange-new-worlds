@@ -13,16 +13,8 @@ export function setPluginVariableUIC_RefArea(snwPlugin: SNWPlugin) {
   plugin = snwPlugin;
 }
 
-export /**
- *  Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
- *
- * @param {string} refType
- * @param {string} key
- * @param {string} filePath
- * @param {boolean} isHoverView
- * @return {*}  {Promise<string>}
- */
-const getUIC_Ref_Area = async (
+//Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
+export const getUIC_Ref_Area = async (
   refType: string,
   realLink: string,
   key: string,
@@ -43,14 +35,7 @@ const getUIC_Ref_Area = async (
   return refAreaContainerEl;
 };
 
-/**
- * Creates a DIV for a colection of reference blocks to be displayed
- *
- * @param {string} refType
- * @param {string} key
- * @param {string} filePath
- * @return {*}  {Promise<{response: string, refCount: number}>}
- */
+// Creates a DIV for a colection of reference blocks to be displayed
 const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{ response: HTMLElement; refCount: number }> => {
   let countOfRefs = 0;
   let linksToLoop: Link[] = null;

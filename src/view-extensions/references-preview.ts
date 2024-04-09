@@ -11,24 +11,9 @@ export function setPluginVariableForMarkdownPreviewProcessor(snwPlugin: SNWPlugi
 
 /**
  * Function called by main.registerMarkdownPostProcessor - this function renders the html when in preview mode
- *
  * This function receives a section of the document for processsing. So this function is called many times for a document.
- *
- * @export
- * @param {HTMLElement} el
- * @param {MarkdownPostProcessorContext} ctx
- * @param {SNWPlugin} thePlugin
- * @return {*}
  */
 export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-  if (plugin.snwAPI.enableDebugging.PreviewRendering)
-    plugin.snwAPI.console(
-      'markdownPreviewProcessor(HTMLElement, MarkdownPostProcessorContext,ctx.getSectionInfo',
-      el,
-      ctx,
-      ctx.getSectionInfo(el)
-    );
-
   // @ts-ignore
   if (ctx.remainingNestLevel === 4) return; // This is an attempt to prevent processing of embed files
 
@@ -63,13 +48,6 @@ class snwChildComponent extends MarkdownRenderChild {
     this.containerEl = containerEl;
     this.sectionInfo = sectionInfo;
     this.currentFile = currentFile;
-    if (plugin.snwAPI.enableDebugging.PreviewRendering)
-      plugin.snwAPI.console(
-        'snwChildComponent(HTMLElement, MarkdownPostProcessorContext,currentfile',
-        containerEl,
-        sectionInfo,
-        currentFile
-      );
   }
 
   onload(): void {

@@ -16,19 +16,8 @@ export function getIndexedReferences() {
   return indexedReferences;
 }
 
-// removes existing references from the map, used with getLinkReferencesForFile to rebuild the refeences
-export const removeLinkReferencesForFile = async (file: TFile) => {
-  for (const [key, items] of indexedReferences.entries()) {
-    for (let i = items.length - 1; i >= 0; i--) {
-      const item = items[i];
-      if (item?.sourceFile && item?.sourceFile?.path === file.path) {
-        items.splice(i, 1);
-      }
-    }
-    indexedReferences.set(key, items);
-  }
-};
-
+// Primary Indexing function. Adss to the indexedReferences map all outgoing links from a given file
+// The Database is primarily a key which is the link, and the value is an array of references that use that link
 export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => {
   if (plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom && file?.path && plugin.app.metadataCache.isUserIgnored(file?.path)) {
     return;
@@ -61,6 +50,19 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
   }
 };
 
+// removes existing references from the map, used with getLinkReferencesForFile to rebuild the refeences
+export const removeLinkReferencesForFile = async (file: TFile) => {
+  for (const [key, items] of indexedReferences.entries()) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      const item = items[i];
+      if (item?.sourceFile && item?.sourceFile?.path === file.path) {
+        items.splice(i, 1);
+      }
+    }
+    indexedReferences.set(key, items);
+  }
+};
+
 /**
  * Buildings a optimized list of cache references for resolving the block count.
  * It is only updated when there are data changes to the vault. This is hooked to an event
@@ -87,13 +89,7 @@ export function buildLinksAndReferences(): void {
 // following MAP works as a cache for the getCurrentPage call. Based on time elapsed since last update, it just returns a cached transformedCache object
 const cacheCurrentPages = new Map<string, TransformedCache>();
 
-/**
- * Provides an optimized view of the cache for determining the block count for references in a given page
- *
- * @export
- * @param {TFile} file
- * @return {*}  {TransformedCache}
- */
+// Provides an optimized view of the cache for determining the block count for references in a given page
 export function getSNWCacheByFile(file: TFile): TransformedCache {
   if (cacheCurrentPages.has(file.path)) {
     const cachedPage = cacheCurrentPages.get(file.path);

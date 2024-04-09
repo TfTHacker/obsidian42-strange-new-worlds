@@ -15,21 +15,14 @@ export function setPluginVariableForHeaderRefCount(snwPlugin: SNWPlugin) {
   plugin = snwPlugin;
 }
 
-/**
- * Iterates all open documents to see if they are markdown file, and if so called processHeader
- *
- */
+// Iterates all open documents to see if they are markdown file, and if so called processHeader
 export default function setHeaderWithReferenceCounts() {
   plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
     if (leaf.view.getViewType() === 'markdown') processHeader(leaf.view as MarkdownView);
   });
 }
 
-/**
- * Analyzes the page and if there is incoming links displays a header message
- *
- * @param {MarkdownView} mdView
- */
+// Analyzes the page and if there is incoming links displays a header message
 function processHeader(mdView: MarkdownView) {
   const mdViewFile = mdView.file!;
   if (!mdViewFile) return;

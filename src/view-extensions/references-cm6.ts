@@ -1,10 +1,7 @@
 /**
  * Codemirror extension - hook into the CM editor
- *
  * CM will call update as the doc updates.
- *
  */
-
 import { EditorView, Decoration, MatchDecorator, ViewUpdate, ViewPlugin, DecorationSet, WidgetType } from '@codemirror/view';
 import { editorInfoField, stripHeading } from 'obsidian';
 import { getSNWCacheByFile, parseLinkTextToFullPath } from 'src/indexer';
@@ -20,9 +17,6 @@ export function setPluginVariableForCM6InlineReferences(snwPlugin: SNWPlugin) {
 
 /**
  * CM widget for renderinged matched ranges of references. This allows us to provide our UX for matches.
- *
- * @class InlineReferenceWidget
- * @extends {WidgetType}
  */
 export const InlineReferenceExtension = ViewPlugin.fromClass(
   class {
@@ -146,14 +140,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
   }
 );
 
-/**
- * Helper function for preparing the Widget for displaying the reference count
- *
- * @param {string} key  - Unique reference key
- * @param {TransformedCachedItem[]} references - list of references
- * @param {string} filePath - file path for file being modified
- * @return {*}  {InlineReferenceWidget}
- */
+// Helper function for preparing the Widget for displaying the reference count
 const constructWidgetForInlineReference = (
   refType: string,
   key: string,
@@ -198,12 +185,7 @@ const constructWidgetForInlineReference = (
   return null;
 };
 
-/**
- * CM widget for renderinged matched ranges of references. This allows us to provide our UX for matches.
- *
- * @class InlineReferenceWidget
- * @extends {WidgetType}
- */
+// CM widget for renderinged matched ranges of references. This allows us to provide our UX for matches.
 export class InlineReferenceWidget extends WidgetType {
   referenceCount: number;
   referenceType: string;
@@ -245,4 +227,4 @@ export class InlineReferenceWidget extends WidgetType {
   ignoreEvent() {
     return false;
   }
-} // END InlineReferenceWidget
+}

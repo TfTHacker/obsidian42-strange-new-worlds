@@ -30,15 +30,14 @@ export const getUIC_Hoverview = async (instance: Instance) => {
   scrollResultsIntoView(popoverEl);
 };
 
-export /**
- *  Loads the references into the side pane, using the same logic as the HoverView
- *
- * @param {string} refType
- * @param {string} key
- * @param {string} filePath
- * @return {*}  {Promise<string>}
- */
-const getUIC_SidePane = async (refType: string, realLink: string, key: string, filePath: string, lineNu: number): Promise<HTMLElement> => {
+// Loads the references into the side pane, using the same logic as the HoverView
+export const getUIC_SidePane = async (
+  refType: string,
+  realLink: string,
+  key: string,
+  filePath: string,
+  lineNu: number
+): Promise<HTMLElement> => {
   const sidepaneEL = createDiv();
   sidepaneEL.addClass('snw-sidepane-container');
   sidepaneEL.addClass('search-result-container');
@@ -51,11 +50,7 @@ const getUIC_SidePane = async (refType: string, realLink: string, key: string, f
   return sidepaneEL;
 };
 
-/**
- * Creates event handlers for components of the HoverView and sidepane
- *
- * @param {boolean} isHoverView
- */
+// Creates event handlers for components of the HoverView and sidepane
 export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForViewEl: HTMLElement) => {
   const linksToFiles: NodeList = rootElementForViewEl.querySelectorAll(
     '.snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover'
@@ -136,12 +131,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
   });
 };
 
-/**
- * Utility function to extact key data points from the Tippy instance
- *
- * @param {Instance} instance
- * @return {*}  {Promise<{refType: string; key: string; filePath: string}>}
- */
+// Utility function to extact key data points from the Tippy instance
 const getDataElements = async (
   instance: Instance
 ): Promise<{

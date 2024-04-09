@@ -7,7 +7,8 @@ import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor 
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from './view-extensions/gutters-cm6';
 import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from './ui/headerRefCount';
 import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/sidebar-pane';
-import { SettingsTab, Settings, DEFAULT_SETTINGS } from './ui/settingsTab';
+import { SettingsTab } from './ui/SettingsTab';
+import { Settings, DEFAULT_SETTINGS } from './ui/settings';
 import SnwAPI from './snwApi';
 import { setPluginVariableForUIC } from './ui/components/uic-ref--parent';
 import { setPluginVariableUIC_RefArea } from './ui/components/uic-ref-area';
@@ -74,20 +75,9 @@ export default class SNWPlugin extends Plugin {
       true
     );
 
-    // this.registerEvent(this.app.metadataCache.on('resolve', indexDebounce));
     this.registerEvent(this.app.vault.on('rename', indexFullUpdateDebounce));
     this.registerEvent(this.app.vault.on('delete', indexFullUpdateDebounce));
-
-    this.registerEvent(
-      this.app.metadataCache.on('resolved', () => {
-        console.log('resolved');
-        // indexDebounce();
-      })
-    );
-
     this.registerEvent(this.app.metadataCache.on('changed', indexFileUpdateDebounce));
-
-    // this.registerEvent(this.app.workspace.on('editor-change', indexDebounce)); // this is unlikely to be needed
 
     this.app.workspace.registerHoverLinkSource(this.appID, {
       display: this.appName,
@@ -118,15 +108,7 @@ export default class SNWPlugin extends Plugin {
     setHeaderWithReferenceCounts();
   }
 
-  /**
-   * Displays the sidebar SNW pane
-   *
-   * @param {string} refType
-   * @param {string} key
-   * @param {string} filePath
-   * @param {number} lineNu
-   * @memberof ThePlugin
-   */
+  // Displays the sidebar SNW pane
   async activateView(refType: string, realLink: string, key: string, filePath: string, lineNu: number) {
     this.lastSelectedReferenceType = refType;
     this.lastSelectedReferenceRealLink = realLink;
@@ -137,21 +119,13 @@ export default class SNWPlugin extends Plugin {
     this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
   }
 
-  /**
-   * Turns on and off the reference count displayed at the top of the document in the header area
-   *
-   * @memberof ThePlugin
-   */
+  // Turns on and off the reference count displayed at the top of the document in the header area
   toggleStateHeaderCount(): void {
     if (this.settings.displayIncomingFilesheader && this.showCountsActive) this.app.workspace.on('layout-change', this.layoutChangeEvent);
     else this.app.workspace.off('layout-change', this.layoutChangeEvent);
   }
 
-  /**
-   * Turns on and off the SNW reference counters in Reading mode
-   *
-   * @memberof ThePlugin
-   */
+  // Turns on and off the SNW reference counters in Reading mode
   toggleStateSNWMarkdownPreview(): void {
     if (this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor === null) {
       this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
@@ -165,11 +139,7 @@ export default class SNWPlugin extends Plugin {
     }
   }
 
-  /**
-   * Turns on and off the SNW reference counters in CM editor
-   *
-   * @memberof ThePlugin
-   */
+  // Turns on and off the SNW reference counters in CM editor
   toggleStateSNWLivePreview(): void {
     let state = this.settings.displayInlineReferencesLivePreview;
 
@@ -178,11 +148,7 @@ export default class SNWPlugin extends Plugin {
     this.updateCMExtensionState('inline-ref', state, InlineReferenceExtension);
   }
 
-  /**
-   * Turns on and off the SNW reference counters in CM editor gutter
-   *
-   * @memberof ThePlugin
-   */
+  // Turns on and off the SNW reference counters in CM editor gutter
   toggleStateSNWGutters(): void {
     let state =
       Platform.isMobile || Platform.isMobileApp ?
@@ -194,14 +160,7 @@ export default class SNWPlugin extends Plugin {
     this.updateCMExtensionState('gutter', state, ReferenceGutterExtension);
   }
 
-  /**
-   * Manages which CM extensions are loaded into Obsidian
-   *
-   * @param {string} extensionIdentifier
-   * @param {boolean} extensionState
-   * @param {Extension} extension
-   * @memberof ThePlugin
-   */
+  // Manages which CM extensions are loaded into Obsidian
   updateCMExtensionState(extensionIdentifier: string, extensionState: boolean, extension: Extension) {
     if (extensionState == true) {
       this.editorExtensions.push(extension);

@@ -13,7 +13,7 @@ export const getUIC_Ref_Title_Div = (
   refCount: number,
   lineNu: number,
   isPopover: boolean,
-  thePlugin: SNWPlugin
+  plugin: SNWPlugin
 ): HTMLElement => {
   const titleElJsx = (
     <div
@@ -37,7 +37,7 @@ export const getUIC_Ref_Title_Div = (
             onClick={(e: MouseEvent) => {
               e.stopPropagation();
               hideAll({ duration: 0 }); // hide popup
-              thePlugin.activateView(refType, realLink, key, filePath, Number(lineNu));
+              plugin.activateView(refType, realLink, key, filePath, Number(lineNu));
             }}>
             <IconMoreDetails />
           </span>
