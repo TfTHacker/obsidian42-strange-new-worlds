@@ -7,7 +7,7 @@
 # Updated
 
 - Major rewrite of the internal indexer - significant performance improvements
-- Removed the cacheing tuning feature - this wasn't proving to be of help in peforamnce
+- Removed the caching tuning feature - this wasn't proving to be of help in performance
 
 # Fixed
 
