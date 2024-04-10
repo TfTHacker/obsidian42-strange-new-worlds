@@ -134,7 +134,10 @@ export class SettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Show SNW indicators in Live Preview Editor')
-      .setDesc('While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds.')
+      .setDesc(
+        'While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds.' +
+          'Note: files may need to be closed and reopened for this setting to take effect.'
+      )
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.plugin.settings.displayInlineReferencesLivePreview);
         cb.onChange(async (value: boolean) => {
@@ -147,7 +150,8 @@ export class SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName('Show SNW indicators in Reading view ')
       .setDesc(
-        'While in Reading View of a document, display inline of the text of documents all reference counts for links, blocks and embeds.'
+        'While in Reading View of a document, display inline of the text of documents all reference counts for links, blocks and embeds.' +
+          'Note: files may need to be closed and reopened for this setting to take effect.'
       )
       .addToggle((cb: ToggleComponent) => {
         cb.setValue(this.plugin.settings.displayInlineReferencesMarkdown);

@@ -56,7 +56,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
             if (firstCharacterMatch === ' ' && (transformedCache?.blocks?.length ?? 0) > 0) {
               widgetsToAdd.push({
                 //blocks
-                key: mdViewFile.path.replace('.md', '') + match[0].replace(' ^', ''), //change this to match the references cache
+                key: mdViewFile.path.replace('.md', '') + match[0].replace(' ^', '#^'), //change this to match the references cache
                 transformedCachedItem: transformedCache.blocks ?? null,
                 refType: 'block',
                 from: to,

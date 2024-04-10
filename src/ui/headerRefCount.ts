@@ -24,7 +24,6 @@ function setHeaderWithReferenceCounts() {
 
 export const updateHeadersDebounce = debounce(
   () => {
-    console.log('Updating headers');
     setHeaderWithReferenceCounts();
   },
   500,

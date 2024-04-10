@@ -126,13 +126,16 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
   if (cachedMetaData?.blocks) {
     const filePath = file.path.replace('.md', '');
-    transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => ({
-      key: filePath + block.id,
-      pos: block.position,
-      page: file.basename,
-      type: 'block',
-      references: indexedReferences.get(filePath + block.id) || []
-    }));
+    transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => {
+      const key = filePath + '#^' + block.id;
+      return {
+        key: key,
+        pos: block.position,
+        page: file.basename,
+        type: 'block',
+        references: indexedReferences.get(key) || []
+      };
+    });
   }
 
   if (cachedMetaData?.headings) {
