@@ -5,7 +5,7 @@ import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } fro
 import { setPluginVariableForHtmlDecorations } from './view-extensions/htmlDecorations';
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from './view-extensions/references-preview';
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from './view-extensions/gutters-cm6';
-import setHeaderWithReferenceCounts, { setPluginVariableForHeaderRefCount } from './ui/headerRefCount';
+import { setPluginVariableForHeaderRefCount, updateHeadersDebounce } from './ui/headerRefCount';
 import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/sidebar-pane';
 import { SettingsTab } from './ui/SettingsTab';
 import { Settings, DEFAULT_SETTINGS } from './ui/settings';
@@ -58,6 +58,7 @@ export default class SNWPlugin extends Plugin {
     const indexFullUpdateDebounce = debounce(
       () => {
         buildLinksAndReferences();
+        updateHeadersDebounce();
       },
       5000,
       true
@@ -69,6 +70,7 @@ export default class SNWPlugin extends Plugin {
         console.time(this.APP_ABBREVIARTION + ' update: ' + file.basename);
         await removeLinkReferencesForFile(file);
         getLinkReferencesForFile(file, cache);
+        updateHeadersDebounce();
         console.timeEnd(this.APP_ABBREVIARTION + ' update: ' + file.basename);
       },
       3000,
@@ -102,7 +104,7 @@ export default class SNWPlugin extends Plugin {
   }
 
   async layoutChangeEvent() {
-    setHeaderWithReferenceCounts();
+    updateHeadersDebounce();
   }
 
   // Displays the sidebar SNW pane

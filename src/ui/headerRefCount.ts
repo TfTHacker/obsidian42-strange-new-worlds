@@ -1,6 +1,6 @@
 // Displays in the header of open documents the count of incoming links
 
-import { MarkdownView, Platform, WorkspaceLeaf } from 'obsidian';
+import { MarkdownView, Platform, WorkspaceLeaf, debounce } from 'obsidian';
 import { Link } from '../types';
 import SNWPlugin from '../main';
 import { processHtmlDecorationReferenceEvent } from '../view-extensions/htmlDecorations';
@@ -16,11 +16,20 @@ export function setPluginVariableForHeaderRefCount(snwPlugin: SNWPlugin) {
 }
 
 // Iterates all open documents to see if they are markdown file, and if so called processHeader
-export default function setHeaderWithReferenceCounts() {
+function setHeaderWithReferenceCounts() {
   plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
     if (leaf.view.getViewType() === 'markdown') processHeader(leaf.view as MarkdownView);
   });
 }
+
+export const updateHeadersDebounce = debounce(
+  () => {
+    console.log('Updating headers');
+    setHeaderWithReferenceCounts();
+  },
+  500,
+  true
+);
 
 // Analyzes the page and if there is incoming links displays a header message
 function processHeader(mdView: MarkdownView) {
