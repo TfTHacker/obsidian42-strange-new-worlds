@@ -38,10 +38,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
         regexp: new RegExp(this.regxPattern, 'g'),
         decorate: (add, from, to, match, view) => {
           const mdView = view.state.field(editorInfoField);
-          // TODO: should handle check for TFile better than non-null! assertion
+          // there is no file, likely a canvas file, so stop processing
+          if (!mdView.file) return;
           const mdViewFile = mdView.file!;
           const firstCharacterMatch = match[0].charAt(0);
+
           const transformedCache = getSNWCacheByFile(mdViewFile);
+
           if (
             transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] != true &&
             transformedCache?.cacheMetaData?.frontmatter?.['snw-canvas-exclude-edit'] != true
@@ -56,7 +59,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
             if (firstCharacterMatch === ' ' && (transformedCache?.blocks?.length ?? 0) > 0) {
               widgetsToAdd.push({
                 //blocks
-                key: mdViewFile.path.replace('.md', '') + match[0].replace(' ^', '#^'), //change this to match the references cache
+                key: mdViewFile.path.replace('.' + mdView.file?.extension, '') + match[0].replace(' ^', '#^'), //change this to match the references cache
                 transformedCachedItem: transformedCache.blocks ?? null,
                 refType: 'block',
                 from: to,
@@ -67,7 +70,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
               let newEmbed = match[0].replace('![[', '').replace(']]', '');
               if (newEmbed.startsWith('#'))
                 //link to an internal page link, add page name
-                newEmbed = mdViewFile.path.replace('.md', '') + stripHeading(newEmbed);
+                newEmbed = mdViewFile.path.replace('.' + mdView.file?.extension, '') + stripHeading(newEmbed);
               widgetsToAdd.push({
                 key: newEmbed,
                 transformedCachedItem: transformedCache.embeds ?? null,
@@ -80,7 +83,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
               let newLink = match[0].replace('[[', '').replace(']]', '');
               if (newLink.startsWith('#'))
                 //link to an internal page link, add page name
-                newLink = mdViewFile.path.replace('.md', '') + newLink;
+                newLink = mdViewFile.path.replace('.' + mdView.file?.extension, '') + newLink;
               widgetsToAdd.push({
                 key: newLink,
                 transformedCachedItem: transformedCache.links ?? null,
@@ -116,7 +119,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 
             for (const ref of widgetsToAdd.sort((a, b) => a.to - b.to)) {
               if (ref.key != '') {
-                const wdgt = constructWidgetForInlineReference(ref.refType, ref.key, ref.transformedCachedItem ?? [], mdViewFile.path);
+                const wdgt = constructWidgetForInlineReference(
+                  ref.refType,
+                  ref.key,
+                  ref.transformedCachedItem ?? [],
+                  mdViewFile.path,
+                  mdViewFile.extension
+                );
                 if (wdgt != null) {
                   add(ref.from, ref.to, Decoration.widget({ widget: wdgt, side: 1 }));
                 }
@@ -145,7 +154,8 @@ const constructWidgetForInlineReference = (
   refType: string,
   key: string,
   references: TransformedCachedItem[],
-  filePath: string
+  filePath: string,
+  fileExtension: string
 ): InlineReferenceWidget | null => {
   for (let i = 0; i < references.length; i++) {
     const ref = references[i];
@@ -163,12 +173,13 @@ const constructWidgetForInlineReference = (
       key = parsedKey === '' ? key : parsedKey; //if no results, likely a ghost link
       if (matchKey.startsWith('#')) {
         // internal page link
-        matchKey = filePath.replace('.md', '') + stripHeading(matchKey);
+        matchKey = filePath.replace('.' + fileExtension, '') + stripHeading(matchKey);
       }
     }
 
     if (matchKey === key) {
-      const filePath = ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace('.md', '') : key;
+      const filePath =
+        ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace('.' + ref.references[0].resolvedFile, '') : key;
       if (ref?.references[0]?.excludedFile != true && ref?.references.length >= plugin.settings.minimumRefCountThreshold)
         return new InlineReferenceWidget(
           ref.references.length,

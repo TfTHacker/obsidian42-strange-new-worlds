@@ -252,3 +252,11 @@ div:has(> .snw-reference),
   height: 0px;
   color: transparent;
 }
+
+
+/* prevent printing of reference numbers */
+@media print {
+  .snw-reference {
+    display: none;
+  }
+}

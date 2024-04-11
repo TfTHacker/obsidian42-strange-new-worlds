@@ -60,7 +60,7 @@ export default class SNWPlugin extends Plugin {
         buildLinksAndReferences();
         updateHeadersDebounce();
       },
-      5000,
+      3000,
       true
     );
 
@@ -73,7 +73,7 @@ export default class SNWPlugin extends Plugin {
         updateHeadersDebounce();
         console.timeEnd(this.APP_ABBREVIARTION + ' update: ' + file.basename);
       },
-      3000,
+      500,
       true
     );
 

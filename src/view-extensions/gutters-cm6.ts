@@ -73,7 +73,7 @@ const ReferenceGutterExtension = gutter({
                 const strippedLineToAnalyze = lineToAnalyze.replace('![[', '').replace(']]', '');
                 let lineFromFile = '';
                 if (strippedLineToAnalyze.startsWith('#')) {
-                  lineFromFile = mdView.file.path.replace('.md', '') + stripHeading(strippedLineToAnalyze);
+                  lineFromFile = mdView.file.path.replace('.' + mdView.file.path, '') + stripHeading(strippedLineToAnalyze);
                 } else {
                   lineFromFile = parseLinkTextToFullPath(strippedLineToAnalyze);
                 }
@@ -83,7 +83,7 @@ const ReferenceGutterExtension = gutter({
                     'embed',
                     ref.references[0].realLink,
                     ref.key,
-                    (ref.references[0].resolvedFile?.path ?? '').replace('.md', ''),
+                    (ref.references[0].resolvedFile?.path ?? '').replace('.' + ref.references[0].resolvedFile?.extension, ''),
                     'snw-embed-special'
                   );
                 }

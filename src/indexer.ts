@@ -101,7 +101,6 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
       }
     }
   }
-
   if (plugin.showCountsActive != true) return {};
 
   const transformedCache: TransformedCache = {};
@@ -125,7 +124,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
   }, []);
 
   if (cachedMetaData?.blocks) {
-    const filePath = file.path.replace('.md', '');
+    const filePath = file.path.replace('.' + file.extension, '');
     transformedCache.blocks = Object.values(cachedMetaData.blocks).map((block) => {
       const key = filePath + '#^' + block.id;
       return {
@@ -141,7 +140,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
   if (cachedMetaData?.headings) {
     transformedCache.headings = cachedMetaData.headings.map((header: { heading: string; position: Pos; level: number }) => {
       const headingString = '#'.repeat(header.level) + header.heading;
-      const key = `${file.path.replace('.md', '')}#${header.heading.replace(/\[|\]/g, '')}`;
+      const key = `${file.path.replace('.' + file.extension, '')}#${header.heading.replace(/\[|\]/g, '')}`;
       return {
         original: headingString,
         key: key,
@@ -165,7 +164,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
       if (newLinkPath.startsWith('#^') || newLinkPath.startsWith('#')) {
         // handles links from same page
-        newLinkPath = file.path.replace('.md', '') + newLinkPath;
+        newLinkPath = file.path.replace('.' + file.extension, '') + newLinkPath;
       }
 
       return {
@@ -194,7 +193,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 
       // if newEmbedPath is empty, then this is a link on the same page
       if (newEmbedPath === '' && (embed.link.startsWith('#^') || embed.link.startsWith('#'))) {
-        newEmbedPath = file.path.replace('.md', '') + embed.link;
+        newEmbedPath = file.path.replace('.' + file.extension, '') + embed.link;
       }
 
       const output = {
@@ -233,5 +232,5 @@ export function parseLinkTextToFullPath(link: string): string {
   const resolvedFilePath = parseLinktext(link);
   const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, '/');
   if (resolvedTFile === null) return '';
-  else return resolvedTFile.path.replace('.md', '') + resolvedFilePath.subpath;
+  else return resolvedTFile.path.replace('.' + resolvedTFile.extension, '') + resolvedFilePath.subpath;
 }

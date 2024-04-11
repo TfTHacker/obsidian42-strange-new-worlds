@@ -12,6 +12,7 @@
 # Fixed
 
 - Fixed max items that can be displayed when reviewing references.
+- Block refrence counts will not show up in Export to PDF
 
 # 1.2.6 (2024-04-05)
 

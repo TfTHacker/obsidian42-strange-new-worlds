@@ -84,7 +84,7 @@ class snwChildComponent extends MarkdownRenderChild {
               'block',
               value.references[0].realLink,
               value.key,
-              value.references[0]?.resolvedFile?.path.replace('.md', ''),
+              value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.path, ''),
               '',
               value.pos.start.line
             );
@@ -117,7 +117,7 @@ class snwChildComponent extends MarkdownRenderChild {
         this.containerEl.querySelectorAll('.internal-embed:not(.snw-embed-preview)').forEach((element) => {
           let embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
           if (embedKey === '') {
-            embedKey = this.currentFile.path.replace('.md', '') + stripHeading(element.getAttribute('src'));
+            embedKey = this.currentFile.path.replace('.' + this.currentFile.extension, '') + stripHeading(element.getAttribute('src'));
           }
           for (const value of transformedCache.embeds) {
             if (
@@ -130,7 +130,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 'embed',
                 value.references[0].realLink,
                 value.key,
-                value.references[0]?.resolvedFile?.path.replace('.md', ''),
+                value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.extension, ''),
                 '',
                 value.pos.start.line
               );
@@ -157,7 +157,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 'heading',
                 value.references[0].realLink,
                 value.key,
-                value.references[0]?.resolvedFile?.path.replace('.md', ''),
+                value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.extension, ''),
                 '',
                 value.pos.start.line
               );
@@ -183,7 +183,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 'link',
                 value.references[0].realLink,
                 value.key,
-                value.references[0]?.resolvedFile?.path.replace('.md', ''),
+                value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.extension, ''),
                 '',
                 value.pos.start.line
               );

@@ -89,7 +89,7 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     refItemFileEl.addClass('search-result-file-title');
     refItemFileEl.addClass('is-clickable');
     refItemFileEl.setAttribute('snw-data-line-number', '-1');
-    refItemFileEl.setAttribute('snw-data-file-name', file_path.sourceFile.path.replace('.md', ''));
+    refItemFileEl.setAttribute('snw-data-file-name', file_path.sourceFile.path.replace('.' + file_path.sourceFile?.extension, ''));
     refItemFileEl.setAttribute('data-href', file_path.sourceFile.path);
     refItemFileEl.setAttribute('href', file_path.sourceFile.path);
 
