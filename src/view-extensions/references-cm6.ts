@@ -20,11 +20,12 @@ export function setPluginVariableForCM6InlineReferences(snwPlugin: SNWPlugin) {
  */
 export const InlineReferenceExtension = ViewPlugin.fromClass(
   class {
-    decorator: MatchDecorator;
+    decorator: MatchDecorator | undefined;
     decorations: DecorationSet = Decoration.none;
     regxPattern = '';
 
     constructor(public view: EditorView) {
+      // The constructor seems to be called only once when a file is viewed. The decorator is called multipe times.
       if (plugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = '(\\s\\^)(\\S+)$';
       if (plugin.settings.enableRenderingEmbedsInLivePreview)
         this.regxPattern += (this.regxPattern != '' ? '|' : '') + '!\\[\\[(.*?)\\]\\]';
@@ -41,14 +42,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
           // there is no file, likely a canvas file, so stop processing
           if (!mdView.file) return;
           const mdViewFile = mdView.file!;
-          const firstCharacterMatch = match[0].charAt(0);
-
           const transformedCache = getSNWCacheByFile(mdViewFile);
 
           if (
             transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] != true &&
             transformedCache?.cacheMetaData?.frontmatter?.['snw-canvas-exclude-edit'] != true
           ) {
+            const firstCharacterMatch = match[0].charAt(0);
             const widgetsToAdd: {
               key: string;
               transformedCachedItem: TransformedCachedItem[] | null;
@@ -135,12 +135,12 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
         }
       });
 
-      if (this.regxPattern != '') this.decorations = this.decorator.createDeco(view);
+      this.decorations = this.decorator.createDeco(view);
     }
 
     update(update: ViewUpdate) {
       if (this.regxPattern != '' && (update.docChanged || update.viewportChanged)) {
-        this.decorations = this.decorator.updateDeco(update, this.decorations);
+        this.decorations = this.decorator!.updateDeco(update, this.decorations);
       }
     }
   },
@@ -180,7 +180,7 @@ const constructWidgetForInlineReference = (
     if (matchKey === key) {
       const filePath =
         ref?.references[0]?.resolvedFile ? ref.references[0].resolvedFile.path.replace('.' + ref.references[0].resolvedFile, '') : key;
-      if (ref?.references[0]?.excludedFile != true && ref?.references.length >= plugin.settings.minimumRefCountThreshold)
+      if (ref?.references.length >= plugin.settings.minimumRefCountThreshold)
         return new InlineReferenceWidget(
           ref.references.length,
           ref.type,

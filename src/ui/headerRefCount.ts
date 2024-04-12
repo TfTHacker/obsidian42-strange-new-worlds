@@ -48,9 +48,6 @@ function processHeader(mdView: MarkdownView) {
   const transformedCache = getSNWCacheByFile(mdViewFile);
   if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true) incomingLinksCount = 0;
 
-  // check if headers for this file are excluded
-  if (incomingLinks[0]?.excludedFile === true) incomingLinksCount = 0;
-
   // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
   if (incomingLinksCount < 1) {
     if (mdView.contentEl.querySelector('.snw-header-count-wrapper')) mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();

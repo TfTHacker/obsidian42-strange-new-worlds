@@ -67,7 +67,7 @@ const ReferenceGutterExtension = gutter({
       for (const embed of embedsFromMetaDataCache) {
         if (embed.position.start.line + 1 === lineNumberInFile) {
           for (const ref of transformedCache?.embeds ?? []) {
-            if (ref?.references[0]?.excludedFile != true && ref?.references.length > 0 && ref?.pos.start.line + 1 === lineNumberInFile) {
+            if (ref?.references.length > 0 && ref?.pos.start.line + 1 === lineNumberInFile) {
               const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim();
               if (lineToAnalyze.startsWith('!')) {
                 const strippedLineToAnalyze = lineToAnalyze.replace('![[', '').replace(']]', '');

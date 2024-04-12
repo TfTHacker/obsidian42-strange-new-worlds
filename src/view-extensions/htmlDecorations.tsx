@@ -12,7 +12,7 @@ export function setPluginVariableForHtmlDecorations(snwPlugin: SNWPlugin) {
 }
 
 /**
- * Shared function between references-cm6.ts and references-preview.s
+ * Shared function between references-cm6.ts and references-preview.
  * This decoration is just the html box drawn into the document with the count of references.
  * It is used in the header as well as inline in the document. If a user clicks on this element,
  * the function processHtmlDecorationReferenceEvent is called
@@ -20,6 +20,7 @@ export function setPluginVariableForHtmlDecorations(snwPlugin: SNWPlugin) {
  * @export
  * @param {number} count            Number to show in the box
  * @param {string} referenceType    The type of references (block, embed, link, header)
+ * @param {string} realLink         The real link to the reference contained in the document
  * @param {string} key              Unique key used to identify this reference based on its type
  * @param {string} filePath         File path in file in vault
  * @param {string} attachCSSClass   if special class is need for the element

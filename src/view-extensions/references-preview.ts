@@ -17,11 +17,10 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownP
   // @ts-ignore
   if (ctx.remainingNestLevel === 4) return; // This is an attempt to prevent processing of embed files
 
-  // check if SNW should ingore this page
-  if (ctx?.frontmatter?.['snw-file-exclude'] === true) return;
-  if (ctx?.frontmatter?.['snw-canvas-exclude-preview'] === true) return;
-
   if (el.hasAttribute('uic')) return; // this is a custom component, don't render SNW inside it.
+
+  // The following line addresses a conflict with the popular Tasks plugin.
+  if (el.querySelectorAll('.contains-task-list').length > 0) return;
 
   const currentFile = plugin.app.vault.fileMap[ctx.sourcePath];
   if (currentFile === undefined) return;
@@ -58,24 +57,22 @@ class snwChildComponent extends MarkdownRenderChild {
     const minRefCountThreshold = plugin.settings.minimumRefCountThreshold;
     const transformedCache = getSNWCacheByFile(this.currentFile);
 
-    // The following line addresses a conflict with the popular Tasks plugin.
-    if (this.containerEl.querySelectorAll('.contains-task-list').length > 0) return;
     if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true) return;
+    if (transformedCache?.cacheMetaData?.frontmatter?.['snw-canvas-exclude-preview'] === true) return;
 
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
       if (plugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
-        let isThisAnEmbed = false;
-        try {
-          // we don't want to proccess embeds
-          // @ts-ignore
-          isThisAnEmbed = ctx.containerEl.closest('.snw-embed-preview').nextSibling.classList.contains('snw-reference');
-        } catch (error) {
-          /* nothing to do here */
-        }
+        let isThisAnEmbed = false; //Testing to see if this check is still needed
+        // try {
+        // we don't want to proccess embeds
+        // @ts-ignore
+        // isThisAnEmbed = ctx.containerEl.closest('.snw-embed-preview').nextSibling.classList.contains('snw-reference');
+        // } catch (error) {
+        /* nothing to do here */
+        // }
 
         for (const value of transformedCache.blocks) {
           if (
-            value.references[0]?.excludedFile != true &&
             value.references.length >= minRefCountThreshold &&
             value.pos.start.line >= this.sectionInfo?.lineStart &&
             value.pos.end.line <= this.sectionInfo?.lineEnd &&
@@ -122,11 +119,7 @@ class snwChildComponent extends MarkdownRenderChild {
             embedKey = this.currentFile.path.replace('.' + this.currentFile.extension, '') + stripHeading(element.getAttribute('src'));
           }
           for (const value of transformedCache.embeds) {
-            if (
-              value.references[0]?.excludedFile != true &&
-              value.references.length >= minRefCountThreshold &&
-              embedKey.endsWith(value.key)
-            ) {
+            if (value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
               const referenceElement = htmlDecorationForReferencesElement(
                 value.references.length,
                 'embed',
@@ -149,11 +142,7 @@ class snwChildComponent extends MarkdownRenderChild {
         if (transformedCache?.headings && headerKey) {
           const textContext = headerKey.getAttribute('data-heading');
           for (const value of transformedCache.headings) {
-            if (
-              value.references[0]?.excludedFile != true &&
-              value.references.length >= minRefCountThreshold &&
-              value.headerMatch === textContext!.replace(/\[|\]/g, '')
-            ) {
+            if (value.references.length >= minRefCountThreshold && value.headerMatch === textContext!.replace(/\[|\]/g, '')) {
               const referenceElement = htmlDecorationForReferencesElement(
                 value.references.length,
                 'heading',
@@ -176,7 +165,6 @@ class snwChildComponent extends MarkdownRenderChild {
           const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
           for (const value of transformedCache.links) {
             if (
-              value.references[0]?.excludedFile != true &&
               value.references.length >= minRefCountThreshold &&
               (value.key === link || (value?.original != undefined && value?.original.contains(link)))
             ) {

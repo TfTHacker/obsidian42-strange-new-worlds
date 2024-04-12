@@ -58,7 +58,6 @@ export interface Link {
   resolvedFile: TFile | null;
   realLink: string; //the real link in the markdown
   sourceFile: TFile | null;
-  excludedFile: boolean;
 }
 
 export interface TransformedCachedItem {
