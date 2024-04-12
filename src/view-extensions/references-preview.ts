@@ -58,6 +58,8 @@ class snwChildComponent extends MarkdownRenderChild {
     const minRefCountThreshold = plugin.settings.minimumRefCountThreshold;
     const transformedCache = getSNWCacheByFile(this.currentFile);
 
+    // The following line addresses a conflict with the popular Tasks plugin.
+    if (this.containerEl.querySelectorAll('.contains-task-list').length > 0) return;
     if (transformedCache?.cacheMetaData?.frontmatter?.['snw-file-exclude'] === true) return;
 
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
@@ -170,7 +172,7 @@ class snwChildComponent extends MarkdownRenderChild {
       }
 
       if (plugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
-        this.containerEl.querySelectorAll('a.internal-link:not(.snw-link-preview)').forEach((element) => {
+        this.containerEl.querySelectorAll('a.internal-link').forEach((element) => {
           const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
           for (const value of transformedCache.links) {
             if (

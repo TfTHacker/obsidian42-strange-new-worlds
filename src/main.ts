@@ -127,7 +127,7 @@ export default class SNWPlugin extends Plugin {
   // Turns on and off the SNW reference counters in Reading mode
   toggleStateSNWMarkdownPreview(): void {
     if (this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor === null) {
-      this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx));
+      this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx), 100);
     } else {
       if (!this.markdownPostProcessor) {
         console.log('Markdown post processor is not registered');

@@ -52,7 +52,7 @@ function processHeader(mdView: MarkdownView) {
   if (incomingLinks[0]?.excludedFile === true) incomingLinksCount = 0;
 
   // if no incoming links, check if there is a header and remove it. In all cases, exit roturin
-  if (incomingLinksCount < plugin.settings.minimumRefCountThreshold) {
+  if (incomingLinksCount < 1) {
     if (mdView.contentEl.querySelector('.snw-header-count-wrapper')) mdView.contentEl.querySelector('.snw-header-count-wrapper')?.remove();
     return;
   }
