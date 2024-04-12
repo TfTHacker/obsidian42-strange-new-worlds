@@ -60,7 +60,8 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
       headingBreadcrumbsEl.createEl('span', { text: 'H' });
 
-      await MarkdownRenderer.renderMarkdown(
+      await MarkdownRenderer.render(
+        plugin.app,
         formatHeadingBreadCrumbs(headingBreadcrumbs),
         headingBreadcrumbsEl,
         ref.sourceFile.path,
@@ -105,6 +106,9 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
       let blockContents = '';
 
       if (sectionContainingLink?.position !== undefined) blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
+
+      const regex = /^\[\^([\w]+)\]:(.*)$/;
+      if (regex.test(blockContents)) blockContents = blockContents.replace('[', '').replace(']:', '');
 
       await MarkdownRenderer.render(plugin.app, blockContents, container, ref.sourceFile.path, plugin);
     }

@@ -67,11 +67,9 @@ export default class SNWPlugin extends Plugin {
     // Updates reference index for a single file by removing and re-adding the references
     const indexFileUpdateDebounce = debounce(
       async (file: TFile, data: string, cache: CachedMetadata) => {
-        console.time(this.APP_ABBREVIARTION + ' update: ' + file.basename);
         await removeLinkReferencesForFile(file);
         getLinkReferencesForFile(file, cache);
         updateHeadersDebounce();
-        console.timeEnd(this.APP_ABBREVIARTION + ' update: ' + file.basename);
       },
       500,
       true

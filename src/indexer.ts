@@ -71,8 +71,6 @@ export const removeLinkReferencesForFile = async (file: TFile) => {
 export function buildLinksAndReferences(): void {
   if (plugin.showCountsActive != true) return;
 
-  console.time(plugin.APP_ABBREVIARTION + ' Vault indexing completed.');
-
   indexedReferences = new Map();
   for (const file of app.vault.getMarkdownFiles()) {
     const fileCache = app.metadataCache.getFileCache(file);
@@ -82,8 +80,6 @@ export function buildLinksAndReferences(): void {
   // @ts-ignore
   window.snwAPI.references = indexedReferences;
   lastUpdateToReferences = Date.now();
-
-  console.timeEnd(plugin.APP_ABBREVIARTION + ' Vault indexing completed.');
 }
 
 // following MAP works as a cache for the getCurrentPage call. Based on time elapsed since last update, it just returns a cached transformedCache object
