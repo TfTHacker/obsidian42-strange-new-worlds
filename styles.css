@@ -27,6 +27,20 @@ div:has(> .snw-reference),
   font-size: var(--font-ui-smaller);
 }
 
+/* Properties */
+/* Have to remove the underline since text-decoration-line isn't inheritted, but then re-add ito the link */
+.metadata-container .internal-link:has(.snw-frontmatter-wrapper) {
+  text-decoration-line: none !important;
+  color: unset;
+  cursor: unset;
+
+  .multi-select-pill-content {
+    text-decoration-line: underline !important;
+    color: var(--link-color);
+    cursor: var(--cursor-link);
+  }
+}
+
 /* CM Live Preview */
 .cm-content .snw-reference {
   padding-right: 2px;

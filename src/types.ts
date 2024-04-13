@@ -75,6 +75,7 @@ export interface TransformedCache {
   links?: TransformedCachedItem[];
   headings?: TransformedCachedItem[];
   embeds?: TransformedCachedItem[];
+  frontmatterLinks?: TransformedCachedItem[];
   createDate?: number; //date when cache was generated with Date.now()
   cacheMetaData?: CachedMetadata;
 }

@@ -217,6 +217,27 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
     }
   }
 
+  if (cachedMetaData?.frontmatterLinks) {
+    transformedCache.frontmatterLinks = cachedMetaData.frontmatterLinks.map((link) => {
+      let newLinkPath = parseLinkTextToFullPath(link.link);
+
+      if (newLinkPath === '') {
+        // file does not exist, likely a ghost file, so just leave the link
+        newLinkPath = link.link;
+      }
+
+      return {
+        key: newLinkPath,
+        original: link.original,
+        type: 'frontmatterLink',
+        pos: { start: { line: -1, col: -1, offset: -1 }, end: { line: -1, col: -1, offset: -1 } },
+        displayText: link.displayText,
+        page: file.basename,
+        references: indexedReferences.get(newLinkPath) || []
+      };
+    });
+  }
+
   transformedCache.cacheMetaData = cachedMetaData;
   transformedCache.createDate = Date.now();
   cacheCurrentPages.set(file.path, transformedCache);

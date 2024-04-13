@@ -13,9 +13,24 @@ export class SettingsTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl('h2', { text: this.plugin.appName });
+    new Setting(containerEl).setHeading().setName('Enable on startup');
+    new Setting(containerEl).setName('On the desktop enable SNW at startup').addToggle((cb: ToggleComponent) => {
+      cb.setValue(this.plugin.settings.enableOnStartupDesktop);
+      cb.onChange(async (value: boolean) => {
+        this.plugin.settings.enableOnStartupDesktop = value;
+        await this.plugin.saveSettings();
+      });
+    });
 
-    containerEl.createEl('h2', { text: 'SNW Activation' });
+    new Setting(containerEl).setName('On mobile devices enable SNW at startup').addToggle((cb: ToggleComponent) => {
+      cb.setValue(this.plugin.settings.enableOnStartupMobile);
+      cb.onChange(async (value: boolean) => {
+        this.plugin.settings.enableOnStartupMobile = value;
+        await this.plugin.saveSettings();
+      });
+    });
+
+    new Setting(containerEl).setHeading().setName('SNW Activation');
     new Setting(containerEl)
       .setName('Require modifier key to activate SNW')
       .setDesc(
@@ -30,7 +45,7 @@ export class SettingsTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl('h2', { text: 'Thresholds' });
+    new Setting(containerEl).setHeading().setName('Thresholds');
     new Setting(containerEl)
       .setName('Minimal required count to show counter')
       .setDesc(
@@ -52,7 +67,7 @@ export class SettingsTab extends PluginSettingTab {
       .setName('Maximum file references to show')
       .setDesc(
         `This setting defines the max amount of files with their references are displayed in the popup or sidebar.  Set to 1000 for no maximum.
-				 Currently set to: ${this.plugin.settings.maxFileCountToDisplay} references.`
+				 Currently set to: ${this.plugin.settings.maxFileCountToDisplay} references. Keep in mind higher numbers can affect performance on larger vaults.`
       )
       .addSlider((slider) =>
         slider
@@ -65,9 +80,7 @@ export class SettingsTab extends PluginSettingTab {
           .setDynamicTooltip()
       );
 
-    containerEl.createEl('h2', {
-      text: "Use Obsidian's Excluded Files list (Settings > Files & Links)"
-    });
+    new Setting(containerEl).setHeading().setName(`Use Obsidian's Excluded Files list (Settings > Files & Links)`);
 
     new Setting(containerEl)
       .setName('Outgoing links')
@@ -95,30 +108,25 @@ export class SettingsTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl('h2', { text: 'Enable on startup' });
-    new Setting(containerEl)
-      .setName('Enable upon startup (Desktop)')
-      .setDesc('If disabled, SNW will not show block counters from startup until enabled from the command palette.')
-      .addToggle((cb: ToggleComponent) => {
-        cb.setValue(this.plugin.settings.enableOnStartupDesktop);
-        cb.onChange(async (value: boolean) => {
-          this.plugin.settings.enableOnStartupDesktop = value;
-          await this.plugin.saveSettings();
-        });
-      });
+    new Setting(containerEl).setHeading().setName('Properties');
 
-    new Setting(containerEl)
-      .setName('Enable startup (Mobile)')
-      .setDesc('If disabled, SNW will not show block counters from startup until enabled from the command palette.')
-      .addToggle((cb: ToggleComponent) => {
-        cb.setValue(this.plugin.settings.enableOnStartupMobile);
-        cb.onChange(async (value: boolean) => {
-          this.plugin.settings.enableOnStartupMobile = value;
-          await this.plugin.saveSettings();
-        });
+    new Setting(containerEl).setName('Show references in properties on Desktop').addToggle((cb: ToggleComponent) => {
+      cb.setValue(this.plugin.settings.displayPropertyReferences);
+      cb.onChange(async (value: boolean) => {
+        this.plugin.settings.displayPropertyReferences = value;
+        await this.plugin.saveSettings();
       });
+    });
 
-    containerEl.createEl('h2', { text: 'View Modes' });
+    new Setting(containerEl).setName('Show references in properties on mobile').addToggle((cb: ToggleComponent) => {
+      cb.setValue(this.plugin.settings.displayPropertyReferencesMobile);
+      cb.onChange(async (value: boolean) => {
+        this.plugin.settings.displayPropertyReferencesMobile = value;
+        await this.plugin.saveSettings();
+      });
+    });
+
+    new Setting(containerEl).setHeading().setName('View Modes');
 
     new Setting(containerEl)
       .setName('Incoming Links Header Count')
@@ -191,7 +199,7 @@ export class SettingsTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl('h2', { text: 'Enable Reference Types in Reading mode' });
+    new Setting(containerEl).setHeading().setName('Enable reference types in Reading Mode');
     containerEl.createEl('sup', {
       text: '(requires reopening documents to take effect)'
     });
@@ -240,7 +248,7 @@ export class SettingsTab extends PluginSettingTab {
         });
       });
 
-    containerEl.createEl('h2', { text: 'Enable Reference Types in Live Preview Mode' });
+    new Setting(containerEl).setHeading().setName('Enable reference types in Live Preview Mode');
     containerEl.createEl('sup', {
       text: '(requires reopening documents to take effect)'
     });

@@ -8,6 +8,8 @@ export interface Settings {
   displayInlineReferencesMarkdown: boolean;
   displayEmbedReferencesInGutter: boolean;
   displayEmbedReferencesInGutterMobile: boolean;
+  displayPropertyReferences: boolean;
+  displayPropertyReferencesMobile: boolean;
   enableRenderingBlockIdInMarkdown: boolean;
   enableRenderingLinksInMarkdown: boolean;
   enableRenderingHeadersInMarkdown: boolean;
@@ -31,6 +33,8 @@ export const DEFAULT_SETTINGS: Settings = {
   displayInlineReferencesMarkdown: true,
   displayEmbedReferencesInGutter: false,
   displayEmbedReferencesInGutterMobile: false,
+  displayPropertyReferences: false,
+  displayPropertyReferencesMobile: false,
   enableRenderingBlockIdInMarkdown: true,
   enableRenderingLinksInMarkdown: true,
   enableRenderingHeadersInMarkdown: true,
