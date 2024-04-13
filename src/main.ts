@@ -7,12 +7,12 @@ import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor 
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from './view-extensions/gutters-cm6';
 import { setPluginVariableForHeaderRefCount, updateHeadersDebounce } from './ui/headerRefCount';
 import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/sidebar-pane';
-import { SettingsTab } from './ui/SettingsTab2';
+import { SettingsTab } from './ui/SettingsTab';
 import { Settings, DEFAULT_SETTINGS } from './ui/settings';
 import SnwAPI from './snwApi';
 import { setPluginVariableForUIC } from './ui/components/uic-ref--parent';
 import { setPluginVariableUIC_RefArea } from './ui/components/uic-ref-area';
-import PluginCommands from './PluginCommands2';
+import PluginCommands from './PluginCommands';
 
 export default class SNWPlugin extends Plugin {
   appName = this.manifest.name;
