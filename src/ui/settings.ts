@@ -29,7 +29,7 @@ export const DEFAULT_SETTINGS: Settings = {
   displayIncomingFilesheader: true,
   displayInlineReferencesLivePreview: true,
   displayInlineReferencesMarkdown: true,
-  displayEmbedReferencesInGutter: true,
+  displayEmbedReferencesInGutter: false,
   displayEmbedReferencesInGutterMobile: false,
   enableRenderingBlockIdInMarkdown: true,
   enableRenderingLinksInMarkdown: true,
