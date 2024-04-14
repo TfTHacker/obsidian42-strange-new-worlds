@@ -1,4 +1,4 @@
-# 2.0.0
+# 2.0.3
 
 ## New
 
@@ -13,6 +13,7 @@
 
 - Fixed max items that can be displayed when reviewing references.
 - Block refrence counts will not show up in Export to PDF
+- Improved the handling of ghost files (files that don't exist in the vault, but are linked to)
 
 # 1.2.6 (2024-04-05)
 
