@@ -31,6 +31,14 @@ export default class SnwAPI {
     }
   };
 
+  searchReferencesContains = async (searchString: string) => {
+    for (const [key, value] of getIndexedReferences()) {
+      if (key.contains(searchString)) {
+        console.log(key, value);
+      }
+    }
+  };
+
   // For given file name passed into the function, get the meta info for that file
   getMetaInfoByFileName = async (fileName: string) => {
     const currentFile = app.metadataCache.getFirstLinkpathDest(fileName, '/');

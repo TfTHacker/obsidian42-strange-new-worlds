@@ -1,4 +1,4 @@
-import { Keymap, MarkdownView } from 'obsidian';
+import { Keymap, MarkdownView, Notice } from 'obsidian';
 import SNWPlugin from 'src/main';
 import { Instance, ReferenceElement } from 'tippy.js';
 import { scrollResultsIntoView } from 'src/utils';
@@ -67,6 +67,11 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
         let lineNu = Number(handlerElement.getAttribute('snw-data-line-number'));
         const filePath = handlerElement.getAttribute('snw-data-file-name');
         const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
+
+        if (!fileT) {
+          new Notice(`File not found: ${filePath}. It may be a broken link.`);
+          return;
+        }
 
         plugin.app.workspace.getLeaf(Keymap.isModEvent(e)).openFile(fileT);
 

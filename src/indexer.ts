@@ -27,25 +27,51 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
     for (const ref of item) {
       const { path, subpath } = parseLinktext(ref.link);
       const tfileDestination = app.metadataCache.getFirstLinkpathDest(path, '/');
-      if (
-        plugin.settings.enableIgnoreObsExcludeFoldersLinksTo &&
-        tfileDestination?.path &&
-        plugin.app.metadataCache.isUserIgnored(tfileDestination.path)
-      ) {
-        return;
-      }
-      const cacheDestination = tfileDestination ? app.metadataCache.getFileCache(tfileDestination) : null;
-      // if the file has a property snw-index-exclude set to true, exclude it from the index
-      if (cacheDestination && cacheDestination?.frontmatter && cacheDestination?.frontmatter['snw-index-exclude'] === true) continue;
-      const linkWithFullPath = tfileDestination ? tfileDestination.path.replace('.' + tfileDestination.extension, '') + subpath : path;
+      if (tfileDestination) {
+        if (
+          plugin.settings.enableIgnoreObsExcludeFoldersLinksTo &&
+          tfileDestination?.path &&
+          plugin.app.metadataCache.isUserIgnored(tfileDestination.path)
+        ) {
+          return;
+        }
+        const cacheDestination = tfileDestination ? app.metadataCache.getFileCache(tfileDestination) : null;
+        // if the file has a property snw-index-exclude set to true, exclude it from the index
+        if (cacheDestination && cacheDestination?.frontmatter && cacheDestination?.frontmatter['snw-index-exclude'] === true) continue;
+        const linkWithFullPath = tfileDestination ? tfileDestination.path.replace('.' + tfileDestination.extension, '') + subpath : path;
 
-      if (!indexedReferences.has(linkWithFullPath)) indexedReferences.set(linkWithFullPath, []);
-      indexedReferences.get(linkWithFullPath).push({
-        realLink: ref.link,
-        reference: ref,
-        resolvedFile: tfileDestination,
-        sourceFile: file
-      });
+        if (!indexedReferences.has(linkWithFullPath)) indexedReferences.set(linkWithFullPath, []);
+        indexedReferences.get(linkWithFullPath).push({
+          realLink: ref.link,
+          reference: ref,
+          resolvedFile: tfileDestination,
+          sourceFile: file
+        });
+      } else {
+        // Null if it is a ghost file link
+        // Create Ghost link
+        if (!indexedReferences.has(ref.link)) indexedReferences.set(ref.link, []);
+        //mock up a tfile for this instance
+        const ghostFile: TFile = {
+          vault: plugin.app.vault,
+          path: path + '.md',
+          name: path + '.md',
+          parent: null,
+          stat: {
+            ctime: 0,
+            mtime: 0,
+            size: 0
+          },
+          basename: path,
+          extension: 'md'
+        };
+        indexedReferences.get(ref.link).push({
+          realLink: ref.link,
+          reference: ref,
+          resolvedFile: ghostFile,
+          sourceFile: file
+        });
+      }
     }
   }
 };
@@ -69,6 +95,7 @@ export const removeLinkReferencesForFile = async (file: TFile) => {
  * trigger in main.ts
  */
 export function buildLinksAndReferences(): void {
+  console.time('buildLinksAndReferences');
   if (plugin.showCountsActive != true) return;
 
   indexedReferences = new Map();
@@ -80,6 +107,7 @@ export function buildLinksAndReferences(): void {
   // @ts-ignore
   window.snwAPI.references = indexedReferences;
   lastUpdateToReferences = Date.now();
+  console.timeEnd('buildLinksAndReferences');
 }
 
 // following MAP works as a cache for the getCurrentPage call. Based on time elapsed since last update, it just returns a cached transformedCache object
@@ -186,6 +214,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
   if (cachedMetaData?.embeds) {
     transformedCache.embeds = cachedMetaData.embeds.map((embed) => {
       let newEmbedPath = parseLinkTextToFullPath(embed.link);
+      newEmbedPath = newEmbedPath === '' ? embed.link : newEmbedPath;
 
       // if newEmbedPath is empty, then this is a link on the same page
       if (newEmbedPath === '' && (embed.link.startsWith('#^') || embed.link.startsWith('#'))) {

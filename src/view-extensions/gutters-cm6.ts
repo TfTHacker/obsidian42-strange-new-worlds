@@ -62,12 +62,12 @@ const ReferenceGutterExtension = gutter({
 
     const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
     if (!embedsFromMetaDataCache) return null;
-    if (embedsFromMetaDataCache?.length ?? 0 >= plugin.settings.minimumRefCountThreshold) {
+    if (embedsFromMetaDataCache?.length >= 0) {
       const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
       for (const embed of embedsFromMetaDataCache) {
         if (embed.position.start.line + 1 === lineNumberInFile) {
           for (const ref of transformedCache?.embeds ?? []) {
-            if (ref?.references.length > 0 && ref?.pos.start.line + 1 === lineNumberInFile) {
+            if (ref?.references.length >= plugin.settings.minimumRefCountThreshold && ref?.pos.start.line + 1 === lineNumberInFile) {
               const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim();
               if (lineToAnalyze.startsWith('!')) {
                 const strippedLineToAnalyze = lineToAnalyze.replace('![[', '').replace(']]', '');
@@ -76,6 +76,9 @@ const ReferenceGutterExtension = gutter({
                   lineFromFile = mdView.file.path.replace('.' + mdView.file.path, '') + stripHeading(strippedLineToAnalyze);
                 } else {
                   lineFromFile = parseLinkTextToFullPath(strippedLineToAnalyze);
+                  if (lineFromFile === '') {
+                    lineFromFile = strippedLineToAnalyze;
+                  }
                 }
                 if (lineFromFile === ref.key) {
                   return new referenceGutterMarker(

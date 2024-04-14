@@ -114,12 +114,10 @@ class snwChildComponent extends MarkdownRenderChild {
 
       if (plugin.settings.enableRenderingEmbedsInMarkdown && transformedCache?.embeds) {
         this.containerEl.querySelectorAll('.internal-embed:not(.snw-embed-preview)').forEach((element) => {
-          let embedKey = parseLinkTextToFullPath(element.getAttribute('src'));
-          if (embedKey === '') {
-            embedKey = this.currentFile.path.replace('.' + this.currentFile.extension, '') + stripHeading(element.getAttribute('src'));
-          }
+          let embedKey = parseLinkTextToFullPath(element.getAttribute('src') + '');
+          embedKey = embedKey === '' ? element.getAttribute('src') + '' : embedKey;
           for (const value of transformedCache.embeds) {
-            if (value.references.length >= minRefCountThreshold && embedKey.endsWith(value.key)) {
+            if (value.references.length >= minRefCountThreshold && embedKey === value.key) {
               const referenceElement = htmlDecorationForReferencesElement(
                 value.references.length,
                 'embed',
@@ -162,7 +160,8 @@ class snwChildComponent extends MarkdownRenderChild {
 
       if (plugin.settings.enableRenderingLinksInMarkdown && transformedCache?.links) {
         this.containerEl.querySelectorAll('a.internal-link').forEach((element) => {
-          const link = parseLinkTextToFullPath(element.getAttribute('data-href'));
+          let link = parseLinkTextToFullPath(element.getAttribute('data-href') + '');
+          link = link === '' ? element.getAttribute('data-href') + '' : link;
           for (const value of transformedCache.links) {
             if (
               value.references.length >= minRefCountThreshold &&
