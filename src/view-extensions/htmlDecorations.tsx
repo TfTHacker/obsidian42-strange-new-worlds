@@ -1,8 +1,8 @@
-import SNWPlugin from '../main';
+import SNWPlugin, { UPDATE_DEBOUNCE } from '../main';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { getUIC_Hoverview } from 'src/ui/components/uic-ref--parent';
-import { Platform } from 'obsidian';
+import { Platform, debounce } from 'obsidian';
 import { render } from 'preact';
 
 let plugin: SNWPlugin;
@@ -98,3 +98,27 @@ export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) =
   const lineNu = target.getAttribute('snw-data-line-number') ?? '';
   plugin.activateView(refType, realLink, key, filePath, Number(lineNu));
 };
+
+// loops all visble references marked with the class snw-liveupdate and updates the count if needed
+// or removes the element if the reference is no longer in the document
+export const updateAllSnwLiveUpdateReferencesDebounce = debounce(
+  () => {
+    document.querySelectorAll('.snw-liveupdate').forEach((element) => {
+      const currentCount = Number((element as HTMLElement).innerText);
+      const key = element.getAttribute('data-snw-key');
+      if (plugin.snwAPI.references.has(key)) {
+        const newCount = plugin.snwAPI.references.get(key).length;
+        if (newCount === 0 || newCount < plugin.settings.minimumRefCountThreshold) {
+          element.remove();
+        } else if (newCount !== currentCount) {
+          (element as HTMLElement).innerText = newCount.toString();
+        }
+      } else {
+        // count is now 0, remove the element
+        element.remove();
+      }
+    });
+  },
+  UPDATE_DEBOUNCE,
+  true
+);

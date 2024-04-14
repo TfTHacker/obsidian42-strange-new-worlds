@@ -84,7 +84,7 @@ class snwChildComponent extends MarkdownRenderChild {
               value.references[0].realLink,
               value.key,
               value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.path, ''),
-              '',
+              'snw-liveupdate',
               value.pos.start.line
             );
             let blockElement: HTMLElement = this.containerEl.querySelector('p');
@@ -124,7 +124,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 value.references[0].realLink,
                 value.key,
                 value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.extension, ''),
-                '',
+                'snw-liveupdate',
                 value.pos.start.line
               );
               referenceElement.addClass('snw-embed-preview');
@@ -173,7 +173,7 @@ class snwChildComponent extends MarkdownRenderChild {
                 value.references[0].realLink,
                 value.key,
                 value.references[0]?.resolvedFile?.path.replace('.' + value.references[0]?.resolvedFile?.extension, ''),
-                '',
+                'snw-liveupdate',
                 value.pos.start.line
               );
               referenceElement.addClass('snw-link-preview');

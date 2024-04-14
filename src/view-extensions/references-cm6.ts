@@ -187,7 +187,7 @@ const constructWidgetForInlineReference = (
           ref.references[0].realLink,
           ref.key,
           filePath,
-          '',
+          'snw-liveupdate',
           ref.pos.start.line
         );
       else return null;

@@ -2,7 +2,7 @@
 
 import { MarkdownView, Platform, WorkspaceLeaf, debounce } from 'obsidian';
 import { Link } from '../types';
-import SNWPlugin from '../main';
+import SNWPlugin, { UPDATE_DEBOUNCE } from '../main';
 import { processHtmlDecorationReferenceEvent } from '../view-extensions/htmlDecorations';
 import { getIndexedReferences, getSNWCacheByFile } from '../indexer';
 import tippy from 'tippy.js';
@@ -26,7 +26,7 @@ export const updateHeadersDebounce = debounce(
   () => {
     setHeaderWithReferenceCounts();
   },
-  500,
+  UPDATE_DEBOUNCE,
   true
 );
 
@@ -69,7 +69,7 @@ function processHeader(mdView: MarkdownView) {
   let wrapper: HTMLElement | null = containerViewContent.querySelector('.snw-header-count-wrapper');
 
   if (!wrapper) {
-    wrapper = createDiv({ cls: 'snw-header-count-wrapper' });
+    wrapper = createDiv({ cls: 'snw-reference snw-header-count-wrapper' });
     snwTitleRefCountDisplayCountEl = createDiv({ cls: 'snw-header-count' });
     wrapper.appendChild(snwTitleRefCountDisplayCountEl);
     containerViewContent.prepend(wrapper);

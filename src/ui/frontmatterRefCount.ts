@@ -1,5 +1,5 @@
 import { MarkdownView, Platform, WorkspaceLeaf, debounce } from 'obsidian';
-import SNWPlugin from '../main';
+import SNWPlugin, { UPDATE_DEBOUNCE } from '../main';
 import { getSNWCacheByFile, parseLinkTextToFullPath } from 'src/indexer';
 import { Transform } from 'stream';
 import { TransformedCache, TransformedCachedItem } from 'src/types';
@@ -22,7 +22,7 @@ export const updatePropertiesDebounce = debounce(
   () => {
     setFrontmatterLinksReferenceCounts();
   },
-  200,
+  UPDATE_DEBOUNCE,
   true
 );
 

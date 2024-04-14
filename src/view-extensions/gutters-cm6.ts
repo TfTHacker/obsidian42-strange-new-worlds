@@ -87,7 +87,7 @@ const ReferenceGutterExtension = gutter({
                     ref.references[0].realLink,
                     ref.key,
                     (ref.references[0].resolvedFile?.path ?? '').replace('.' + ref.references[0].resolvedFile?.extension, ''),
-                    'snw-embed-special'
+                    'snw-embed-special snw-liveupdate'
                   );
                 }
               }

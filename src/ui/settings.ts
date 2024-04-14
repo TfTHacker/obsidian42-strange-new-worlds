@@ -33,7 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
   displayInlineReferencesMarkdown: true,
   displayEmbedReferencesInGutter: false,
   displayEmbedReferencesInGutterMobile: false,
-  displayPropertyReferences: false,
+  displayPropertyReferences: true,
   displayPropertyReferencesMobile: false,
   enableRenderingBlockIdInMarkdown: true,
   enableRenderingLinksInMarkdown: true,
