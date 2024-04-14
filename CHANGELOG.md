@@ -8,11 +8,12 @@
 
 - Major rewrite of the internal indexer - significant performance improvements
 - Removed the caching tuning feature - this wasn't proving to be of help in performance
+- Simplified the Settings screen where possible
 
 # Fixed
 
-- Fixed max items that can be displayed when reviewing references.
-- Block refrence counts will not show up in Export to PDF
+- Fixed max items that can be displayed when reviewing references
+- Block reference counts will not show up in Export to PDF
 - Improved the handling of ghost files (files that don't exist in the vault, but are linked to)
 
 # 1.2.6 (2024-04-05)
