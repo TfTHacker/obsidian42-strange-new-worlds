@@ -4,6 +4,8 @@ import SNWPlugin from 'src/main';
 import { hideAll } from 'tippy.js';
 import { IconMoreDetails } from '../icons';
 import { render } from 'preact';
+import { SortOption } from '../settings';
+import { SortOrderDropdown } from '../SortOrderDropdown';
 
 export const getUIC_Ref_Title_Div = (
   refType: string,
@@ -13,7 +15,8 @@ export const getUIC_Ref_Title_Div = (
   refCount: number,
   lineNu: number,
   isPopover: boolean,
-  plugin: SNWPlugin
+  plugin: SNWPlugin,
+  handleSortOptionChangeCallback: () => void
 ): HTMLElement => {
   const titleElJsx = (
     <div
@@ -24,14 +27,15 @@ export const getUIC_Ref_Title_Div = (
       snw-data-file-name={filePath}
       snw-data-line-number={lineNu.toString()}>
       <div className="snw-ref-title-popover-label">{realLink}</div>
-      <span
-        className="snw-ref-title-popover-open-sidepane-icon"
-        snw-ref-title-type={refType}
-        snw-ref-title-reallink={realLink}
-        snw-ref-title-key={key}
-        snw-data-file-name={filePath}
-        snw-data-line-number={lineNu.toString()}>
-        {isPopover && (
+      <SortOrderDropdown plugin={plugin} onChange={handleSortOptionChangeCallback} />
+      {isPopover && (
+        <span
+          className="snw-ref-title-popover-open-sidepane-icon"
+          snw-ref-title-type={refType}
+          snw-ref-title-reallink={realLink}
+          snw-ref-title-key={key}
+          snw-data-file-name={filePath}
+          snw-data-line-number={lineNu.toString()}>
           <span
             className="snw-ref-title-popover-icon"
             onClick={(e: MouseEvent) => {
@@ -41,8 +45,8 @@ export const getUIC_Ref_Title_Div = (
             }}>
             <IconMoreDetails />
           </span>
-        )}
-      </span>
+        </span>
+      )}
     </div>
   );
 

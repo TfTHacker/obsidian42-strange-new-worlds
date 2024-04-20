@@ -267,6 +267,58 @@ div:has(> .snw-reference),
   color: transparent;
 }
 
+/* Dropdown options */
+.snw-sort-dropdown-wrapper {
+  position: relative;
+}
+
+.snw-sort-dropdown-button {
+  border: none !important;
+  box-shadow: none !important;
+  width: 35px;
+  background-color: unset !important;
+  opacity: var(--snw-icon-opacity);
+
+  >svg {
+    width: 25px;
+    color: var(--tab-text-color-focused) !important;
+  }
+}
+
+.snw-sort-dropdown-list {
+  position: absolute;
+  right: 0;
+  top: 15px;
+  width: 90px;
+  padding: 5px;
+  z-index: 1;
+  border: 3px solid var(--divider-color);
+  border-radius: 2px;
+  background-color: var(--background-primary);
+  overflow-y: auto;
+  list-style: none;
+  color: var(--nav-item-color);
+  font-size: var(--nav-item-size);
+  font-weight: var(--nav-item-weight);
+}
+
+
+
+.snw-sort-dropdown-list-item {
+  padding-left: 5px;
+}
+
+.snw-sort-dropdown-list-item:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.snw-sort-dropdown-list-item-label {
+  padding-left: 5px;
+  position: relative;
+  bottom: 5px;
+}
+
+
 
 /* prevent printing of reference numbers */
 @media print {

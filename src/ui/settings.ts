@@ -1,3 +1,5 @@
+export type SortOption = 'name-asc' | 'name-desc' | 'mtime-asc' | 'mtime-desc';
+
 export interface Settings {
   enableOnStartupDesktop: boolean;
   enableOnStartupMobile: boolean;
@@ -21,6 +23,7 @@ export interface Settings {
   enableIgnoreObsExcludeFoldersLinksFrom: boolean; //Use Obsidians Exclude Files from folder - links from those files outgoing to other files
   enableIgnoreObsExcludeFoldersLinksTo: boolean; //Use Obsidians Exclude Files from folder - links to those "excluded" files
   requireModifierKeyToActivateSNWView: boolean; //require CTRL hover to activate SNW view
+  sortOptionDefault: SortOption;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -45,5 +48,6 @@ export const DEFAULT_SETTINGS: Settings = {
   enableRenderingEmbedsInLivePreview: true,
   enableIgnoreObsExcludeFoldersLinksFrom: false,
   enableIgnoreObsExcludeFoldersLinksTo: false,
-  requireModifierKeyToActivateSNWView: false
+  requireModifierKeyToActivateSNWView: false,
+  sortOptionDefault: 'name-asc'
 };

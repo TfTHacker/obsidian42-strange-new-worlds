@@ -4,6 +4,7 @@ import { setIcon } from 'obsidian';
 import { getIndexedReferences } from 'src/indexer';
 import SNWPlugin from 'src/main';
 import { Link } from 'src/types';
+import { SortOption } from '../settings';
 import { getUIC_Ref_Item } from './uic-ref-item';
 import { getUIC_Ref_Title_Div } from './uic-ref-title';
 
@@ -13,7 +14,7 @@ export function setPluginVariableUIC_RefArea(snwPlugin: SNWPlugin) {
   plugin = snwPlugin;
 }
 
-//Crates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
+//Creates the primarhy "AREA" body for displaying refrences. This is the overall wrapper for the title and individaul references
 export const getUIC_Ref_Area = async (
   refType: string,
   realLink: string,
@@ -26,13 +27,46 @@ export const getUIC_Ref_Area = async (
   const refAreaContainerEl = createDiv();
 
   //get title header for this reference area
-  refAreaContainerEl.append(getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, plugin));
+  refAreaContainerEl.append(
+    getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, plugin, async () => {
+      // Callback to re-render the references area when the sort option is changed
+      const refAreaEl: HTMLElement | null = refAreaContainerEl.querySelector('.snw-ref-area');
+      if (refAreaEl) {
+        refAreaEl.style.visibility = 'hidden';
+        while (refAreaEl.firstChild) {
+          refAreaEl.removeChild(refAreaEl.firstChild);
+        }
+        refAreaEl.style.visibility = 'visible';
+        const refAreaItems = await getRefAreaItems(refType, key, filePath);
+        refAreaEl.prepend(refAreaItems.response);
+      }
+    })
+  );
 
   const refAreaEl = createDiv({ cls: 'snw-ref-area' });
   refAreaEl.append(refAreaItems.response);
   refAreaContainerEl.append(refAreaEl);
 
   return refAreaContainerEl;
+};
+
+const sortLinks = (links: Link[], option: SortOption): Link[] => {
+  return links.sort((a, b) => {
+    const fileA = a.sourceFile;
+    const fileB = b.sourceFile;
+    switch (option) {
+      case 'name-asc':
+        return fileA!.basename.localeCompare(fileB!.basename);
+      case 'name-desc':
+        return fileB!.basename.localeCompare(fileA!.basename);
+      case 'mtime-asc':
+        return fileA!.stat.mtime - fileB!.stat.mtime;
+      case 'mtime-desc':
+        return fileB!.stat.mtime - fileA!.stat.mtime;
+      default:
+        return 0;
+    }
+  });
 };
 
 // Creates a DIV for a colection of reference blocks to be displayed
@@ -60,9 +94,11 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
   }
 
   // get the unique file names for files in thie refeernces
-  const uniqueFileKeys: Link[] = Array.from(new Set(linksToLoop.map((a) => a.sourceFile.path))).map((file_path) => {
-    return linksToLoop.find((a) => a.sourceFile.path === file_path);
+  const uniqueFileKeys: Link[] = Array.from(new Set(linksToLoop.map((a: Link) => a.sourceFile?.path))).map((file_path) => {
+    return linksToLoop.find((a) => a.sourceFile?.path === file_path);
   });
+
+  const sortedFileKeys = sortLinks(uniqueFileKeys, plugin.settings.sortOptionDefault);
 
   const wrapperEl = createDiv();
 
@@ -74,9 +110,9 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
   let itemsDisplayedCounter = 0;
 
-  for (let index = 0; index < uniqueFileKeys.length; index++) {
+  for (let index = 0; index < sortedFileKeys.length; index++) {
     if (itemsDisplayedCounter > maxItemsToShow) continue;
-    const file_path = uniqueFileKeys[index];
+    const file_path = sortedFileKeys[index];
     const responseItemContainerEl = createDiv();
     responseItemContainerEl.addClass('snw-ref-item-container');
     responseItemContainerEl.addClass('tree-item');
