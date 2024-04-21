@@ -1,3 +1,9 @@
+# 2.1.0
+
+## New
+
+- Items shown in the refreence panel can now be sorted by File Name and Date Modified, in ascending and decending order. This can be changed in the reference count hover panel or sidepane. A change in either these places will be reflected in the other.
+
 # 2.0.3
 
 ## New

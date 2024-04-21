@@ -53,7 +53,7 @@ export const getUIC_SidePane = async (
 // Creates event handlers for components of the HoverView and sidepane
 export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForViewEl: HTMLElement) => {
   const linksToFiles: NodeList = rootElementForViewEl.querySelectorAll(
-    '.snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover'
+    '.snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-popover-label'
   );
   linksToFiles.forEach((node: Element) => {
     if (!node.getAttribute('snw-has-handler')) {
@@ -61,9 +61,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
       // CLICK event
       node.addEventListener('click', async (e: MouseEvent) => {
         e.preventDefault();
-        const handlerElement = (e.target as HTMLElement).closest(
-          '.snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-side-pane, .snw-ref-title-popover'
-        );
+        const handlerElement = (e.target as HTMLElement).closest('.snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-popover-label');
         let lineNu = Number(handlerElement.getAttribute('snw-data-line-number'));
         const filePath = handlerElement.getAttribute('snw-data-file-name');
         const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);

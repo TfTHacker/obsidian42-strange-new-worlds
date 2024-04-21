@@ -19,14 +19,16 @@ export const getUIC_Ref_Title_Div = (
   handleSortOptionChangeCallback: () => void
 ): HTMLElement => {
   const titleElJsx = (
-    <div
-      className={`${isPopover ? 'snw-ref-title-popover' : 'snw-ref-title-side-pane'} tree-item-self is-clickable`}
-      snw-ref-title-type={refType}
-      snw-ref-title-reallink={realLink}
-      snw-ref-title-key={key}
-      snw-data-file-name={filePath}
-      snw-data-line-number={lineNu.toString()}>
-      <div className="snw-ref-title-popover-label">{realLink}</div>
+    <div className={`${isPopover ? 'snw-ref-title-popover' : 'snw-ref-title-side-pane'} tree-item-self is-clickable`}>
+      <div
+        className="snw-ref-title-popover-label"
+        snw-ref-title-type={refType}
+        snw-ref-title-reallink={realLink}
+        snw-ref-title-key={key}
+        snw-data-file-name={filePath}
+        snw-data-line-number={lineNu.toString()}>
+        {realLink}
+      </div>
       <SortOrderDropdown plugin={plugin} onChange={handleSortOptionChangeCallback} />
       {isPopover && (
         <span
