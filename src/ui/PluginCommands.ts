@@ -1,5 +1,5 @@
 import { Notice } from 'obsidian';
-import SNWPlugin from './main';
+import SNWPlugin from '../main';
 
 export default class PluginCommands {
   plugin: SNWPlugin;

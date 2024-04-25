@@ -20,7 +20,7 @@ export default class SnwAPI {
   // For active file return the meta information used by various components of SNW
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMetaInfoByCurrentFile = async (): Promise<any> => {
-    return this.getMetaInfoByFileName(app.workspace.getActiveFile()?.path || '');
+    return this.getMetaInfoByFileName(this.plugin.app.workspace.getActiveFile()?.path || '');
   };
 
   searchReferencesStartingWith = async (searchString: string) => {
@@ -41,10 +41,10 @@ export default class SnwAPI {
 
   // For given file name passed into the function, get the meta info for that file
   getMetaInfoByFileName = async (fileName: string) => {
-    const currentFile = app.metadataCache.getFirstLinkpathDest(fileName, '/');
+    const currentFile = this.plugin.app.metadataCache.getFirstLinkpathDest(fileName, '/');
     return {
       TFile: currentFile,
-      metadataCache: currentFile ? app.metadataCache.getFileCache(currentFile) : null,
+      metadataCache: currentFile ? this.plugin.app.metadataCache.getFileCache(currentFile) : null,
       SnwTransformedCache: currentFile ? getSNWCacheByFile(currentFile) : null
     };
   };

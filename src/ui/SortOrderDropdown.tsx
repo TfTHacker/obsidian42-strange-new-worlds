@@ -1,7 +1,7 @@
 import type { FunctionComponent } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import SNWPlugin from 'src/main';
-import { SortOption } from './settings';
+import { SortOption } from '../settings';
 
 interface SortOptionUI {
   label: string;

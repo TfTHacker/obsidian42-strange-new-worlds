@@ -6,13 +6,13 @@ import { setPluginVariableForHtmlDecorations, updateAllSnwLiveUpdateReferencesDe
 import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from './view-extensions/references-preview';
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from './view-extensions/gutters-cm6';
 import { setPluginVariableForHeaderRefCount, updateHeadersDebounce } from './ui/headerRefCount';
-import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/sidebar-pane';
+import { SideBarPaneView, VIEW_TYPE_SNW } from './ui/SideBarPaneView';
 import { SettingsTab } from './ui/SettingsTab';
-import { Settings, DEFAULT_SETTINGS } from './ui/settings';
+import { Settings, DEFAULT_SETTINGS } from './settings';
 import SnwAPI from './snwApi';
 import { setPluginVariableForUIC } from './ui/components/uic-ref--parent';
 import { setPluginVariableUIC_RefArea } from './ui/components/uic-ref-area';
-import PluginCommands from './PluginCommands';
+import PluginCommands from './ui/PluginCommands';
 import { setPluginVariableForFrontmatterLinksRefCount, updatePropertiesDebounce } from './ui/frontmatterRefCount';
 
 export const UPDATE_DEBOUNCE = 200;

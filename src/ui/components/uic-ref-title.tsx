@@ -2,7 +2,7 @@
 
 import SNWPlugin from 'src/main';
 import { hideAll } from 'tippy.js';
-import { IconMoreDetails } from '../icons';
+import { IconMoreDetails } from '../IconMoreDetails';
 import { render } from 'preact';
 import { SortOrderDropdown } from '../SortOrderDropdown';
 

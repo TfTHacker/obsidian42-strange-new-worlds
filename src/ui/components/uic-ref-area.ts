@@ -4,7 +4,7 @@ import { setIcon } from 'obsidian';
 import { getIndexedReferences } from 'src/indexer';
 import SNWPlugin from 'src/main';
 import { Link } from 'src/types';
-import { SortOption } from '../settings';
+import { SortOption } from '../../settings';
 import { getUIC_Ref_Item } from './uic-ref-item';
 import { getUIC_Ref_Title_Div } from './uic-ref-title';
 
