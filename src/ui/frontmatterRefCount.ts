@@ -1,8 +1,6 @@
 import { MarkdownView, Platform, WorkspaceLeaf, debounce } from 'obsidian';
 import SNWPlugin, { UPDATE_DEBOUNCE } from '../main';
-import { getSNWCacheByFile, parseLinkTextToFullPath } from 'src/indexer';
-import { Transform } from 'stream';
-import { TransformedCache, TransformedCachedItem } from 'src/types';
+import { getSNWCacheByFile } from 'src/indexer';
 import { htmlDecorationForReferencesElement } from 'src/view-extensions/htmlDecorations';
 
 let plugin: SNWPlugin;

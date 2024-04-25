@@ -1,7 +1,6 @@
 // Displays in the header of open documents the count of incoming links
 
 import { MarkdownView, Platform, WorkspaceLeaf, debounce } from 'obsidian';
-import { Link } from '../types';
 import SNWPlugin, { UPDATE_DEBOUNCE } from '../main';
 import { processHtmlDecorationReferenceEvent } from '../view-extensions/htmlDecorations';
 import { getIndexedReferences, getSNWCacheByFile } from '../indexer';

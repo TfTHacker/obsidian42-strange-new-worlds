@@ -1,5 +1,5 @@
 import { Extension } from '@codemirror/state';
-import { CachedMetadata, debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plugin, TFile } from 'obsidian';
+import { CachedMetadata, debounce, MarkdownPostProcessor, MarkdownPreviewRenderer, Platform, Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 import { buildLinksAndReferences, getLinkReferencesForFile, removeLinkReferencesForFile, setPluginVariableForIndexer } from './indexer';
 import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from './view-extensions/references-cm6';
 import { setPluginVariableForHtmlDecorations, updateAllSnwLiveUpdateReferencesDebounce } from './view-extensions/htmlDecorations';
@@ -121,8 +121,23 @@ export default class SNWPlugin extends Plugin {
     this.lastSelectedReferenceKey = key;
     this.lastSelectedReferenceFilePath = filePath;
     this.lastSelectedLineNumber = lineNu;
+
+    const { workspace } = this.app;
+    let leaf: WorkspaceLeaf | null = null;
+    const leaves = workspace.getLeavesOfType(VIEW_TYPE_SNW);
+
+    if (leaves.length > 0) {
+      // A leaf with our view already exists, use that
+      leaf = leaves[0];
+    } else {
+      // Our view could not be found in the workspace, create a new leaf
+      const leaf = workspace.getRightLeaf(false);
+      await leaf!.setViewState({ type: VIEW_TYPE_SNW, active: true });
+    }
+
+    // "Reveal" the leaf in case it is in a collapsed sidebar
+    if (leaf) workspace.revealLeaf(leaf);
     await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
-    this.app.workspace.revealLeaf(this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]);
   }
 
   // Turns on and off the reference count displayed at the top of the document in the header area

@@ -1,4 +1,4 @@
-import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile, stripHeading } from 'obsidian';
+import { MarkdownPostProcessorContext, MarkdownRenderChild, MarkdownSectionInformation, TFile } from 'obsidian';
 import { htmlDecorationForReferencesElement } from './htmlDecorations';
 import { getSNWCacheByFile, parseLinkTextToFullPath } from '../indexer';
 import SNWPlugin from '../main';
@@ -62,21 +62,11 @@ class snwChildComponent extends MarkdownRenderChild {
 
     if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
       if (plugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
-        let isThisAnEmbed = false; //Testing to see if this check is still needed
-        // try {
-        // we don't want to proccess embeds
-        // @ts-ignore
-        // isThisAnEmbed = ctx.containerEl.closest('.snw-embed-preview').nextSibling.classList.contains('snw-reference');
-        // } catch (error) {
-        /* nothing to do here */
-        // }
-
         for (const value of transformedCache.blocks) {
           if (
             value.references.length >= minRefCountThreshold &&
             value.pos.start.line >= this.sectionInfo?.lineStart &&
-            value.pos.end.line <= this.sectionInfo?.lineEnd &&
-            !isThisAnEmbed
+            value.pos.end.line <= this.sectionInfo?.lineEnd
           ) {
             const referenceElement = htmlDecorationForReferencesElement(
               value.references.length,

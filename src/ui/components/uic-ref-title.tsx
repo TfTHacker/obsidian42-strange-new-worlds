@@ -4,7 +4,6 @@ import SNWPlugin from 'src/main';
 import { hideAll } from 'tippy.js';
 import { IconMoreDetails } from '../icons';
 import { render } from 'preact';
-import { SortOption } from '../settings';
 import { SortOrderDropdown } from '../SortOrderDropdown';
 
 export const getUIC_Ref_Title_Div = (

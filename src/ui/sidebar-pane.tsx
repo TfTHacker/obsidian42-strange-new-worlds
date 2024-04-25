@@ -34,7 +34,7 @@ export class SideBarPaneView extends ItemView {
         <div class="snw-sidepane-loading-banner">Discovering Strange New Worlds...</div>
         <div class="snw-sidepane-loading-subtext">Click a reference counter in the main document for information to appear here.</div>
       </div>,
-      this.containerEl
+      this.containerEl.querySelector('.view-content') as HTMLElement
     );
   }
 
@@ -52,5 +52,6 @@ export class SideBarPaneView extends ItemView {
 
   async onClose() {
     // Nothing to clean up.
+    console.log('Closing SNW sidepane');
   }
 }

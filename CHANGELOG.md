@@ -1,3 +1,7 @@
+# 2.1.1
+
+- Fix to [#136](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/136)
+
 # 2.1.0
 
 ## New
