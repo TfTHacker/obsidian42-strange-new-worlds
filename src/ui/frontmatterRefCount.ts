@@ -2,6 +2,7 @@ import { MarkdownView, Platform, WorkspaceLeaf, debounce } from 'obsidian';
 import SNWPlugin, { UPDATE_DEBOUNCE } from '../main';
 import { getSNWCacheByFile } from 'src/indexer';
 import { htmlDecorationForReferencesElement } from 'src/view-extensions/htmlDecorations';
+import { TransformedCachedItem } from '../types';
 
 let plugin: SNWPlugin;
 
