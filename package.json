@@ -1,6 +1,6 @@
 {
   "name": "obsidian42-strange-new-worlds",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Revealing networked thought and the strange new worlds created by your vault",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -27,9 +27,9 @@
     "@html-eslint/eslint-plugin": "^0.24.1",
     "@html-eslint/parser": "^0.24.1",
     "@types/obsidian-typings": "github:Fevol/obsidian-typings",
-    "@typescript-eslint/eslint-plugin": "^7.7.0",
-    "@typescript-eslint/parser": "^7.7.0",
-    "@typescript-eslint/utils": "^7.7.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "@typescript-eslint/utils": "^7.7.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-css": "^0.9.2",

@@ -8,6 +8,7 @@ export interface Settings {
   displayIncomingFilesheader: boolean;
   displayInlineReferencesLivePreview: boolean;
   displayInlineReferencesMarkdown: boolean;
+  displayInlineReferencesInSourceMode: boolean;
   displayEmbedReferencesInGutter: boolean;
   displayEmbedReferencesInGutterMobile: boolean;
   displayPropertyReferences: boolean;
@@ -34,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   displayIncomingFilesheader: true,
   displayInlineReferencesLivePreview: true,
   displayInlineReferencesMarkdown: true,
+  displayInlineReferencesInSourceMode: false,
   displayEmbedReferencesInGutter: false,
   displayEmbedReferencesInGutterMobile: false,
   displayPropertyReferences: true,

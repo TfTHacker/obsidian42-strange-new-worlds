@@ -41,6 +41,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
           const mdView = view.state.field(editorInfoField);
           // there is no file, likely a canvas file, so stop processing
           if (!mdView.file) return;
+
+          // Check if should show in source mode
+          if (mdView.currentMode?.sourceMode === true && plugin.settings.displayInlineReferencesInSourceMode === false) return null;
+
           const mdViewFile = mdView.file!;
           const transformedCache = getSNWCacheByFile(mdViewFile);
 

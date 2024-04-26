@@ -171,6 +171,21 @@ export class SettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
+      .setName('Show SNW indicators in Source Mode ')
+      .setDesc(
+        'While in Source Mode of a document, display inline of the text of documents all reference counts for links, blocks and embeds.' +
+          'By default, this is turned off since the goal of Source Mode is to see the raw markdown.' +
+          'Note: files may need to be closed and reopened for this setting to take effect.'
+      )
+      .addToggle((cb: ToggleComponent) => {
+        cb.setValue(this.plugin.settings.displayInlineReferencesInSourceMode);
+        cb.onChange(async (value: boolean) => {
+          this.plugin.settings.displayInlineReferencesInSourceMode = value;
+          await this.plugin.saveSettings();
+        });
+      });
+
+    new Setting(containerEl)
       .setName('Embed references in Gutter in Live Preview Mode (Desktop)')
       .setDesc(
         `Displays a count of references in the gutter while in live preview. This is done only in a

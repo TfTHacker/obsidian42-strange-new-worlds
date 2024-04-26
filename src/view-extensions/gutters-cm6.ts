@@ -53,6 +53,9 @@ const ReferenceGutterExtension = gutter({
   lineMarker(editorView: EditorView, line: BlockInfo) {
     const mdView = editorView.state.field(editorInfoField);
 
+    // Check if should show in source mode
+    if (mdView.currentMode?.sourceMode === true && plugin.settings.displayInlineReferencesInSourceMode === false) return null;
+
     if (!mdView.file) return null;
     const transformedCache = getSNWCacheByFile(mdView.file);
 
