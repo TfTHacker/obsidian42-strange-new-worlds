@@ -7,6 +7,7 @@ import { Link } from 'src/types';
 import { SortOption } from '../../settings';
 import { getUIC_Ref_Item } from './uic-ref-item';
 import { getUIC_Ref_Title_Div } from './uic-ref-title';
+import { setFileLinkHandlers } from './uic-ref--parent';
 
 let plugin: SNWPlugin;
 
@@ -39,6 +40,10 @@ export const getUIC_Ref_Area = async (
         refAreaEl.style.visibility = 'visible';
         const refAreaItems = await getRefAreaItems(refType, key, filePath);
         refAreaEl.prepend(refAreaItems.response);
+
+        setTimeout(async () => {
+          await setFileLinkHandlers(false, refAreaEl);
+        }, 500);
       }
     })
   );

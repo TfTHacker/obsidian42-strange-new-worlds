@@ -1,3 +1,8 @@
+# 2.1.3
+
+- Fix: after sorting list of references, they would not respond to being clicked on.
+- Dependency updates
+
 # 2.1.2
 
 - New: Added an option to toggle SNW off and on in Source Mode. By default, it is toggled off, since source mode is intended to view the raw markdown. This can be changed in the settings. [#137](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/137)
