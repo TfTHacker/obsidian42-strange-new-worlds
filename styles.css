@@ -146,6 +146,10 @@ div:has(> .snw-reference),
   flex-direction: row;
 }
 
+.snw-ref-item-file.tree-item-self {
+  align-items: flex-start !important;
+}
+
 .snw-ref-item-collection-items {
   margin-left: 1px;
   margin-right: 1px;

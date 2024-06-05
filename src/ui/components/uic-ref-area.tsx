@@ -8,6 +8,7 @@ import { SortOption } from '../../settings';
 import { getUIC_Ref_Item } from './uic-ref-item';
 import { getUIC_Ref_Title_Div } from './uic-ref-title';
 import { setFileLinkHandlers } from './uic-ref--parent';
+import { render } from 'preact';
 
 let plugin: SNWPlugin;
 
@@ -149,6 +150,19 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     refItemFileEl.append(refItemFileLabelEl);
 
     responseItemContainerEl.appendChild(refItemFileEl);
+
+    // Add custom property field to display
+    const fileCache = plugin.app.metadataCache.getFileCache(file_path.sourceFile);
+    if (fileCache?.frontmatter?.['Summary']) {
+      const customPropertyJsx = (
+        <div>
+          <b>Summary</b>: {fileCache?.frontmatter?.['Summary']}
+        </div>
+      );
+      const fieldEl = createDiv();
+      render(customPropertyJsx, fieldEl);
+      refItemFileLabelEl.append(fieldEl);
+    }
 
     const refItemsCollectionE = createDiv();
     refItemsCollectionE.addClass('snw-ref-item-collection-items');
