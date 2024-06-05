@@ -75,7 +75,7 @@ const sortLinks = (links: Link[], option: SortOption): Link[] => {
   });
 };
 
-// Creates a DIV for a colection of reference blocks to be displayed
+// Creates a DIV for a collection of reference blocks to be displayed
 const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{ response: HTMLElement; refCount: number }> => {
   let countOfRefs = 0;
   let linksToLoop: Link[] = null;
@@ -116,6 +116,10 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
   let itemsDisplayedCounter = 0;
 
+  let customProperties = null;
+  if (plugin.settings.displayCustomPropertyList.trim() != '')
+    customProperties = plugin.settings.displayCustomPropertyList.split(',').map((x) => x.trim());
+
   for (let index = 0; index < sortedFileKeys.length; index++) {
     if (itemsDisplayedCounter > maxItemsToShow) continue;
     const file_path = sortedFileKeys[index];
@@ -152,17 +156,22 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     responseItemContainerEl.appendChild(refItemFileEl);
 
     // Add custom property field to display
-    const fileCache = plugin.app.metadataCache.getFileCache(file_path.sourceFile);
-    if (fileCache?.frontmatter?.['Summary']) {
-      const customPropertyJsx = (
-        <div class="snw-custom-property-container">
-          <span class="snw-custom-property-name">Summary</span>
-          <span class="snw-custom-property-text">: {fileCache?.frontmatter?.['Summary']}</span>
-        </div>
-      );
-      const fieldEl = createDiv();
-      render(customPropertyJsx, fieldEl);
-      refItemFileLabelEl.append(fieldEl);
+    if (customProperties != null) {
+      const fileCache = plugin.app.metadataCache.getFileCache(file_path.sourceFile);
+      customProperties.forEach((propName) => {
+        const propValue = fileCache?.frontmatter?.[propName];
+        if (propValue) {
+          const customPropertyElement = (
+            <div class="snw-custom-property-container">
+              <span class="snw-custom-property-name">{propName}</span>
+              <span class="snw-custom-property-text">: {propValue}</span>
+            </div>
+          );
+          const fieldEl = createDiv();
+          render(customPropertyElement, fieldEl);
+          refItemFileLabelEl.append(fieldEl);
+        }
+      });
     }
 
     const refItemsCollectionE = createDiv();

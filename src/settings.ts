@@ -25,6 +25,7 @@ export interface Settings {
   enableIgnoreObsExcludeFoldersLinksTo: boolean; //Use Obsidians Exclude Files from folder - links to those "excluded" files
   requireModifierKeyToActivateSNWView: boolean; //require CTRL hover to activate SNW view
   sortOptionDefault: SortOption;
+  displayCustomPropertyList: string; //list of custom properties to display when showing references
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -51,5 +52,6 @@ export const DEFAULT_SETTINGS: Settings = {
   enableIgnoreObsExcludeFoldersLinksFrom: false,
   enableIgnoreObsExcludeFoldersLinksTo: false,
   requireModifierKeyToActivateSNWView: false,
-  sortOptionDefault: 'name-asc'
+  sortOptionDefault: 'name-asc',
+  displayCustomPropertyList: ''
 };

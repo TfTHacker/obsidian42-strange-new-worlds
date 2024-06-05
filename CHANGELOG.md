@@ -1,3 +1,7 @@
+# 2.1.4
+
+- New: In Settings under Custom Display List, the display of references can be customized to show properties from referenced files. In Settings, provide a comma separated list of case-sensitive property names. If a file has any of these properties when displayed in the reference list, the properties will also be displayed.
+
 # 2.1.3
 
 - Fix: after sorting list of references, they would not respond to being clicked on.

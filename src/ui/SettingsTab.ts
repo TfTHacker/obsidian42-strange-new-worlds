@@ -311,5 +311,21 @@ export class SettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         });
       });
+
+    new Setting(containerEl).setHeading().setName('Custom Display Settings');
+
+    new Setting(this.containerEl)
+      .setName('Custom Property List')
+      .setDesc(
+        'Displays properties from referenced files in the references list. The list is comma separated list of case-sensitive property names.'
+      )
+      .addText((cb) => {
+        cb.setPlaceholder('Ex: Project, Summary')
+          .setValue(this.plugin.settings.displayCustomPropertyList)
+          .onChange(async (list) => {
+            this.plugin.settings.displayCustomPropertyList = list;
+            await this.plugin.saveSettings();
+          });
+      });
   }
 }
