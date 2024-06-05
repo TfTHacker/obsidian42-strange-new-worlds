@@ -155,8 +155,9 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
     const fileCache = plugin.app.metadataCache.getFileCache(file_path.sourceFile);
     if (fileCache?.frontmatter?.['Summary']) {
       const customPropertyJsx = (
-        <div>
-          <b>Summary</b>: {fileCache?.frontmatter?.['Summary']}
+        <div class="snw-custom-property-container">
+          <span class="snw-custom-property-name">Summary</span>
+          <span class="snw-custom-property-text">: {fileCache?.frontmatter?.['Summary']}</span>
         </div>
       );
       const fieldEl = createDiv();
