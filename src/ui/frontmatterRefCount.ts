@@ -13,7 +13,7 @@ export function setPluginVariableForFrontmatterLinksRefCount(snwPlugin: SNWPlugi
 // Iterates all open documents to see if they are markdown file, and if so called processHeader
 function setFrontmatterLinksReferenceCounts() {
   plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
-    if (leaf.view.getViewType() === 'markdown') processFrontmatterLinks(leaf.view as MarkdownView);
+    if (leaf.view instanceof MarkdownView) processFrontmatterLinks(leaf.view as MarkdownView);
   });
 }
 
@@ -37,7 +37,6 @@ function processFrontmatterLinks(mdView: MarkdownView) {
   // if no frontmatter links, exit
   if (transformedCache.frontmatterLinks?.length === 0) return;
 
-  // @ts-ignore - metadataEditor is undocumented type
   mdView.metadataEditor.rendered.forEach((item) => {
     const innerLink = item.valueEl.querySelector('.metadata-link-inner.internal-link');
     if (innerLink) {

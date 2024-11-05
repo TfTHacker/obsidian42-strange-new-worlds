@@ -68,6 +68,7 @@ export interface TransformedCachedItem {
   references: Link[];
   original?: string;
   headerMatch?: string; //used for matching headers
+  displayText?: string;
 }
 
 export interface TransformedCache {
