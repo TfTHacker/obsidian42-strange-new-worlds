@@ -1,3 +1,9 @@
+# 2.1.5
+
+- Updating plugin to newest Obsidian recommendations https://docs.obsidian.md/oo24/plugin.
+- Transition to Biome from EsLint and Prettier.
+- Update to new DeferredView handling - Thank you to @baodrate for PR [151](https://github.com/TfTHacker/obsidian42-strange-new-worlds/pull/151)
+
 # 2.1.4
 
 - New: In Settings under Custom Display List, the display of references can be customized to show properties from referenced files. In Settings, provide a comma separated list of case-sensitive property names. If a file has any of these properties when displayed in the reference list, the properties will also be displayed.

@@ -119,6 +119,7 @@ div:has(> .snw-reference),
   border-bottom: var(--border-width) solid var(--modal-border-color);
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .snw-ref-title-popover-open-sidepane-icon {
@@ -140,6 +141,7 @@ div:has(> .snw-reference),
   border-radius: var(--radius-s);
   background-color: var(--titlebar-background-focused);
   border: var(--border-width) solid var(--modal-border-color);
+  align-items: center;
 }
 
 .snw-ref-item-container {
