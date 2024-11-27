@@ -18,14 +18,11 @@ export function setPluginVariableForUIC(snwPlugin: SNWPlugin) {
  * @param {Instance} instance   the Tippy instance. Tippy provides the floating container.
  */
 export const getUIC_Hoverview = async (instance: Instance) => {
-	const { refType, realLink, key, filePath, lineNu } =
-		await getDataElements(instance);
+	const { refType, realLink, key, filePath, lineNu } = await getDataElements(instance);
 	const popoverEl = createDiv();
 	popoverEl.addClass("snw-popover-container");
 	popoverEl.addClass("search-result-container");
-	popoverEl.appendChild(
-		await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, true),
-	);
+	popoverEl.appendChild(await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, true));
 	instance.setContent(popoverEl);
 	setTimeout(async () => {
 		await setFileLinkHandlers(false, popoverEl);
@@ -44,9 +41,7 @@ export const getUIC_SidePane = async (
 	const sidepaneEL = createDiv();
 	sidepaneEL.addClass("snw-sidepane-container");
 	sidepaneEL.addClass("search-result-container");
-	sidepaneEL.append(
-		await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, false),
-	);
+	sidepaneEL.append(await getUIC_Ref_Area(refType, realLink, key, filePath, lineNu, false));
 
 	setTimeout(async () => {
 		await setFileLinkHandlers(false, sidepaneEL);
@@ -56,10 +51,7 @@ export const getUIC_SidePane = async (
 };
 
 // Creates event handlers for components of the HoverView and sidepane
-export const setFileLinkHandlers = async (
-	isHoverView: boolean,
-	rootElementForViewEl: HTMLElement,
-) => {
+export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForViewEl: HTMLElement) => {
 	const linksToFiles: NodeList = rootElementForViewEl.querySelectorAll(
 		".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-popover-label",
 	);
@@ -70,17 +62,10 @@ export const setFileLinkHandlers = async (
 			// CLICK event
 			node.addEventListener("click", async (e: MouseEvent) => {
 				e.preventDefault();
-				const handlerElement = (e.target as HTMLElement).closest(
-					".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-popover-label",
-				);
-				let lineNu = Number(
-					handlerElement.getAttribute("snw-data-line-number"),
-				);
+				const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-popover-label");
+				let lineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
 				const filePath = handlerElement.getAttribute("snw-data-file-name");
-				const fileT = app.metadataCache.getFirstLinkpathDest(
-					filePath,
-					filePath,
-				);
+				const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
 
 				if (!fileT) {
 					new Notice(`File not found: ${filePath}. It may be a broken link.`);
@@ -94,9 +79,7 @@ export const setFileLinkHandlers = async (
 				if (titleKey) {
 					if (titleKey.contains("#^")) {
 						// links to a block id
-						const destinationBlocks = Object.entries(
-							plugin.app.metadataCache.getFileCache(fileT)?.blocks,
-						);
+						const destinationBlocks = Object.entries(plugin.app.metadataCache.getFileCache(fileT)?.blocks);
 						if (destinationBlocks) {
 							const blockID = titleKey
 								.match(/#\^(.+)$/g)[0]
@@ -107,13 +90,10 @@ export const setFileLinkHandlers = async (
 						}
 					} else if (titleKey.contains("#")) {
 						// possibly links to a header
-						const destinationHeadings =
-							plugin.app.metadataCache.getFileCache(fileT)?.headings;
+						const destinationHeadings = plugin.app.metadataCache.getFileCache(fileT)?.headings;
 						if (destinationHeadings) {
 							const headingKey = titleKey.match(/#(.+)/g)[0].replace("#", "");
-							const l = destinationHeadings.find(
-								(h) => h.heading === headingKey,
-							);
+							const l = destinationHeadings.find((h) => h.heading === headingKey);
 							lineNu = l.position.start.line;
 						}
 					}
@@ -123,9 +103,7 @@ export const setFileLinkHandlers = async (
 					setTimeout(() => {
 						// jumps to the line of the file where the reference is located
 						try {
-							plugin.app.workspace
-								.getActiveViewOfType(MarkdownView)
-								.setEphemeralState({ line: lineNu });
+							plugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({ line: lineNu });
 						} catch (error) {
 							/* Do nothing */
 						}
@@ -139,13 +117,8 @@ export const setFileLinkHandlers = async (
 					e.preventDefault();
 					// @ts-ignore
 					const hoverMetaKeyRequired =
-						app.internalPlugins.plugins["page-preview"].instance.overrides[
-							"obsidian42-strange-new-worlds"
-						] !== false;
-					if (
-						hoverMetaKeyRequired === false ||
-						(hoverMetaKeyRequired === true && Keymap.isModifier(e, "Mod"))
-					) {
+						app.internalPlugins.plugins["page-preview"].instance.overrides["obsidian42-strange-new-worlds"] !== false;
+					if (hoverMetaKeyRequired === false || (hoverMetaKeyRequired === true && Keymap.isModifier(e, "Mod"))) {
 						const target = e.target as HTMLElement;
 						const previewLocation = {
 							scroll: Number(target.getAttribute("snw-data-line-number")),
@@ -153,14 +126,7 @@ export const setFileLinkHandlers = async (
 						const filePath = target.getAttribute("snw-data-file-name");
 						if (filePath) {
 							// parameter signature for link-hover parent: HoverParent, targetEl: HTMLElement, linkText: string, sourcePath: string, eState: EphemeralState
-							app.workspace.trigger(
-								"link-hover",
-								{},
-								target,
-								filePath,
-								"",
-								previewLocation,
-							);
+							app.workspace.trigger("link-hover", {}, target, filePath, "", previewLocation);
 						}
 					}
 				});

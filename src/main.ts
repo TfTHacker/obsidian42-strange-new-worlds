@@ -9,12 +9,7 @@ import {
 	type WorkspaceLeaf,
 	debounce,
 } from "obsidian";
-import {
-	buildLinksAndReferences,
-	getLinkReferencesForFile,
-	removeLinkReferencesForFile,
-	setPluginVariableForIndexer,
-} from "./indexer";
+import { buildLinksAndReferences, getLinkReferencesForFile, removeLinkReferencesForFile, setPluginVariableForIndexer } from "./indexer";
 import { DEFAULT_SETTINGS, type Settings } from "./settings";
 import SnwAPI from "./snwApi";
 import PluginCommands from "./ui/PluginCommands";
@@ -22,28 +17,12 @@ import { SettingsTab } from "./ui/SettingsTab";
 import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/SideBarPaneView";
 import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
 import { setPluginVariableUIC_RefArea } from "./ui/components/uic-ref-area";
-import {
-	setPluginVariableForFrontmatterLinksRefCount,
-	updatePropertiesDebounce,
-} from "./ui/frontmatterRefCount";
-import {
-	setPluginVariableForHeaderRefCount,
-	updateHeadersDebounce,
-} from "./ui/headerRefCount";
-import ReferenceGutterExtension, {
-	setPluginVariableForCM6Gutter,
-} from "./view-extensions/gutters-cm6";
-import {
-	setPluginVariableForHtmlDecorations,
-	updateAllSnwLiveUpdateReferencesDebounce,
-} from "./view-extensions/htmlDecorations";
-import {
-	InlineReferenceExtension,
-	setPluginVariableForCM6InlineReferences,
-} from "./view-extensions/references-cm6";
-import markdownPreviewProcessor, {
-	setPluginVariableForMarkdownPreviewProcessor,
-} from "./view-extensions/references-preview";
+import { setPluginVariableForFrontmatterLinksRefCount, updatePropertiesDebounce } from "./ui/frontmatterRefCount";
+import { setPluginVariableForHeaderRefCount, updateHeadersDebounce } from "./ui/headerRefCount";
+import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./view-extensions/gutters-cm6";
+import { setPluginVariableForHtmlDecorations, updateAllSnwLiveUpdateReferencesDebounce } from "./view-extensions/htmlDecorations";
+import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./view-extensions/references-cm6";
+import markdownPreviewProcessor, { setPluginVariableForMarkdownPreviewProcessor } from "./view-extensions/references-preview";
 
 export const UPDATE_DEBOUNCE = 200;
 
@@ -83,8 +62,7 @@ export default class SNWPlugin extends Plugin {
 		this.addSettingTab(new SettingsTab(this.app, this));
 
 		// set current state based on startup parameters
-		if (Platform.isMobile || Platform.isMobileApp)
-			this.showCountsActive = this.settings.enableOnStartupMobile;
+		if (Platform.isMobile || Platform.isMobileApp) this.showCountsActive = this.settings.enableOnStartupMobile;
 		else this.showCountsActive = this.settings.enableOnStartupDesktop;
 
 		this.registerView(VIEW_TYPE_SNW, (leaf) => new SideBarPaneView(leaf, this));
@@ -110,15 +88,13 @@ export default class SNWPlugin extends Plugin {
 				updatePropertiesDebounce();
 				updateAllSnwLiveUpdateReferencesDebounce();
 			},
-			500,
+			2000,
 			true,
 		);
 
 		this.registerEvent(this.app.vault.on("rename", indexFullUpdateDebounce));
 		this.registerEvent(this.app.vault.on("delete", indexFullUpdateDebounce));
-		this.registerEvent(
-			this.app.metadataCache.on("changed", indexFileUpdateDebounce),
-		);
+		this.registerEvent(this.app.metadataCache.on("changed", indexFileUpdateDebounce));
 
 		this.app.workspace.registerHoverLinkSource(this.appID, {
 			display: this.appName,
@@ -136,9 +112,7 @@ export default class SNWPlugin extends Plugin {
 
 		this.app.workspace.onLayoutReady(async () => {
 			if (!this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)?.length) {
-				await this.app.workspace
-					.getRightLeaf(false)
-					?.setViewState({ type: VIEW_TYPE_SNW, active: false });
+				await this.app.workspace.getRightLeaf(false)?.setViewState({ type: VIEW_TYPE_SNW, active: false });
 			}
 			buildLinksAndReferences();
 		});
@@ -150,13 +124,7 @@ export default class SNWPlugin extends Plugin {
 	}
 
 	// Displays the sidebar SNW pane
-	async activateView(
-		refType: string,
-		realLink: string,
-		key: string,
-		filePath: string,
-		lineNu: number,
-	) {
+	async activateView(refType: string, realLink: string, key: string, filePath: string, lineNu: number) {
 		this.lastSelectedReferenceType = refType;
 		this.lastSelectedReferenceRealLink = realLink;
 		this.lastSelectedReferenceKey = key;
@@ -178,37 +146,24 @@ export default class SNWPlugin extends Plugin {
 
 		// "Reveal" the leaf in case it is in a collapsed sidebar
 		if (leaf) workspace.revealLeaf(leaf);
-		await (
-			this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0]
-				.view as SideBarPaneView
-		).updateView();
+		await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
 	}
 
 	// Turns on and off the reference count displayed at the top of the document in the header area
 	toggleStateHeaderCount(): void {
-		if (this.settings.displayIncomingFilesheader && this.showCountsActive)
-			this.app.workspace.on("layout-change", this.layoutChangeEvent);
+		if (this.settings.displayIncomingFilesheader && this.showCountsActive) this.app.workspace.on("layout-change", this.layoutChangeEvent);
 		else this.app.workspace.off("layout-change", this.layoutChangeEvent);
 	}
 
 	// Turns on and off the SNW reference counters in Reading mode
 	toggleStateSNWMarkdownPreview(): void {
-		if (
-			this.settings.displayInlineReferencesMarkdown &&
-			this.showCountsActive &&
-			this.markdownPostProcessor === null
-		) {
-			this.markdownPostProcessor = this.registerMarkdownPostProcessor(
-				(el, ctx) => markdownPreviewProcessor(el, ctx),
-				100,
-			);
+		if (this.settings.displayInlineReferencesMarkdown && this.showCountsActive && this.markdownPostProcessor === null) {
+			this.markdownPostProcessor = this.registerMarkdownPostProcessor((el, ctx) => markdownPreviewProcessor(el, ctx), 100);
 		} else {
 			if (!this.markdownPostProcessor) {
 				console.log("Markdown post processor is not registered");
 			} else {
-				MarkdownPreviewRenderer.unregisterPostProcessor(
-					this.markdownPostProcessor,
-				);
+				MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
 			}
 			this.markdownPostProcessor = null;
 		}
@@ -236,16 +191,11 @@ export default class SNWPlugin extends Plugin {
 	}
 
 	// Manages which CM extensions are loaded into Obsidian
-	updateCMExtensionState(
-		extensionIdentifier: string,
-		extensionState: boolean,
-		extension: Extension,
-	) {
+	updateCMExtensionState(extensionIdentifier: string, extensionState: boolean, extension: Extension) {
 		if (extensionState === true) {
 			this.editorExtensions.push(extension);
 			// @ts-ignore
-			this.editorExtensions[this.editorExtensions.length - 1].snwID =
-				extensionIdentifier;
+			this.editorExtensions[this.editorExtensions.length - 1].snwID = extensionIdentifier;
 		} else {
 			for (let i = 0; i < this.editorExtensions.length; i++) {
 				const ext = this.editorExtensions[i];
@@ -273,9 +223,7 @@ export default class SNWPlugin extends Plugin {
 			if (!this.markdownPostProcessor) {
 				console.log("Markdown post processor is not registered");
 			} else {
-				MarkdownPreviewRenderer.unregisterPostProcessor(
-					this.markdownPostProcessor,
-				);
+				MarkdownPreviewRenderer.unregisterPostProcessor(this.markdownPostProcessor);
 			}
 			this.app.workspace.unregisterHoverLinkSource(this.appID);
 		} catch (error) {

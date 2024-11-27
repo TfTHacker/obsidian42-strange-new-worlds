@@ -1,3 +1,18 @@
+# 2.2.0 (Pending)
+
+- This is another major update to the indexing engine to avoid detecting certain reported issues.
+- Additional optimization efforts to improve performance. (removing loops, keeping index optimized)
+- Fix: when a link or embed points to the file it is in, it will now be included in the reference count.
+- One challenge is case-sensitivity. In fact, Obsidian allows links to be case-insensitive, but the internal link engine is case-sensitive. This is a problem when a link is written in a different case than the file name. This update should help with this issue. The internal index ignores the case of links. [#145](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/145), [#153](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/153)
+
+[[#142](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/142)]
+
+- Cannot distinguish the title with the same name [#143](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/143)
+- Fixed issue with Alias links display reference counts
+
+
+
+
 # 2.1.5
 
 - Updating plugin to newest Obsidian recommendations https://docs.obsidian.md/oo24/plugin.

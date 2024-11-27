@@ -8,30 +8,12 @@ declare global {
 }
 
 declare module "obsidian" {
-	interface Workspace {
-		// registerHoverLinkSource: (
-		// 	appID: string,
-		// 	appInfo: {
-		// 		display: string;
-		// 		defaultMod: boolean;
-		// 	},
-		// ) => void;
-		// unregisterHoverLinkSource: (appID: string) => void;
-	}
+	interface Workspace {}
 
 	interface MetadataCache {
 		metadataCache: {
 			[x: string]: CachedMetadata;
 		};
-		// getLinks: () => {
-		// 	[key: string]: {
-		// 		link: string;
-		// 		position: Pos;
-		// 	};
-		// };
-		// iterateReferences: (
-		// 	cb: (sourcePath: string, reference: ReferenceCache) => void,
-		// ) => void;
 		isUserIgnored(path: string): boolean;
 	}
 

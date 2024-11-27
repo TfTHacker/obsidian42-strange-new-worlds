@@ -41,7 +41,7 @@ export function htmlDecorationForReferencesElement(
 			className={`snw-reference snw-${referenceType} ${attachCSSClass}`}
 			data-snw-type={referenceType}
 			data-snw-reallink={realLink}
-			data-snw-key={key}
+			data-snw-key={key.toLocaleUpperCase()}
 			data-snw-filepath={filePath}
 			snw-data-line-number={lineNu.toString()}
 		>
@@ -55,11 +55,9 @@ export function htmlDecorationForReferencesElement(
 
 	if (Platform.isDesktop || Platform.isDesktopApp)
 		//click is default to desktop, otherwise mobile behaves differently
-		refCountBox.onclick = async (e: MouseEvent) =>
-			processHtmlDecorationReferenceEvent(e.target as HTMLElement);
+		refCountBox.onclick = async (e: MouseEvent) => processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 
-	const requireModifierKey =
-		plugin.settings.requireModifierKeyToActivateSNWView;
+	const requireModifierKey = plugin.settings.requireModifierKeyToActivateSNWView;
 	// defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
 	let showTippy = true;
 	const tippyObject = tippy(refCountBox, {
@@ -94,9 +92,7 @@ export function htmlDecorationForReferencesElement(
 }
 
 //  Opens the sidebar SNW pane by calling activateView on main.ts
-export const processHtmlDecorationReferenceEvent = async (
-	target: HTMLElement,
-) => {
+export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) => {
 	const refType = target.getAttribute("data-snw-type") ?? "";
 	const realLink = target.getAttribute("data-snw-realLink") ?? "";
 	const key = target.getAttribute("data-snw-key") ?? "";
@@ -115,10 +111,7 @@ export const updateAllSnwLiveUpdateReferencesDebounce = debounce(
 			const key = element.getAttribute("data-snw-key");
 			if (plugin.snwAPI.references.has(key)) {
 				const newCount = plugin.snwAPI.references.get(key).length;
-				if (
-					newCount === 0 ||
-					newCount < plugin.settings.minimumRefCountThreshold
-				) {
+				if (newCount === 0 || newCount < plugin.settings.minimumRefCountThreshold) {
 					element.remove();
 				} else if (newCount !== currentCount) {
 					(element as HTMLElement).innerText = newCount.toString();

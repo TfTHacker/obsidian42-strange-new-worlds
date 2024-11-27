@@ -31,13 +31,8 @@ export class SideBarPaneView extends ItemView {
 	async onOpen() {
 		render(
 			<div class="snw-sidepane-loading">
-				<div class="snw-sidepane-loading-banner">
-					Discovering Strange New Worlds...
-				</div>
-				<div class="snw-sidepane-loading-subtext">
-					Click a reference counter in the main document for information to
-					appear here.
-				</div>
+				<div class="snw-sidepane-loading-banner">Discovering Strange New Worlds...</div>
+				<div class="snw-sidepane-loading-subtext">Click a reference counter in the main document for information to appear here.</div>
 			</div>,
 			this.containerEl.querySelector(".view-content") as HTMLElement,
 		);
@@ -50,9 +45,7 @@ export class SideBarPaneView extends ItemView {
 		const filePath = this.plugin.lastSelectedReferenceFilePath;
 		const lineNu = this.plugin.lastSelectedLineNumber;
 
-		this.containerEl.replaceChildren(
-			await getUIC_SidePane(refType, realLink, key, filePath, lineNu),
-		);
+		this.containerEl.replaceChildren(await getUIC_SidePane(refType, realLink, key, filePath, lineNu));
 
 		scrollResultsIntoView(this.containerEl);
 	}

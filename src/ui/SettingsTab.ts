@@ -1,9 +1,4 @@
-import {
-	type App,
-	PluginSettingTab,
-	Setting,
-	type ToggleComponent,
-} from "obsidian";
+import { type App, PluginSettingTab, Setting, type ToggleComponent } from "obsidian";
 import type SNWPlugin from "../main";
 
 export class SettingsTab extends PluginSettingTab {
@@ -19,25 +14,21 @@ export class SettingsTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl).setHeading().setName("Enable on startup");
-		new Setting(containerEl)
-			.setName("On the desktop enable SNW at startup")
-			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.plugin.settings.enableOnStartupDesktop);
-				cb.onChange(async (value: boolean) => {
-					this.plugin.settings.enableOnStartupDesktop = value;
-					await this.plugin.saveSettings();
-				});
+		new Setting(containerEl).setName("On the desktop enable SNW at startup").addToggle((cb: ToggleComponent) => {
+			cb.setValue(this.plugin.settings.enableOnStartupDesktop);
+			cb.onChange(async (value: boolean) => {
+				this.plugin.settings.enableOnStartupDesktop = value;
+				await this.plugin.saveSettings();
 			});
+		});
 
-		new Setting(containerEl)
-			.setName("On mobile devices enable SNW at startup")
-			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.plugin.settings.enableOnStartupMobile);
-				cb.onChange(async (value: boolean) => {
-					this.plugin.settings.enableOnStartupMobile = value;
-					await this.plugin.saveSettings();
-				});
+		new Setting(containerEl).setName("On mobile devices enable SNW at startup").addToggle((cb: ToggleComponent) => {
+			cb.setValue(this.plugin.settings.enableOnStartupMobile);
+			cb.onChange(async (value: boolean) => {
+				this.plugin.settings.enableOnStartupMobile = value;
+				await this.plugin.saveSettings();
 			});
+		});
 
 		new Setting(containerEl).setHeading().setName("SNW Activation");
 		new Setting(containerEl)
@@ -89,9 +80,7 @@ export class SettingsTab extends PluginSettingTab {
 					.setDynamicTooltip(),
 			);
 
-		new Setting(containerEl)
-			.setHeading()
-			.setName(`Use Obsidian's Excluded Files list (Settings > Files & Links)`);
+		new Setting(containerEl).setHeading().setName(`Use Obsidian's Excluded Files list (Settings > Files & Links)`);
 
 		new Setting(containerEl)
 			.setName("Outgoing links")
@@ -99,9 +88,7 @@ export class SettingsTab extends PluginSettingTab {
 				"If enabled, links FROM files in the excluded folder will not be included in SNW's reference counters. May require restarting Obsidian.",
 			)
 			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(
-					this.plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom,
-				);
+				cb.setValue(this.plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom);
 				cb.onChange(async (value: boolean) => {
 					this.plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom = value;
 					await this.plugin.saveSettings();
@@ -123,33 +110,27 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl).setHeading().setName("Properties");
 
-		new Setting(containerEl)
-			.setName("Show references in properties on Desktop")
-			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.plugin.settings.displayPropertyReferences);
-				cb.onChange(async (value: boolean) => {
-					this.plugin.settings.displayPropertyReferences = value;
-					await this.plugin.saveSettings();
-				});
+		new Setting(containerEl).setName("Show references in properties on Desktop").addToggle((cb: ToggleComponent) => {
+			cb.setValue(this.plugin.settings.displayPropertyReferences);
+			cb.onChange(async (value: boolean) => {
+				this.plugin.settings.displayPropertyReferences = value;
+				await this.plugin.saveSettings();
 			});
+		});
 
-		new Setting(containerEl)
-			.setName("Show references in properties on mobile")
-			.addToggle((cb: ToggleComponent) => {
-				cb.setValue(this.plugin.settings.displayPropertyReferencesMobile);
-				cb.onChange(async (value: boolean) => {
-					this.plugin.settings.displayPropertyReferencesMobile = value;
-					await this.plugin.saveSettings();
-				});
+		new Setting(containerEl).setName("Show references in properties on mobile").addToggle((cb: ToggleComponent) => {
+			cb.setValue(this.plugin.settings.displayPropertyReferencesMobile);
+			cb.onChange(async (value: boolean) => {
+				this.plugin.settings.displayPropertyReferencesMobile = value;
+				await this.plugin.saveSettings();
 			});
+		});
 
 		new Setting(containerEl).setHeading().setName("View Modes");
 
 		new Setting(containerEl)
 			.setName("Incoming Links Header Count")
-			.setDesc(
-				"In header of a document, show number of incoming link to that file.",
-			)
+			.setDesc("In header of a document, show number of incoming link to that file.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.displayIncomingFilesheader);
 				cb.onChange(async (value: boolean) => {
@@ -223,9 +204,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Embed references in Gutter in Live Preview Mode (Mobile)")
-			.setDesc(
-				"This is off by default on mobile since the gutter takes up some space in the left margin.",
-			)
+			.setDesc("This is off by default on mobile since the gutter takes up some space in the left margin.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.displayEmbedReferencesInGutterMobile);
 				cb.onChange(async (value: boolean) => {
@@ -235,18 +214,14 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});
 
-		new Setting(containerEl)
-			.setHeading()
-			.setName("Enable reference types in Reading Mode");
+		new Setting(containerEl).setHeading().setName("Enable reference types in Reading Mode");
 		containerEl.createEl("sup", {
 			text: "(requires reopening documents to take effect)",
 		});
 
 		new Setting(containerEl)
 			.setName("Block ID")
-			.setDesc(
-				"Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.",
-			)
+			.setDesc("Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.enableRenderingBlockIdInMarkdown);
 				cb.onChange(async (value: boolean) => {
@@ -257,9 +232,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Embeds")
-			.setDesc(
-				"Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].",
-			)
+			.setDesc("Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.enableRenderingEmbedsInMarkdown);
 				cb.onChange(async (value: boolean) => {
@@ -281,9 +254,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Headers")
-			.setDesc(
-				"Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.",
-			)
+			.setDesc("Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.enableRenderingHeadersInMarkdown);
 				cb.onChange(async (value: boolean) => {
@@ -292,18 +263,14 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});
 
-		new Setting(containerEl)
-			.setHeading()
-			.setName("Enable reference types in Live Preview Mode");
+		new Setting(containerEl).setHeading().setName("Enable reference types in Live Preview Mode");
 		containerEl.createEl("sup", {
 			text: "(requires reopening documents to take effect)",
 		});
 
 		new Setting(containerEl)
 			.setName("Block ID")
-			.setDesc(
-				"Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.",
-			)
+			.setDesc("Identifies block ID's, for example text blocks that end with a ^ and unique ID for that text block.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.enableRenderingBlockIdInLivePreview);
 				cb.onChange(async (value: boolean) => {
@@ -314,9 +281,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Embeds")
-			.setDesc(
-				"Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].",
-			)
+			.setDesc("Identifies embedded links, that is links that start with an explanation mark. For example: ![[PageName]].")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.enableRenderingEmbedsInLivePreview);
 				cb.onChange(async (value: boolean) => {
@@ -338,9 +303,7 @@ export class SettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Headers")
-			.setDesc(
-				"Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.",
-			)
+			.setDesc("Identifies headers, that is lines of text that start with a hash mark or multiple hash marks. For example: # Heading 1.")
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.enableRenderingHeadersInLivePreview);
 				cb.onChange(async (value: boolean) => {

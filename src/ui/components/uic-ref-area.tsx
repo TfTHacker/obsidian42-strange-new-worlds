@@ -30,34 +30,23 @@ export const getUIC_Ref_Area = async (
 
 	//get title header for this reference area
 	refAreaContainerEl.append(
-		getUIC_Ref_Title_Div(
-			refType,
-			realLink,
-			key,
-			filePath,
-			refAreaItems.refCount,
-			lineNu,
-			isHoverView,
-			plugin,
-			async () => {
-				// Callback to re-render the references area when the sort option is changed
-				const refAreaEl: HTMLElement | null =
-					refAreaContainerEl.querySelector(".snw-ref-area");
-				if (refAreaEl) {
-					refAreaEl.style.visibility = "hidden";
-					while (refAreaEl.firstChild) {
-						refAreaEl.removeChild(refAreaEl.firstChild);
-					}
-					refAreaEl.style.visibility = "visible";
-					const refAreaItems = await getRefAreaItems(refType, key, filePath);
-					refAreaEl.prepend(refAreaItems.response);
-
-					setTimeout(async () => {
-						await setFileLinkHandlers(false, refAreaEl);
-					}, 500);
+		getUIC_Ref_Title_Div(refType, realLink, key, filePath, refAreaItems.refCount, lineNu, isHoverView, plugin, async () => {
+			// Callback to re-render the references area when the sort option is changed
+			const refAreaEl: HTMLElement | null = refAreaContainerEl.querySelector(".snw-ref-area");
+			if (refAreaEl) {
+				refAreaEl.style.visibility = "hidden";
+				while (refAreaEl.firstChild) {
+					refAreaEl.removeChild(refAreaEl.firstChild);
 				}
-			},
-		),
+				refAreaEl.style.visibility = "visible";
+				const refAreaItems = await getRefAreaItems(refType, key, filePath);
+				refAreaEl.prepend(refAreaItems.response);
+
+				setTimeout(async () => {
+					await setFileLinkHandlers(false, refAreaEl);
+				}, 500);
+			}
+		}),
 	);
 
 	const refAreaEl = createDiv({ cls: "snw-ref-area" });
@@ -87,11 +76,7 @@ const sortLinks = (links: Link[], option: SortOption): Link[] => {
 };
 
 // Creates a DIV for a collection of reference blocks to be displayed
-const getRefAreaItems = async (
-	refType: string,
-	key: string,
-	filePath: string,
-): Promise<{ response: HTMLElement; refCount: number }> => {
+const getRefAreaItems = async (refType: string, key: string, filePath: string): Promise<{ response: HTMLElement; refCount: number }> => {
 	let countOfRefs = 0;
 	let linksToLoop: Link[] = null;
 
@@ -100,8 +85,7 @@ const getRefAreaItems = async (
 		const incomingLinks = [];
 		for (const items of allLinks.values()) {
 			for (const item of items) {
-				if (item?.resolvedFile && item?.resolvedFile?.path === filePath)
-					incomingLinks.push(item);
+				if (item?.resolvedFile && item?.resolvedFile?.path === filePath) incomingLinks.push(item);
 			}
 		}
 
@@ -116,16 +100,11 @@ const getRefAreaItems = async (
 	}
 
 	// get the unique file names for files in thie refeernces
-	const uniqueFileKeys: Link[] = Array.from(
-		new Set(linksToLoop.map((a: Link) => a.sourceFile?.path)),
-	).map((file_path) => {
+	const uniqueFileKeys: Link[] = Array.from(new Set(linksToLoop.map((a: Link) => a.sourceFile?.path))).map((file_path) => {
 		return linksToLoop.find((a) => a.sourceFile?.path === file_path);
 	});
 
-	const sortedFileKeys = sortLinks(
-		uniqueFileKeys,
-		plugin.settings.sortOptionDefault,
-	);
+	const sortedFileKeys = sortLinks(uniqueFileKeys, plugin.settings.sortOptionDefault);
 
 	const wrapperEl = createDiv();
 
@@ -139,9 +118,7 @@ const getRefAreaItems = async (
 
 	let customProperties = null;
 	if (plugin.settings.displayCustomPropertyList.trim() !== "")
-		customProperties = plugin.settings.displayCustomPropertyList
-			.split(",")
-			.map((x) => x.trim());
+		customProperties = plugin.settings.displayCustomPropertyList.split(",").map((x) => x.trim());
 
 	for (let index = 0; index < sortedFileKeys.length; index++) {
 		if (itemsDisplayedCounter > maxItemsToShow) continue;
@@ -158,13 +135,7 @@ const getRefAreaItems = async (
 		refItemFileEl.addClass("search-result-file-title");
 		refItemFileEl.addClass("is-clickable");
 		refItemFileEl.setAttribute("snw-data-line-number", "-1");
-		refItemFileEl.setAttribute(
-			"snw-data-file-name",
-			file_path.sourceFile.path.replace(
-				`.${file_path.sourceFile?.extension}`,
-				"",
-			),
-		);
+		refItemFileEl.setAttribute("snw-data-file-name", file_path.sourceFile.path.replace(`.${file_path.sourceFile?.extension}`, ""));
 		refItemFileEl.setAttribute("data-href", file_path.sourceFile.path);
 		refItemFileEl.setAttribute("href", file_path.sourceFile.path);
 
@@ -186,9 +157,7 @@ const getRefAreaItems = async (
 
 		// Add custom property field to display
 		if (customProperties != null) {
-			const fileCache = file_path.sourceFile
-				? plugin.app.metadataCache.getFileCache(file_path.sourceFile)
-				: null;
+			const fileCache = file_path.sourceFile ? plugin.app.metadataCache.getFileCache(file_path.sourceFile) : null;
 
 			// biome-ignore lint/complexity/noForEach: <explanation>
 			customProperties.forEach((propName) => {
@@ -213,10 +182,7 @@ const getRefAreaItems = async (
 		responseItemContainerEl.appendChild(refItemsCollectionE);
 
 		for (const ref of linksToLoop) {
-			if (
-				file_path.sourceFile?.path === ref.sourceFile?.path &&
-				itemsDisplayedCounter < maxItemsToShow
-			) {
+			if (file_path.sourceFile?.path === ref.sourceFile?.path && itemsDisplayedCounter < maxItemsToShow) {
 				itemsDisplayedCounter += 1;
 				refItemsCollectionE.appendChild(await getUIC_Ref_Item(ref));
 			}
@@ -229,16 +195,11 @@ const getRefAreaItems = async (
 const sortRefCache = async (refCache: Link[]): Promise<Link[]> => {
 	return refCache.sort((a, b) => {
 		let positionA = 0; //added because of properties - need to fix later
-		if (a.reference.position !== undefined)
-			positionA = Number(a.reference.position.start.line);
+		if (a.reference.position !== undefined) positionA = Number(a.reference.position.start.line);
 
 		let positionB = 0; //added because of properties - need to fix later
-		if (b.reference.position !== undefined)
-			positionB = Number(b.reference.position.start.line);
+		if (b.reference.position !== undefined) positionB = Number(b.reference.position.start.line);
 
-		return (
-			a.sourceFile?.basename.localeCompare(b.sourceFile.basename) ||
-			Number(positionA) - Number(positionB)
-		);
+		return a.sourceFile?.basename.localeCompare(b.sourceFile.basename) || Number(positionA) - Number(positionB);
 	});
 };

@@ -1,4 +1,4 @@
-import { getIndexedReferences, getSNWCacheByFile } from "./indexer";
+import { getIndexedReferences, getSNWCacheByFile, parseLinkTextToFullPath } from "./indexer";
 import type SNWPlugin from "./main";
 
 /**
@@ -11,14 +11,14 @@ export default class SnwAPI {
 	constructor(snwPlugin: SNWPlugin) {
 		this.plugin = snwPlugin;
 	}
+
 	console = (logDescription: string, ...outputs: unknown[]): void => {
 		console.log(`SNW: ${logDescription}`, outputs);
 	};
+
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	getMetaInfoByCurrentFile = async (): Promise<any> => {
-		return this.getMetaInfoByFileName(
-			this.plugin.app.workspace.getActiveFile()?.path || "",
-		);
+		return this.getMetaInfoByFileName(this.plugin.app.workspace.getActiveFile()?.path || "");
 	};
 
 	searchReferencesStartingWith = async (searchString: string) => {
@@ -39,16 +39,15 @@ export default class SnwAPI {
 
 	// For given file name passed into the function, get the meta info for that file
 	getMetaInfoByFileName = async (fileName: string) => {
-		const currentFile = this.plugin.app.metadataCache.getFirstLinkpathDest(
-			fileName,
-			"/",
-		);
+		const currentFile = this.plugin.app.metadataCache.getFirstLinkpathDest(fileName, "/");
 		return {
 			TFile: currentFile,
-			metadataCache: currentFile
-				? this.plugin.app.metadataCache.getFileCache(currentFile)
-				: null,
+			metadataCache: currentFile ? this.plugin.app.metadataCache.getFileCache(currentFile) : null,
 			SnwTransformedCache: currentFile ? getSNWCacheByFile(currentFile) : null,
 		};
 	};
+
+	parseLinkTextToFullPath(linkText: string) {
+		return parseLinkTextToFullPath(linkText);
+	}
 }

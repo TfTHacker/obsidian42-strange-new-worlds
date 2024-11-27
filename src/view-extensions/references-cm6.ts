@@ -2,15 +2,7 @@
  * Codemirror extension - hook into the CM editor
  * CM will call update as the doc updates.
  */
-import {
-	Decoration,
-	type DecorationSet,
-	type EditorView,
-	MatchDecorator,
-	ViewPlugin,
-	type ViewUpdate,
-	WidgetType,
-} from "@codemirror/view";
+import { Decoration, type DecorationSet, type EditorView, MatchDecorator, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
 import { editorInfoField, stripHeading } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
@@ -34,14 +26,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 
 		constructor(public view: EditorView) {
 			// The constructor seems to be called only once when a file is viewed. The decorator is called multipe times.
-			if (plugin.settings.enableRenderingBlockIdInLivePreview)
-				this.regxPattern = "(\\s\\^)(\\S+)$";
-			if (plugin.settings.enableRenderingEmbedsInLivePreview)
-				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}!\\[\\[(.*?)\\]\\]`;
-			if (plugin.settings.enableRenderingLinksInLivePreview)
-				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}\\[\\[(.*?)\\]\\]`;
-			if (plugin.settings.enableRenderingHeadersInLivePreview)
-				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}^#+\\s.+`;
+			if (plugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = "(\\s\\^)(\\S+)$";
+			if (plugin.settings.enableRenderingEmbedsInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}!\\[\\[(.*?)\\]\\]`;
+			if (plugin.settings.enableRenderingLinksInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}\\[\\[(.*?)\\]\\]`;
+			if (plugin.settings.enableRenderingHeadersInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}^#+\\s.+`;
 
 			//if there is no regex pattern, then don't go further
 			if (this.regxPattern === "") return;
@@ -54,23 +42,15 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 					if (!mdView.file) return;
 
 					// Check if should show in source mode
-					if (
-						mdView.currentMode?.sourceMode === true &&
-						plugin.settings.displayInlineReferencesInSourceMode === false
-					)
-						return null;
+					if (mdView.currentMode?.sourceMode === true && plugin.settings.displayInlineReferencesInSourceMode === false) return null;
 
-					// biome-ignore lint/style/noNonNullAssertion: <explanation>
-					const mdViewFile = mdView.file!;
+					const mdViewFile = mdView.file;
 					const transformedCache = getSNWCacheByFile(mdViewFile);
 
 					if (
-						transformedCache?.cacheMetaData?.frontmatter?.[
-							"snw-file-exclude"
-						] !== true &&
-						transformedCache?.cacheMetaData?.frontmatter?.[
-							"snw-canvas-exclude-edit"
-						] !== true
+						(transformedCache.links || transformedCache.headings || transformedCache.embeds || transformedCache.blocks) &&
+						transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"] !== true &&
+						transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"] !== true
 					) {
 						const firstCharacterMatch = match[0].charAt(0);
 						const widgetsToAdd: {
@@ -80,49 +60,13 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 							from: number;
 							to: number;
 						}[] = [];
-						if (
-							firstCharacterMatch === " " &&
-							(transformedCache?.blocks?.length ?? 0) > 0
-						) {
-							widgetsToAdd.push({
-								//blocks
-								key:
-									mdViewFile.path.replace(`.${mdView.file?.extension}`, "") +
-									match[0].replace(" ^", "#^"), //change this to match the references cache
-								transformedCachedItem: transformedCache.blocks ?? null,
-								refType: "block",
-								from: to,
-								to: to,
-							});
-						} else if (
-							firstCharacterMatch === "!" &&
-							(transformedCache?.embeds?.length ?? 0) > 0
-						) {
-							//embeds
-							let newEmbed = match[0].replace("![[", "").replace("]]", "");
-							if (newEmbed.startsWith("#"))
-								//link to an internal page link, add page name
-								newEmbed =
-									mdViewFile.path.replace(`.${mdView.file?.extension}`, "") +
-									stripHeading(newEmbed);
-							widgetsToAdd.push({
-								key: newEmbed,
-								transformedCachedItem: transformedCache.embeds ?? null,
-								refType: "embed",
-								from: to,
-								to: to,
-							});
-						} else if (
-							firstCharacterMatch === "[" &&
-							(transformedCache?.links?.length ?? 0) > 0
-						) {
+
+						if (firstCharacterMatch === "[" && (transformedCache?.links?.length ?? 0) > 0) {
 							//link
 							let newLink = match[0].replace("[[", "").replace("]]", "");
-							if (newLink.startsWith("#"))
-								//link to an internal page link, add page name
-								newLink =
-									mdViewFile.path.replace(`.${mdView.file?.extension}`, "") +
-									newLink;
+							//link to an internal page link, add page name
+							if (newLink.startsWith("#")) newLink = mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + newLink;
+							newLink = newLink.toLocaleUpperCase();
 							widgetsToAdd.push({
 								key: newLink,
 								transformedCachedItem: transformedCache.links ?? null,
@@ -130,10 +74,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 								from: to,
 								to: to,
 							});
-						} else if (
-							firstCharacterMatch === "#" &&
-							(transformedCache?.headings?.length ?? 0) > 0
-						) {
+						} else if (firstCharacterMatch === "#" && (transformedCache?.headings?.length ?? 0) > 0) {
 							//heading
 							widgetsToAdd.push({
 								// @ts-ignore
@@ -145,30 +86,45 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 							});
 							if (plugin.settings.enableRenderingLinksInLivePreview) {
 								// this was not working with mobile from 0.16.4 so had to convert it to a string
-								const linksinHeader = match[0].match(
-									/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g,
-								);
+								const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
 								if (linksinHeader)
 									for (const l of linksinHeader) {
 										widgetsToAdd.push({
-											key: l
-												.replace("![[", "")
-												.replace("[[", "")
-												.replace("]]", ""), //change this to match the references cache
-											transformedCachedItem: l.startsWith("!")
-												? (transformedCache.embeds ?? null)
-												: (transformedCache.links ?? null),
+											key: l.replace("![[", "").replace("[[", "").replace("]]", "").toLocaleUpperCase(), //change this to match the references cache
+											transformedCachedItem: l.startsWith("!") ? (transformedCache.embeds ?? null) : (transformedCache.links ?? null),
 											refType: "link",
-											from:
-												to - match[0].length + (match[0].indexOf(l) + l.length),
-											to:
-												to - match[0].length + (match[0].indexOf(l) + l.length),
+											from: to - match[0].length + (match[0].indexOf(l) + l.length),
+											to: to - match[0].length + (match[0].indexOf(l) + l.length),
 										});
 									}
 							}
+						} else if (firstCharacterMatch === "!" && (transformedCache?.embeds?.length ?? 0) > 0) {
+							//embeds
+							let newEmbed = match[0].replace("![[", "").replace("]]", "");
+							//link to an internal page link, add page name
+							if (newEmbed.startsWith("#")) newEmbed = mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + stripHeading(newEmbed);
+							widgetsToAdd.push({
+								key: newEmbed.toLocaleUpperCase(),
+								transformedCachedItem: transformedCache.embeds ?? null,
+								refType: "embed",
+								from: to,
+								to: to,
+							});
+						} else if (firstCharacterMatch === " " && (transformedCache?.blocks?.length ?? 0) > 0) {
+							widgetsToAdd.push({
+								//blocks
+								key: (mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + match[0].replace(" ^", "#^")).toLocaleUpperCase(), //change this to match the references cache
+								transformedCachedItem: transformedCache.blocks ?? null,
+								refType: "block",
+								from: to,
+								to: to,
+							});
 						}
 
-						for (const ref of widgetsToAdd.sort((a, b) => a.to - b.to)) {
+						// first see if it is a heading, as it should be sorted to the end, then sort by position
+						const sortWidgets = widgetsToAdd.sort((a, b) => (a.to === b.to ? (a.refType === "heading" ? 1 : -1) : a.to - b.to));
+
+						for (const ref of widgetsToAdd) {
 							if (ref.key !== "") {
 								const wdgt = constructWidgetForInlineReference(
 									ref.refType,
@@ -178,11 +134,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 									mdViewFile.extension,
 								);
 								if (wdgt != null) {
-									add(
-										ref.from,
-										ref.to,
-										Decoration.widget({ widget: wdgt, side: 1 }),
-									);
+									add(ref.from, ref.to, Decoration.widget({ widget: wdgt, side: 1 }));
 								}
 							}
 						} // end for
@@ -194,10 +146,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 		}
 
 		update(update: ViewUpdate) {
-			if (
-				this.regxPattern !== "" &&
-				(update.docChanged || update.viewportChanged)
-			) {
+			if (this.regxPattern !== "" && (update.docChanged || update.viewportChanged)) {
 				this.decorations = this.decorator?.updateDeco(update, this.decorations);
 			}
 		}
@@ -225,24 +174,19 @@ const constructWidgetForInlineReference = (
 		}
 
 		if (refType === "embed" || refType === "link") {
-			if (modifyKey.contains("|"))
-				// check for aliased references
-				modifyKey = modifyKey.substring(0, key.search(/\|/));
-			const parsedKey = parseLinkTextToFullPath(key);
+			// check for aliased references
+			if (modifyKey.contains("|")) modifyKey = modifyKey.substring(0, key.search(/\|/));
+			const parsedKey = parseLinkTextToFullPath(modifyKey).toLocaleUpperCase();
 			modifyKey = parsedKey === "" ? modifyKey : parsedKey; //if no results, likely a ghost link
 			if (matchKey.startsWith("#")) {
 				// internal page link
-				matchKey =
-					filePath.replace(`.${fileExtension}`, "") + stripHeading(matchKey);
+				matchKey = filePath.replace(`.${fileExtension}`, "") + stripHeading(matchKey);
 			}
 		}
 
 		if (matchKey === modifyKey) {
 			const filePath = ref?.references[0]?.resolvedFile
-				? ref.references[0].resolvedFile.path.replace(
-						`.${ref.references[0].resolvedFile}`,
-						"",
-					)
+				? ref.references[0].resolvedFile.path.replace(`.${ref.references[0].resolvedFile}`, "")
 				: modifyKey;
 			if (ref?.references.length >= plugin.settings.minimumRefCountThreshold)
 				return new InlineReferenceWidget(
@@ -270,15 +214,7 @@ export class InlineReferenceWidget extends WidgetType {
 	addCssClass: string; //if a reference need special treatment, this class can be assigned
 	lineNu: number; //number of line within the file
 
-	constructor(
-		refCount: number,
-		cssclass: string,
-		realLink: string,
-		key: string,
-		filePath: string,
-		addCSSClass: string,
-		lineNu: number,
-	) {
+	constructor(refCount: number, cssclass: string, realLink: string, key: string, filePath: string, addCSSClass: string, lineNu: number) {
 		super();
 		this.referenceCount = refCount;
 		this.referenceType = cssclass;

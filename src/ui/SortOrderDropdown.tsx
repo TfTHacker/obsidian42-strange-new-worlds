@@ -32,10 +32,7 @@ interface HelpSourceButtonProps {
 	onChange: () => void;
 }
 
-export const SortOrderDropdown: FunctionComponent<HelpSourceButtonProps> = ({
-	plugin,
-	onChange,
-}) => {
+export const SortOrderDropdown: FunctionComponent<HelpSourceButtonProps> = ({ plugin, onChange }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 
@@ -65,11 +62,7 @@ export const SortOrderDropdown: FunctionComponent<HelpSourceButtonProps> = ({
 
 	return (
 		<div className="snw-sort-dropdown-wrapper" ref={menuRef}>
-			<button
-				type="button"
-				onClick={handleButtonClick}
-				class="snw-sort-dropdown-button"
-			>
+			<button type="button" onClick={handleButtonClick} class="snw-sort-dropdown-button">
 				<div
 					// biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
 					dangerouslySetInnerHTML={{

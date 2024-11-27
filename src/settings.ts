@@ -31,7 +31,7 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
 	enableOnStartupDesktop: true,
 	enableOnStartupMobile: true,
-	minimumRefCountThreshold: 2,
+	minimumRefCountThreshold: 1,
 	maxFileCountToDisplay: 100,
 	displayIncomingFilesheader: true,
 	displayInlineReferencesLivePreview: true,

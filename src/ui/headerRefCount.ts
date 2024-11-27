@@ -1,11 +1,6 @@
 // Displays in the header of open documents the count of incoming links
 
-import {
-	type MarkdownView,
-	Platform,
-	type WorkspaceLeaf,
-	debounce,
-} from "obsidian";
+import { type MarkdownView, Platform, type WorkspaceLeaf, debounce } from "obsidian";
 import tippy from "tippy.js";
 import { getIndexedReferences, getSNWCacheByFile } from "../indexer";
 import type SNWPlugin from "../main";
@@ -23,8 +18,7 @@ export function setPluginVariableForHeaderRefCount(snwPlugin: SNWPlugin) {
 // Iterates all open documents to see if they are markdown file, and if so called processHeader
 function setHeaderWithReferenceCounts() {
 	plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
-		if (leaf.view.getViewType() === "markdown")
-			processHeader(leaf.view as MarkdownView);
+		if (leaf.view.getViewType() === "markdown") processHeader(leaf.view as MarkdownView);
 	});
 }
 
@@ -45,47 +39,34 @@ function processHeader(mdView: MarkdownView) {
 	const incomingLinks = [];
 	for (const items of allLinks.values()) {
 		for (const item of items) {
-			if (item?.resolvedFile && item?.resolvedFile?.path === mdViewFile.path)
-				incomingLinks.push(item);
+			if (item?.resolvedFile && item?.resolvedFile?.path === mdViewFile.path) incomingLinks.push(item);
 		}
 	}
 	let incomingLinksCount = incomingLinks.length;
 
 	// check if the page is to be ignored
 	const transformedCache = getSNWCacheByFile(mdViewFile);
-	if (
-		transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"] === true
-	)
-		incomingLinksCount = 0;
+	if (transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"] === true) incomingLinksCount = 0;
 
 	// if no incoming links, check if there is a header and remove it. In all cases, exit roturin
 	if (incomingLinksCount < 1) {
-		if (mdView.contentEl.querySelector(".snw-header-count-wrapper"))
-			mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
+		if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
 		return;
 	}
 
-	let snwTitleRefCountDisplayCountEl: HTMLElement | null =
-		mdView.contentEl.querySelector(".snw-header-count");
+	let snwTitleRefCountDisplayCountEl: HTMLElement | null = mdView.contentEl.querySelector(".snw-header-count");
 
 	// header count is already displayed, just update information.
-	if (
-		snwTitleRefCountDisplayCountEl &&
-		snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") ===
-			mdViewFile.basename
-	) {
+	if (snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdViewFile.basename) {
 		snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinks.length.toString()} `;
 		return;
 	}
 
 	const containerViewContent: HTMLElement = mdView.contentEl;
 
-	if (mdView.contentEl.querySelector(".snw-header-count-wrapper"))
-		mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
+	if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
 
-	let wrapper: HTMLElement | null = containerViewContent.querySelector(
-		".snw-header-count-wrapper",
-	);
+	let wrapper: HTMLElement | null = containerViewContent.querySelector(".snw-header-count-wrapper");
 
 	if (!wrapper) {
 		wrapper = createDiv({ cls: "snw-reference snw-header-count-wrapper" });
@@ -93,16 +74,11 @@ function processHeader(mdView: MarkdownView) {
 		wrapper.appendChild(snwTitleRefCountDisplayCountEl);
 		containerViewContent.prepend(wrapper);
 	} else {
-		snwTitleRefCountDisplayCountEl =
-			containerViewContent.querySelector(".snw-header-count");
+		snwTitleRefCountDisplayCountEl = containerViewContent.querySelector(".snw-header-count");
 	}
 
-	if (snwTitleRefCountDisplayCountEl)
-		snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinks.length.toString()} `;
-	if (
-		(Platform.isDesktop || Platform.isDesktopApp) &&
-		snwTitleRefCountDisplayCountEl
-	) {
+	if (snwTitleRefCountDisplayCountEl) snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinks.length.toString()} `;
+	if ((Platform.isDesktop || Platform.isDesktopApp) && snwTitleRefCountDisplayCountEl) {
 		snwTitleRefCountDisplayCountEl.onclick = (e: MouseEvent) => {
 			e.stopPropagation();
 			if (wrapper) processHtmlDecorationReferenceEvent(wrapper);
@@ -117,8 +93,7 @@ function processHeader(mdView: MarkdownView) {
 		processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 	};
 
-	const requireModifierKey =
-		plugin.settings.requireModifierKeyToActivateSNWView;
+	const requireModifierKey = plugin.settings.requireModifierKeyToActivateSNWView;
 	// defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
 	let showTippy = true;
 	const tippyObject = tippy(wrapper, {

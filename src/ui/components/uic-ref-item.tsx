@@ -5,11 +5,7 @@ import { render } from "preact";
 import type SNWPlugin from "src/main";
 import type { Link } from "../../types";
 import { ContextBuilder } from "./context/ContextBuilder";
-import {
-	formatHeadingBreadCrumbs,
-	formatListBreadcrumbs,
-	formatListWithDescendants,
-} from "./context/formatting-utils";
+import { formatHeadingBreadCrumbs, formatListBreadcrumbs, formatListWithDescendants } from "./context/formatting-utils";
 import { getTextAtPosition } from "./context/position-utils";
 
 let plugin: SNWPlugin;
@@ -19,23 +15,14 @@ export function setPluginVariableUIC_RefItem(snwPlugin: SNWPlugin) {
 }
 
 export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
-	const startLine =
-		ref.reference.position !== undefined
-			? ref.reference.position.start.line.toString()
-			: "0";
+	const startLine = ref.reference.position !== undefined ? ref.reference.position.start.line.toString() : "0";
 
 	const itemElJsx = (
 		<div
 			className="snw-ref-item-info search-result-file-match"
 			snw-data-line-number={startLine}
-			snw-data-file-name={ref?.sourceFile?.path.replace(
-				`.${ref?.sourceFile?.extension}`,
-				"",
-			)}
-			data-href={ref?.sourceFile?.path.replace(
-				`.${ref?.sourceFile?.extension}`,
-				"",
-			)}
+			snw-data-file-name={ref?.sourceFile?.path.replace(`.${ref?.sourceFile?.extension}`, "")}
+			data-href={ref?.sourceFile?.path.replace(`.${ref?.sourceFile?.extension}`, "")}
 			// biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
 			dangerouslySetInnerHTML={{
 				__html: (await grabChunkOfFile(ref)).innerHTML,
@@ -85,8 +72,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 		);
 	}
 
-	const indexOfListItemContainingLink =
-		contextBuilder.getListItemIndexContaining(linkPosition);
+	const indexOfListItemContainingLink = contextBuilder.getListItemIndexContaining(linkPosition);
 	const isLinkInListItem = indexOfListItemContainingLink >= 0;
 
 	if (isLinkInListItem) {
@@ -107,9 +93,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 			);
 		}
 
-		const listItemWithDescendants = contextBuilder.getListItemWithDescendants(
-			indexOfListItemContainingLink,
-		);
+		const listItemWithDescendants = contextBuilder.getListItemWithDescendants(indexOfListItemContainingLink);
 
 		const contextEl = container.createDiv();
 		await MarkdownRenderer.render(
@@ -120,36 +104,21 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 			plugin,
 		);
 	} else {
-		const sectionContainingLink =
-			contextBuilder.getSectionContaining(linkPosition);
+		const sectionContainingLink = contextBuilder.getSectionContaining(linkPosition);
 
 		let blockContents = "";
 
-		if (sectionContainingLink?.position !== undefined)
-			blockContents = getTextAtPosition(
-				fileContents,
-				sectionContainingLink.position,
-			);
+		if (sectionContainingLink?.position !== undefined) blockContents = getTextAtPosition(fileContents, sectionContainingLink.position);
 
 		const regex = /^\[\^([\w]+)\]:(.*)$/;
-		if (regex.test(blockContents))
-			blockContents = blockContents.replace("[", "").replace("]:", "");
+		if (regex.test(blockContents)) blockContents = blockContents.replace("[", "").replace("]:", "");
 
-		await MarkdownRenderer.render(
-			plugin.app,
-			blockContents,
-			container,
-			ref.sourceFile.path,
-			plugin,
-		);
+		await MarkdownRenderer.render(plugin.app, blockContents, container, ref.sourceFile.path, plugin);
 	}
 
-	const headingThatContainsLink =
-		contextBuilder.getHeadingContaining(linkPosition);
+	const headingThatContainsLink = contextBuilder.getHeadingContaining(linkPosition);
 	if (headingThatContainsLink) {
-		const firstSectionPosition = contextBuilder.getFirstSectionUnder(
-			headingThatContainsLink.position,
-		);
+		const firstSectionPosition = contextBuilder.getFirstSectionUnder(headingThatContainsLink.position);
 		if (firstSectionPosition) {
 			const contextEl = container.createDiv();
 			await MarkdownRenderer.render(
@@ -164,9 +133,7 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
 	// add highlight to the link
 	const elems = container.querySelectorAll("*");
-	const res = Array.from(elems).find(
-		(v) => v.textContent === ref.reference.displayText,
-	);
+	const res = Array.from(elems).find((v) => v.textContent === ref.reference.displayText);
 	try {
 		// this fails in some edge cases, so in that case, just ignore
 		res.addClass("search-result-file-matched-text");
