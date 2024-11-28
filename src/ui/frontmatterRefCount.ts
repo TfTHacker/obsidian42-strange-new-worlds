@@ -35,15 +35,21 @@ function processFrontmatterLinks(mdView: MarkdownView) {
 	const transformedCache = mdView.file ? getSNWCacheByFile(mdView.file) : {};
 	if (!transformedCache.frontmatterLinks?.length) return;
 
+	console.log("mdView.metadataEditor.rendered", mdView.metadataEditor.rendered);
 	for (const item of mdView.metadataEditor.rendered) {
+		console.log("item", item);
 		const innerLink = item.valueEl.querySelector(".metadata-link-inner.internal-link") as HTMLElement;
+		console.log("innerLink", innerLink);
 		if (innerLink) {
 			const fmMatch = transformedCache.frontmatterLinks?.find((item) => item.displayText === innerLink.textContent);
 			if (fmMatch) appendRefCounter(innerLink as HTMLElement, fmMatch);
-			return;
+			continue;
 		}
+
 		const pillLinks = item.valueEl.querySelectorAll(".multi-select-pill.internal-link .multi-select-pill-content span");
-		if (!pillLinks.length) return;
+		console.log("pillLinks", pillLinks, item);
+		if (!pillLinks.length) continue;
+		console.log("pillLinks 2", pillLinks);
 		for (const pill of Array.from(pillLinks) as HTMLElement[]) {
 			const fmMatch = transformedCache.frontmatterLinks?.find((item) => item.displayText === pill.textContent);
 			const parent = pill.parentElement;
@@ -53,6 +59,7 @@ function processFrontmatterLinks(mdView: MarkdownView) {
 }
 
 function appendRefCounter(parentLink: HTMLElement, cacheItem: TransformedCachedItem) {
+	console.log("appendRefCounter", parentLink, cacheItem);
 	let wrapperEl = parentLink.parentElement?.querySelector(".snw-frontmatter-wrapper");
 	const refCount = cacheItem.references.length;
 

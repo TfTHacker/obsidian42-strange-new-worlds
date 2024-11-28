@@ -1,5 +1,7 @@
 import { getIndexedReferences, getSNWCacheByFile, parseLinkTextToFullPath } from "./indexer";
 import type SNWPlugin from "./main";
+import type { TFile, CachedMetadata } from "obsidian";
+import type { TransformedCache } from "./types";
 
 /**
  * Provide a simple API for use with Templater, Dataview and debugging the complexities of various pages.
@@ -17,8 +19,11 @@ export default class SnwAPI {
 		console.log(`SNW: ${logDescription}`, outputs);
 	};
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	getMetaInfoByCurrentFile = async (): Promise<any> => {
+	getMetaInfoByCurrentFile = async (): Promise<{
+		TFile: TFile | null;
+		metadataCache: CachedMetadata | null;
+		SnwTransformedCache: TransformedCache | null;
+	} | null> => {
 		return this.getMetaInfoByFileName(this.plugin.app.workspace.getActiveFile()?.path || "");
 	};
 

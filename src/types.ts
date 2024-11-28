@@ -36,6 +36,7 @@ export interface ReferenceLocation {
 export interface Link {
 	reference: {
 		link: string;
+		key: string;
 		displayText: string;
 		position: Pos;
 	};
