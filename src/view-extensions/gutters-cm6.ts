@@ -64,41 +64,38 @@ const ReferenceGutterExtension = gutter({
 		if (transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"] === true) return null;
 
 		const embedsFromMetaDataCache = mdView.app.metadataCache.getFileCache(mdView.file)?.embeds;
-		if (!embedsFromMetaDataCache) return null;
-		if (embedsFromMetaDataCache?.length >= 0) {
-			const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
-			for (const embed of embedsFromMetaDataCache) {
-				if (embed.position.start.line + 1 === lineNumberInFile) {
-					for (const ref of transformedCache?.embeds ?? []) {
-						if (ref?.references.length >= plugin.settings.minimumRefCountThreshold && ref?.pos.start.line + 1 === lineNumberInFile) {
-							const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim();
-							if (lineToAnalyze.startsWith("!")) {
-								const strippedLineToAnalyze = lineToAnalyze.replace("![[", "").replace("]]", "");
-								let lineFromFile = "";
-								if (strippedLineToAnalyze.startsWith("#")) {
-									lineFromFile = mdView.file.path.replace(`.${mdView.file.extension}`, "") + strippedLineToAnalyze;
-								} else {
-									lineFromFile = parseLinkTextToFullPath(strippedLineToAnalyze);
-									if (lineFromFile === "") {
-										lineFromFile = strippedLineToAnalyze;
-									}
-								}
-								if (lineFromFile.toLocaleUpperCase() === ref.key) {
-									return new referenceGutterMarker(
-										ref.references.length,
-										"embed",
-										ref.references[0].realLink,
-										ref.key,
-										(ref.references[0].resolvedFile?.path ?? "").replace(`.${ref.references[0].resolvedFile?.extension}`, ""),
-										"snw-embed-special snw-liveupdate",
-									);
-								}
+		if (!embedsFromMetaDataCache || !embedsFromMetaDataCache.length) return null;
+
+		const lineNumberInFile = editorView.state.doc.lineAt(line.from).number;
+		for (const embed of embedsFromMetaDataCache) {
+			if (embed.position.start.line + 1 === lineNumberInFile) {
+				for (const ref of transformedCache?.embeds ?? []) {
+					if (ref?.references.length >= plugin.settings.minimumRefCountThreshold && ref?.pos.start.line + 1 === lineNumberInFile) {
+						const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim();
+						if (lineToAnalyze.startsWith("!")) {
+							// Remove  [[ and ]] and split by | to get the link text if aliased
+							const strippedLineToAnalyze = lineToAnalyze.replace("![[", "").replace("]]", "").split("|")[0];
+							const lineFromFile = (
+								strippedLineToAnalyze.startsWith("#")
+									? mdView.file.path.replace(`.${mdView.file.extension}`, "") + strippedLineToAnalyze
+									: parseLinkTextToFullPath(strippedLineToAnalyze) || strippedLineToAnalyze
+							).toLocaleUpperCase();
+							if (lineFromFile === ref.key) {
+								return new referenceGutterMarker(
+									ref.references.length,
+									"embed",
+									ref.references[0].realLink,
+									ref.key,
+									(ref.references[0].resolvedFile?.path ?? "").replace(`.${ref.references[0].resolvedFile?.extension}`, ""),
+									"snw-embed-special snw-liveupdate",
+								);
 							}
 						}
 					}
 				}
 			}
 		}
+
 		return null;
 	},
 	initialSpacer: () => emptyMarker,

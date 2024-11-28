@@ -39,19 +39,20 @@ export class SideBarPaneView extends ItemView {
 	}
 
 	async updateView() {
-		const refType = this.plugin.lastSelectedReferenceType;
-		const realLink = this.plugin.lastSelectedReferenceRealLink;
-		const key = this.plugin.lastSelectedReferenceKey;
-		const filePath = this.plugin.lastSelectedReferenceFilePath;
-		const lineNu = this.plugin.lastSelectedLineNumber;
+		const plugin = this.plugin;
 
-		this.containerEl.replaceChildren(await getUIC_SidePane(refType, realLink, key, filePath, lineNu));
+		this.containerEl.replaceChildren(
+			await getUIC_SidePane(
+				plugin.lastSelectedReferenceType,
+				plugin.lastSelectedReferenceRealLink,
+				plugin.lastSelectedReferenceKey,
+				plugin.lastSelectedReferenceFilePath,
+				plugin.lastSelectedLineNumber,
+			),
+		);
 
 		scrollResultsIntoView(this.containerEl);
 	}
 
-	async onClose() {
-		// Nothing to clean up.
-		console.log("Closing SNW sidepane");
-	}
+	async onClose() {}
 }

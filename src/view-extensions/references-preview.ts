@@ -167,6 +167,7 @@ class snwChildComponent extends MarkdownRenderChild {
 				const headerKey = this.containerEl.querySelector("[data-heading]");
 				if (transformedCache?.headings && headerKey) {
 					const textContext = headerKey.getAttribute("data-heading");
+
 					for (const value of transformedCache.headings) {
 						if (value.references.length >= minRefCountThreshold && value.headerMatch === textContext?.replace(/\[|\]/g, "")) {
 							const referenceElement = htmlDecorationForReferencesElement(

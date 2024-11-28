@@ -62,7 +62,6 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 						}[] = [];
 
 						if (firstCharacterMatch === "[" && (transformedCache?.links?.length ?? 0) > 0) {
-							//link
 							let newLink = match[0].replace("[[", "").replace("]]", "");
 							//link to an internal page link, add page name
 							if (newLink.startsWith("#")) newLink = mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + newLink;
@@ -147,7 +146,8 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 
 		update(update: ViewUpdate) {
 			if (this.regxPattern !== "" && (update.docChanged || update.viewportChanged)) {
-				this.decorations = this.decorator?.updateDeco(update, this.decorations);
+				this.decorations = this.decorator ? this.decorator.updateDeco(update, this.decorations) : this.decorations;
+				// this.decorations = this.decorator?.updateDeco(update, this.decorations);
 			}
 		}
 	},

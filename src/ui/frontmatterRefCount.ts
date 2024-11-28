@@ -27,42 +27,33 @@ export const updatePropertiesDebounce = debounce(
 );
 
 function processFrontmatterLinks(mdView: MarkdownView) {
-	if (plugin.showCountsActive === false) return;
+	if (!plugin.showCountsActive) return;
 	const state =
 		Platform.isMobile || Platform.isMobileApp ? plugin.settings.displayPropertyReferencesMobile : plugin.settings.displayPropertyReferences;
-	if (state === false) return;
+	if (!state || !mdView?.rawFrontmatter) return;
 
-	if (mdView?.rawFrontmatter === "") return;
-	// biome-ignore lint/style/noNonNullAssertion: <explanation>
-	const transformedCache = getSNWCacheByFile(mdView.file!);
-	// if no frontmatter links, exit
-	if (transformedCache.frontmatterLinks?.length === 0) return;
+	const transformedCache = mdView.file ? getSNWCacheByFile(mdView.file) : {};
+	if (!transformedCache.frontmatterLinks?.length) return;
 
-	// biome-ignore lint/complexity/noForEach: <explanation>
-	mdView.metadataEditor.rendered.forEach((item) => {
-		const innerLink = item.valueEl.querySelector(".metadata-link-inner.internal-link");
+	for (const item of mdView.metadataEditor.rendered) {
+		const innerLink = item.valueEl.querySelector(".metadata-link-inner.internal-link") as HTMLElement;
 		if (innerLink) {
-			const fmMatch = transformedCache.frontmatterLinks?.find((item) => item.displayText === innerLink.innerText);
-			if (fmMatch) appendRefCounter(innerLink, fmMatch);
-		} else {
-			const pillLinks = item.valueEl.querySelectorAll(".multi-select-pill.internal-link .multi-select-pill-content span");
-			if (pillLinks.length > 0) {
-				// biome-ignore lint/complexity/noForEach: <explanation>
-				pillLinks.forEach((pill: HTMLElement) => {
-					if (pill) {
-						const fmMatch = transformedCache.frontmatterLinks?.find((item) => item.displayText === pill.innerText);
-						// biome-ignore lint/style/noNonNullAssertion: <explanation>
-						if (fmMatch) appendRefCounter(pill.parentElement!, fmMatch);
-					}
-				});
-			}
+			const fmMatch = transformedCache.frontmatterLinks?.find((item) => item.displayText === innerLink.textContent);
+			if (fmMatch) appendRefCounter(innerLink as HTMLElement, fmMatch);
+			return;
 		}
-	});
+		const pillLinks = item.valueEl.querySelectorAll(".multi-select-pill.internal-link .multi-select-pill-content span");
+		if (!pillLinks.length) return;
+		for (const pill of Array.from(pillLinks) as HTMLElement[]) {
+			const fmMatch = transformedCache.frontmatterLinks?.find((item) => item.displayText === pill.textContent);
+			const parent = pill.parentElement;
+			if (fmMatch && parent) appendRefCounter(parent, fmMatch);
+		}
+	}
 }
 
 function appendRefCounter(parentLink: HTMLElement, cacheItem: TransformedCachedItem) {
 	let wrapperEl = parentLink.parentElement?.querySelector(".snw-frontmatter-wrapper");
-
 	const refCount = cacheItem.references.length;
 
 	if (!wrapperEl && refCount >= plugin.settings.minimumRefCountThreshold) {
@@ -72,7 +63,7 @@ function appendRefCounter(parentLink: HTMLElement, cacheItem: TransformedCachedI
 			"link",
 			cacheItem.references[0].realLink,
 			cacheItem.key,
-			cacheItem.references[0]?.resolvedFile?.path.replace(`.${cacheItem.references[0]?.resolvedFile?.extension}`, ""),
+			(cacheItem.references[0]?.resolvedFile?.path ?? "").replace(`.${cacheItem.references[0]?.resolvedFile?.extension ?? ""}`, ""),
 			"snw-frontmatter-count",
 			cacheItem.pos.start.line,
 		);
@@ -89,8 +80,6 @@ function appendRefCounter(parentLink: HTMLElement, cacheItem: TransformedCachedI
 			} else {
 				wrapperEl?.remove();
 			}
-		} catch (error) {
-			//no node to change, ignore this error
-		}
+		} catch (error) {}
 	}
 }

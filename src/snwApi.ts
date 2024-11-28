@@ -7,6 +7,7 @@ import type SNWPlugin from "./main";
  */
 export default class SnwAPI {
 	plugin: SNWPlugin;
+	references = new Map();
 
 	constructor(snwPlugin: SNWPlugin) {
 		this.plugin = snwPlugin;

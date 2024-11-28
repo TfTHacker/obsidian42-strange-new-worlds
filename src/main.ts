@@ -105,7 +105,11 @@ export default class SNWPlugin extends Plugin {
 
 		this.registerEditorExtension(this.editorExtensions);
 
-		this.toggleStateHeaderCount();
+		this.app.workspace.on("layout-change", () => {
+			updateHeadersDebounce();
+			updatePropertiesDebounce();
+		});
+
 		this.toggleStateSNWMarkdownPreview();
 		this.toggleStateSNWLivePreview();
 		this.toggleStateSNWGutters();
@@ -116,11 +120,6 @@ export default class SNWPlugin extends Plugin {
 			}
 			buildLinksAndReferences();
 		});
-	}
-
-	async layoutChangeEvent() {
-		updateHeadersDebounce();
-		updatePropertiesDebounce();
 	}
 
 	// Displays the sidebar SNW pane
@@ -147,12 +146,6 @@ export default class SNWPlugin extends Plugin {
 		// "Reveal" the leaf in case it is in a collapsed sidebar
 		if (leaf) workspace.revealLeaf(leaf);
 		await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
-	}
-
-	// Turns on and off the reference count displayed at the top of the document in the header area
-	toggleStateHeaderCount(): void {
-		if (this.settings.displayIncomingFilesheader && this.showCountsActive) this.app.workspace.on("layout-change", this.layoutChangeEvent);
-		else this.app.workspace.off("layout-change", this.layoutChangeEvent);
 	}
 
 	// Turns on and off the SNW reference counters in Reading mode

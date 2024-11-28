@@ -135,7 +135,6 @@ export class SettingsTab extends PluginSettingTab {
 				cb.setValue(this.plugin.settings.displayIncomingFilesheader);
 				cb.onChange(async (value: boolean) => {
 					this.plugin.settings.displayIncomingFilesheader = value;
-					this.plugin.toggleStateHeaderCount();
 					await this.plugin.saveSettings();
 				});
 			});

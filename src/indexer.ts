@@ -43,29 +43,34 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
 				const linkWithFullPath = (
 					tfileDestination ? tfileDestination.path.replace(`.${tfileDestination.extension}`, "") + subpath : path
 				).toLocaleUpperCase();
-				if (!indexedReferences.has(linkWithFullPath)) indexedReferences.set(linkWithFullPath, []);
-				indexedReferences.get(linkWithFullPath).push({
-					realLink: ref.link,
-					reference: ref,
-					resolvedFile: tfileDestination,
-					sourceFile: file,
-				});
+
+				indexedReferences.set(linkWithFullPath, [
+					...(indexedReferences.get(linkWithFullPath) || []),
+					{
+						realLink: ref.link,
+						reference: ref,
+						resolvedFile: tfileDestination,
+						sourceFile: file,
+					},
+				]);
 			} else {
 				// Null if it is a ghost file link, Create Ghost link
 				const link = ref.link.toLocaleUpperCase();
-				if (!indexedReferences.has(link)) indexedReferences.set(link, []);
-				indexedReferences.get(link).push({
-					realLink: ref.link,
-					reference: ref,
-					// mock up ghost file for linking
-					resolvedFile: {
-						path: `${path}.md`,
-						name: `${path}.md`,
-						basename: path,
-						extension: "md",
-					} as TFile,
-					sourceFile: file,
-				});
+				indexedReferences.set(link, [
+					...(indexedReferences.get(link) || []),
+					{
+						realLink: ref.link,
+						reference: ref,
+						// mock up ghost file for linking
+						resolvedFile: {
+							path: `${path}.md`,
+							name: `${path}.md`,
+							basename: path,
+							extension: "md",
+						} as TFile,
+						sourceFile: file,
+					},
+				]);
 			}
 		}
 	}
@@ -74,14 +79,8 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
 // removes existing references from the map, used with getLinkReferencesForFile to rebuild the refeences
 export const removeLinkReferencesForFile = async (file: TFile) => {
 	for (const [key, items] of indexedReferences.entries()) {
-		for (let i = items.length - 1; i >= 0; i--) {
-			const item = items[i];
-			if (item?.sourceFile && item?.sourceFile?.path === file.path) {
-				items.splice(i, 1);
-			}
-		}
-		if (items.length === 0) indexedReferences.delete(key);
-		else indexedReferences.set(key, items);
+		const filtered = items.filter((item: { sourceFile?: TFile }) => item?.sourceFile?.path !== file.path);
+		filtered.length === 0 ? indexedReferences.delete(key) : indexedReferences.set(key, filtered);
 	}
 };
 
@@ -132,7 +131,9 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 		// map - map to the transformed cache
 		const baseFilePath = `${filePathWithoutExtension}#`;
 		const tempCacheHeadings = cachedMetaData.headings
-			.filter((header) => indexedReferences.has(baseFilePath + stripHeading(header.heading).toLocaleUpperCase()))
+			.filter((header) => {
+				return indexedReferences.has(baseFilePath + stripHeading(header.heading).toLocaleUpperCase());
+			})
 			.map((header) => {
 				const key = baseFilePath + stripHeading(header.heading).toLocaleUpperCase();
 				return {

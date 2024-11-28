@@ -14,7 +14,6 @@ export default class PluginCommands {
 				let msg = `SNW toggled ${this.plugin.showCountsActive ? "ON\n\n" : "OFF\n\n"}`;
 				msg += "Tabs may require reloading for this change to take effect.";
 				new Notice(msg);
-				this.plugin.toggleStateHeaderCount();
 				this.plugin.toggleStateSNWMarkdownPreview();
 				this.plugin.toggleStateSNWLivePreview();
 				this.plugin.toggleStateSNWGutters();

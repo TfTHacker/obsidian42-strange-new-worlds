@@ -17,6 +17,7 @@ export function setPluginVariableForHeaderRefCount(snwPlugin: SNWPlugin) {
 
 // Iterates all open documents to see if they are markdown file, and if so called processHeader
 function setHeaderWithReferenceCounts() {
+	if (!plugin.settings.displayIncomingFilesheader || !plugin.showCountsActive) return;
 	plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
 		if (leaf.view.getViewType() === "markdown") processHeader(leaf.view as MarkdownView);
 	});
@@ -36,13 +37,14 @@ function processHeader(mdView: MarkdownView) {
 	if (!mdViewFile) return;
 	const allLinks = getIndexedReferences();
 
-	const incomingLinks = [];
+	let incomingLinksCount = 0;
 	for (const items of allLinks.values()) {
 		for (const item of items) {
-			if (item?.resolvedFile && item?.resolvedFile?.path === mdViewFile.path) incomingLinks.push(item);
+			if (item?.resolvedFile && item?.resolvedFile?.path === mdViewFile.path) {
+				incomingLinksCount++;
+			}
 		}
 	}
-	let incomingLinksCount = incomingLinks.length;
 
 	// check if the page is to be ignored
 	const transformedCache = getSNWCacheByFile(mdViewFile);
@@ -50,21 +52,21 @@ function processHeader(mdView: MarkdownView) {
 
 	// if no incoming links, check if there is a header and remove it. In all cases, exit roturin
 	if (incomingLinksCount < 1) {
-		if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
+		const headerCountWrapper = mdView.contentEl.querySelector(".snw-header-count-wrapper");
+		if (headerCountWrapper) headerCountWrapper.remove();
 		return;
 	}
 
 	let snwTitleRefCountDisplayCountEl: HTMLElement | null = mdView.contentEl.querySelector(".snw-header-count");
 
 	// header count is already displayed, just update information.
-	if (snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.getAttribute("data-snw-key") === mdViewFile.basename) {
-		snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinks.length.toString()} `;
+	if (snwTitleRefCountDisplayCountEl && snwTitleRefCountDisplayCountEl.dataset.snwKey === mdViewFile.basename) {
+		snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinksCount.toString()} `;
 		return;
 	}
 
+	// ad new header count
 	const containerViewContent: HTMLElement = mdView.contentEl;
-
-	if (mdView.contentEl.querySelector(".snw-header-count-wrapper")) mdView.contentEl.querySelector(".snw-header-count-wrapper")?.remove();
 
 	let wrapper: HTMLElement | null = containerViewContent.querySelector(".snw-header-count-wrapper");
 
@@ -77,7 +79,7 @@ function processHeader(mdView: MarkdownView) {
 		snwTitleRefCountDisplayCountEl = containerViewContent.querySelector(".snw-header-count");
 	}
 
-	if (snwTitleRefCountDisplayCountEl) snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinks.length.toString()} `;
+	if (snwTitleRefCountDisplayCountEl) snwTitleRefCountDisplayCountEl.innerText = ` ${incomingLinksCount.toString()} `;
 	if ((Platform.isDesktop || Platform.isDesktopApp) && snwTitleRefCountDisplayCountEl) {
 		snwTitleRefCountDisplayCountEl.onclick = (e: MouseEvent) => {
 			e.stopPropagation();
@@ -88,13 +90,13 @@ function processHeader(mdView: MarkdownView) {
 	wrapper.setAttribute("data-snw-key", mdViewFile.basename);
 	wrapper.setAttribute("data-snw-type", "File");
 	wrapper.setAttribute("data-snw-filepath", mdViewFile.path);
+
 	wrapper.onclick = (e: MouseEvent) => {
 		e.stopPropagation();
 		processHtmlDecorationReferenceEvent(e.target as HTMLElement);
 	};
 
-	const requireModifierKey = plugin.settings.requireModifierKeyToActivateSNWView;
-	// defaults to showing tippy on hover, but if requireModifierKey is true, then only show on ctrl/meta key
+	// defaults to showing tippy on hover, but if plugin.settings.requireModifierKeyToActivateSNWView is true, then only show on ctrl/meta key
 	let showTippy = true;
 	const tippyObject = tippy(wrapper, {
 		interactive: true,
@@ -104,7 +106,7 @@ function processHeader(mdView: MarkdownView) {
 		placement: "auto-end",
 		onTrigger(instance, event) {
 			const mouseEvent = event as MouseEvent;
-			if (requireModifierKey === false) return;
+			if (plugin.settings.requireModifierKeyToActivateSNWView === false) return;
 			if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
 				showTippy = true;
 			} else {

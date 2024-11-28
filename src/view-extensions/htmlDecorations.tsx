@@ -105,22 +105,18 @@ export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) =
 // or removes the element if the reference is no longer in the document
 export const updateAllSnwLiveUpdateReferencesDebounce = debounce(
 	() => {
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		document.querySelectorAll(".snw-liveupdate").forEach((element) => {
-			const currentCount = Number((element as HTMLElement).innerText);
-			const key = element.getAttribute("data-snw-key");
-			if (plugin.snwAPI.references.has(key)) {
-				const newCount = plugin.snwAPI.references.get(key).length;
-				if (newCount === 0 || newCount < plugin.settings.minimumRefCountThreshold) {
-					element.remove();
-				} else if (newCount !== currentCount) {
-					(element as HTMLElement).innerText = newCount.toString();
-				}
-			} else {
-				// count is now 0, remove the element
-				element.remove();
+		const elements = document.querySelectorAll(".snw-liveupdate");
+		for (const el of Array.from(elements) as HTMLElement[]) {
+			const newCount = plugin.snwAPI.references.get(el.dataset.snwKey)?.length ?? 0;
+			if (newCount < plugin.settings.minimumRefCountThreshold) {
+				el.remove();
+				continue;
 			}
-		});
+			const newCountStr = String(newCount);
+			if (el.textContent !== newCountStr) {
+				el.textContent = newCountStr;
+			}
+		}
 	},
 	UPDATE_DEBOUNCE,
 	true,
