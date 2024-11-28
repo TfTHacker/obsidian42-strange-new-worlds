@@ -38,6 +38,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 				regexp: new RegExp(this.regxPattern, "g"),
 				decorate: (add, from, to, match, view) => {
 					const mdView = view.state.field(editorInfoField);
+
 					// there is no file, likely a canvas file, so stop processing
 					if (!mdView.file) return;
 
@@ -73,7 +74,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 								from: to,
 								to: to,
 							});
-						} else if (firstCharacterMatch === "#" && (transformedCache?.headings?.length ?? 0) > 0) {
+						} else if (firstCharacterMatch === "#" && ((transformedCache?.headings?.length || transformedCache?.links?.length) ?? 0) > 0) {
 							//heading
 							widgetsToAdd.push({
 								// @ts-ignore

@@ -35,7 +35,7 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
 					tfileDestination?.path &&
 					plugin.app.metadataCache.isUserIgnored(tfileDestination.path)
 				) {
-					return;
+					continue;
 				}
 				// if the file has a property snw-index-exclude set to true, exclude it from the index
 				if (plugin.app.metadataCache.getFileCache(tfileDestination)?.frontmatter?.["snw-index-exclude"] === true) continue;

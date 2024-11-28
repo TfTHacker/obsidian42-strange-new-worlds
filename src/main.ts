@@ -88,7 +88,7 @@ export default class SNWPlugin extends Plugin {
 				updatePropertiesDebounce();
 				updateAllSnwLiveUpdateReferencesDebounce();
 			},
-			2000,
+			1000,
 			true,
 		);
 
