@@ -1,4 +1,4 @@
-import { MarkdownView, Platform, type WorkspaceLeaf, debounce } from "obsidian";
+import { MarkdownView, Platform, View, type WorkspaceLeaf, debounce } from "obsidian";
 import { getSNWCacheByFile } from "src/indexer";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
 import type SNWPlugin from "../main";
@@ -14,7 +14,7 @@ export function setPluginVariableForFrontmatterLinksRefCount(snwPlugin: SNWPlugi
 // Iterates all open documents to see if they are markdown file, and if so called processHeader
 function setFrontmatterLinksReferenceCounts() {
 	plugin.app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
-		if (leaf.view instanceof MarkdownView) processFrontmatterLinks(leaf.view as MarkdownView);
+		if (leaf.view.getViewType() === "markdown" || leaf.view.getViewType() === "file-properties") processFrontmatterLinks(leaf.view);
 	});
 }
 
@@ -26,16 +26,18 @@ export const updatePropertiesDebounce = debounce(
 	true,
 );
 
-function processFrontmatterLinks(mdView: MarkdownView) {
+function processFrontmatterLinks(mdView: View) {
 	if (!plugin.showCountsActive) return;
 	const state =
 		Platform.isMobile || Platform.isMobileApp ? plugin.settings.displayPropertyReferencesMobile : plugin.settings.displayPropertyReferences;
-	if (!state || !mdView?.rawFrontmatter) return;
 
-	const transformedCache = mdView.file ? getSNWCacheByFile(mdView.file) : {};
+	const markdownView = mdView as MarkdownView;
+	if (!state || !markdownView?.rawFrontmatter) return;
+
+	const transformedCache = markdownView.file ? getSNWCacheByFile(markdownView.file) : {};
 	if (!transformedCache.frontmatterLinks?.length) return;
 
-	for (const item of mdView.metadataEditor.rendered) {
+	for (const item of markdownView.metadataEditor.rendered) {
 		const innerLink = item.valueEl.querySelector(".metadata-link-inner.internal-link") as HTMLElement;
 		if (innerLink) {
 			const innerLinkText = innerLink.textContent;

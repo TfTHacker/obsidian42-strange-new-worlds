@@ -1,3 +1,7 @@
+# 2.2.1
+
+- Reference count now appears in the files property subpan
+
 # 2.2.0 
 
 - This is another major update to the indexing engine to avoid detecting certain reported issues.
