@@ -26,6 +26,7 @@ export interface Settings {
 	requireModifierKeyToActivateSNWView: boolean; //require CTRL hover to activate SNW view
 	sortOptionDefault: SortOption;
 	displayCustomPropertyList: string; //list of custom properties to display when showing references
+	pluginSupportKanban: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -54,4 +55,5 @@ export const DEFAULT_SETTINGS: Settings = {
 	requireModifierKeyToActivateSNWView: false,
 	sortOptionDefault: "name-asc",
 	displayCustomPropertyList: "",
+	pluginSupportKanban: false,
 };

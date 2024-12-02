@@ -1,3 +1,7 @@
+# 2.3.0 (Pending - still in development)
+- New: Added support for references to show up in the kanban plugin. This can be toggled on and off in settings.
+- Changed: In the past there was a conflict with the Tasks plugin. It seems to be resolved, so the check for the plugin was removed. if it sitll causes issues, please let me know.
+
 # 2.2.1
 
 - Reference count now appears in the files property subpan

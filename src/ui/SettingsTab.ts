@@ -326,5 +326,21 @@ export class SettingsTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					});
 			});
+
+		new Setting(containerEl).setHeading().setName("Support for Other Plugins");
+
+		new Setting(containerEl)
+			.setName("Kanban by mgmeyers")
+			.setDesc(
+				`Enables SNW support with in the preview mode of the Kanban plugin by mgmeyers at https://github.com/mgmeyers/obsidian-kanban. 
+				SNW references will always show when editing a card. Changing this setting may require reopening files.`,
+			)
+			.addToggle((cb: ToggleComponent) => {
+				cb.setValue(this.plugin.settings.pluginSupportKanban);
+				cb.onChange(async (value: boolean) => {
+					this.plugin.settings.pluginSupportKanban = value;
+					await this.plugin.saveSettings();
+				});
+			});
 	}
 }

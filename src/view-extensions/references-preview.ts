@@ -20,15 +20,16 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownP
 	if (el.hasAttribute("uic")) return; // this is a custom component, don't render SNW inside it.
 
 	// The following line addresses a conflict with the popular Tasks plugin.
-	if (el.querySelectorAll(".contains-task-list").length > 0) return;
+	// if ( el.querySelectorAll(".contains-task-list").length > 0) return;
 
 	const currentFile = plugin.app.vault.fileMap[ctx.sourcePath];
 	if (currentFile === undefined) return;
 
 	// check for incompatibility with other plugins
 	const fileCache = plugin.app.metadataCache.getFileCache(currentFile);
-	// @ts-ignore
-	if (fileCache?.frontmatter?.["kanban-plugin"] || ctx.el.parentElement?.classList.contains("kanban-plugin__markdown-preview-view")) return; //no support for kanban board
+
+	if (plugin.settings.pluginSupportKanban === false && fileCache?.frontmatter?.["kanban-plugin"]) return;
+	// || ctx.el.parentElement?.classList.contains("kanban-plugin__markdown-preview-view")
 
 	try {
 		ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile));
