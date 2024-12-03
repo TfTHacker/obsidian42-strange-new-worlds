@@ -263,6 +263,5 @@ export function parseLinkTextToFullPath(link: string): string {
 	const resolvedFilePath = parseLinktext(link);
 	const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
 	if (resolvedTFile === null) return "";
-
 	return resolvedTFile.path.replace(`.${resolvedTFile.extension}`, "") + resolvedFilePath.subpath;
 }

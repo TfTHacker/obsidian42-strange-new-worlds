@@ -1,7 +1,14 @@
-import { type MarkdownPostProcessorContext, MarkdownRenderChild, type MarkdownSectionInformation, type TFile } from "obsidian";
+import {
+	type MarkdownPostProcessorContext,
+	MarkdownRenderChild,
+	type MarkdownSectionInformation,
+	parseLinktext,
+	type TFile,
+} from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "../indexer";
 import type SNWPlugin from "../main";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
+import SnwAPI from "src/snwApi";
 
 let plugin: SNWPlugin;
 
@@ -23,22 +30,58 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownP
 	// if ( el.querySelectorAll(".contains-task-list").length > 0) return;
 
 	const currentFile = plugin.app.vault.fileMap[ctx.sourcePath];
-	if (currentFile === undefined) return;
+	// try {
+	if (currentFile === undefined) {
+		ctx.addChild(new snwChildComponentMardkownWithoutFile(el));
+	} else {
+		// check for incompatibility with other plugins
+		const fileCache = plugin.app.metadataCache.getFileCache(currentFile);
+		if (plugin.settings.pluginSupportKanban === false && fileCache?.frontmatter?.["kanban-plugin"]) return;
+		// || ctx.el.parentElement?.classList.contains("kanban-plugin__markdown-preview-view")
+		ctx.addChild(new snwChildComponentForMarkdownFile(el, ctx.getSectionInfo(el), currentFile));
+	}
+	// } catch (error) {}
+}
 
-	// check for incompatibility with other plugins
-	const fileCache = plugin.app.metadataCache.getFileCache(currentFile);
+// Processes pure markdown not coming from a document, like a card on a canvas that is not based on a file
+class snwChildComponentMardkownWithoutFile extends MarkdownRenderChild {
+	containerEl: HTMLElement;
 
-	if (plugin.settings.pluginSupportKanban === false && fileCache?.frontmatter?.["kanban-plugin"]) return;
-	// || ctx.el.parentElement?.classList.contains("kanban-plugin__markdown-preview-view")
+	constructor(containerEl: HTMLElement) {
+		super(containerEl);
+		this.containerEl = containerEl;
+	}
 
-	try {
-		ctx.addChild(new snwChildComponent(el, ctx.getSectionInfo(el), currentFile));
-	} catch (error) {
-		// for now just fail - no logging
+	onload(): void {
+		for (const link of Array.from(this.containerEl.querySelectorAll("a.internal-link, span.internal-embed"))) {
+			const ref = ((link as HTMLElement).dataset.href || link.getAttribute("src")) as string;
+			const key = parseLinkTextToFullPath(ref).toLocaleUpperCase();
+			const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(parseLinktext(ref).path, "/");
+			// const key
+			const references = plugin.snwAPI.references.get(key);
+
+			const refCount = references?.length || 0;
+			if (refCount <= 0 || refCount < plugin.settings.minimumRefCountThreshold) continue;
+
+			const refType = link.classList.contains("internal-link") ? "link" : "embed";
+			if (!resolvedTFile) continue;
+
+			const referenceElement = htmlDecorationForReferencesElement(
+				refCount,
+				refType,
+				ref,
+				key,
+				resolvedTFile.path.replace(`.${resolvedTFile.extension}`, ""),
+				`snw-liveupdate snw-${refType}-preview`,
+				1,
+			);
+			link.after(referenceElement);
+		}
 	}
 }
 
-class snwChildComponent extends MarkdownRenderChild {
+// Processes markdown coming from a markdown file
+class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 	containerEl: HTMLElement;
 	sectionInfo: MarkdownSectionInformation;
 	currentFile: TFile;
@@ -51,10 +94,6 @@ class snwChildComponent extends MarkdownRenderChild {
 	}
 
 	onload(): void {
-		this.processMarkdown();
-	}
-
-	processMarkdown(): void {
 		const minRefCountThreshold = plugin.settings.minimumRefCountThreshold;
 		const transformedCache = getSNWCacheByFile(this.currentFile);
 
