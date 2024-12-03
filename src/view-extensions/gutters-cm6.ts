@@ -77,7 +77,7 @@ const ReferenceGutterExtension = gutter({
 							const strippedLineToAnalyze = lineToAnalyze.replace("![[", "").replace("]]", "").split("|")[0];
 							const lineFromFile = (
 								strippedLineToAnalyze.startsWith("#")
-									? mdView.file.path.replace(`.${mdView.file.extension}`, "") + strippedLineToAnalyze
+									? mdView.file + strippedLineToAnalyze
 									: parseLinkTextToFullPath(strippedLineToAnalyze) || strippedLineToAnalyze
 							).toLocaleUpperCase();
 							if (lineFromFile === ref.key) {
@@ -86,7 +86,7 @@ const ReferenceGutterExtension = gutter({
 									"embed",
 									ref.references[0].realLink,
 									ref.key,
-									(ref.references[0].resolvedFile?.path ?? "").replace(`.${ref.references[0].resolvedFile?.extension}`, ""),
+									ref.references[0].resolvedFile?.path ?? "",
 									"snw-embed-special snw-liveupdate",
 								);
 							}

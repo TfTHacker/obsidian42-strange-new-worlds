@@ -65,7 +65,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 						if (firstCharacterMatch === "[" && (transformedCache?.links?.length ?? 0) > 0) {
 							let newLink = match[0].replace("[[", "").replace("]]", "");
 							//link to an internal page link, add page name
-							if (newLink.startsWith("#")) newLink = mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + newLink;
+							if (newLink.startsWith("#")) newLink = mdViewFile.path + newLink;
 							newLink = newLink.toLocaleUpperCase();
 							widgetsToAdd.push({
 								key: newLink,
@@ -102,7 +102,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 							//embeds
 							let newEmbed = match[0].replace("![[", "").replace("]]", "");
 							//link to an internal page link, add page name
-							if (newEmbed.startsWith("#")) newEmbed = mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + stripHeading(newEmbed);
+							if (newEmbed.startsWith("#")) newEmbed = mdViewFile.path + stripHeading(newEmbed);
 							widgetsToAdd.push({
 								key: newEmbed.toLocaleUpperCase(),
 								transformedCachedItem: transformedCache.embeds ?? null,
@@ -113,7 +113,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 						} else if (firstCharacterMatch === " " && (transformedCache?.blocks?.length ?? 0) > 0) {
 							widgetsToAdd.push({
 								//blocks
-								key: (mdViewFile.path.replace(`.${mdView.file?.extension}`, "") + match[0].replace(" ^", "#^")).toLocaleUpperCase(), //change this to match the references cache
+								key: (mdViewFile.path + match[0].replace(" ^", "#^")).toLocaleUpperCase(), //change this to match the references cache
 								transformedCachedItem: transformedCache.blocks ?? null,
 								refType: "block",
 								from: to,
@@ -181,7 +181,7 @@ const constructWidgetForInlineReference = (
 			modifyKey = parsedKey === "" ? modifyKey : parsedKey; //if no results, likely a ghost link
 			if (matchKey.startsWith("#")) {
 				// internal page link
-				matchKey = filePath.replace(`.${fileExtension}`, "") + stripHeading(matchKey);
+				matchKey = filePath + stripHeading(matchKey);
 			}
 		}
 

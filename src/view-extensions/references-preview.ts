@@ -71,7 +71,7 @@ class snwChildComponentMardkownWithoutFile extends MarkdownRenderChild {
 				refType,
 				ref,
 				key,
-				resolvedTFile.path.replace(`.${resolvedTFile.extension}`, ""),
+				resolvedTFile.path,
 				`snw-liveupdate snw-${refType}-preview`,
 				1,
 			);
@@ -161,7 +161,7 @@ class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 								"embed",
 								value.references[0].realLink,
 								value.key.toLocaleUpperCase(),
-								(value.references[0]?.resolvedFile?.path ?? "").replace(`.${value.references[0]?.resolvedFile?.extension ?? ""}`, ""),
+								value.references[0]?.resolvedFile?.path ?? "",
 								"snw-liveupdate",
 								value.pos.start.line,
 							);
@@ -191,7 +191,7 @@ class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 								"link",
 								value.references[0].realLink,
 								value.key.toLocaleUpperCase(),
-								(value.references[0]?.resolvedFile?.path ?? "").replace(`.${value.references[0]?.resolvedFile?.extension ?? ""}`, ""),
+								value.references[0]?.resolvedFile?.path ?? "",
 								"snw-liveupdate",
 								value.pos.start.line,
 							);
@@ -215,7 +215,7 @@ class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 								"heading",
 								value.references[0].realLink,
 								value.key,
-								(value.references[0]?.resolvedFile?.path ?? "").replace(`.${value.references[0]?.resolvedFile?.extension ?? ""}`, ""),
+								value.references[0]?.resolvedFile?.path ?? "",
 								"snw-liveupdate",
 								value.pos.start.line,
 							);

@@ -93,7 +93,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
 						const destinationHeadings = plugin.app.metadataCache.getFileCache(fileT)?.headings;
 						if (destinationHeadings) {
 							const headingKey = titleKey.match(/#(.+)/g)[0].replace("#", "");
-							const l = destinationHeadings.find((h) => h.heading === headingKey);
+							const l = destinationHeadings.find((h) => h.heading.toLocaleUpperCase() === headingKey);
 							lineNu = l.position.start.line;
 						}
 					}

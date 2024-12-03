@@ -21,8 +21,8 @@ export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
 		<div
 			className="snw-ref-item-info search-result-file-match"
 			snw-data-line-number={startLine}
-			snw-data-file-name={ref?.sourceFile?.path.replace(`.${ref?.sourceFile?.extension}`, "")}
-			data-href={ref?.sourceFile?.path.replace(`.${ref?.sourceFile?.extension}`, "")}
+			snw-data-file-name={ref?.sourceFile?.path}
+			data-href={ref?.sourceFile?.path}
 			// biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
 			dangerouslySetInnerHTML={{
 				__html: (await grabChunkOfFile(ref)).innerHTML,

@@ -40,10 +40,7 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
 				// if the file has a property snw-index-exclude set to true, exclude it from the index
 				if (plugin.app.metadataCache.getFileCache(tfileDestination)?.frontmatter?.["snw-index-exclude"] === true) continue;
 
-				const linkWithFullPath = (
-					tfileDestination ? tfileDestination.path.replace(`.${tfileDestination.extension}`, "") + subpath : path
-				).toLocaleUpperCase();
-
+				const linkWithFullPath = (tfileDestination ? tfileDestination.path + subpath : path).toLocaleUpperCase();
 				indexedReferences.set(linkWithFullPath, [
 					...(indexedReferences.get(linkWithFullPath) || []),
 					{
@@ -122,14 +119,14 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 	const transformedCache: TransformedCache = {};
 	const cachedMetaData = plugin.app.metadataCache.getFileCache(file);
 	if (!cachedMetaData) return transformedCache;
-	const filePathWithoutExtension = file.path.replace(`.${file.extension}`, "").toLocaleUpperCase();
+	const filePathInUppercase = file.path.toLocaleUpperCase();
 
 	if (!indexedReferences) buildLinksAndReferences();
 
 	if (cachedMetaData?.headings) {
 		// filter - fFirst confirm there are references
 		// map - map to the transformed cache
-		const baseFilePath = `${filePathWithoutExtension}#`;
+		const baseFilePath = `${filePathInUppercase}#`;
 		const tempCacheHeadings = cachedMetaData.headings
 			.filter((header) => {
 				return indexedReferences.has(baseFilePath + stripHeading(header.heading).toLocaleUpperCase());
@@ -152,9 +149,9 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 		// First confirm there are references to the block
 		// then map the block to the transformed cache
 		const tempCacheBlocks = Object.values(cachedMetaData.blocks)
-			.filter((block) => (indexedReferences.get(`${filePathWithoutExtension}#^${block.id.toUpperCase()}`)?.length || 0) > 0)
+			.filter((block) => (indexedReferences.get(`${filePathInUppercase}#^${block.id.toUpperCase()}`)?.length || 0) > 0)
 			.map((block) => {
-				const key = `${filePathWithoutExtension}#^${block.id.toLocaleUpperCase()}`;
+				const key = `${filePathInUppercase}#^${block.id.toLocaleUpperCase()}`;
 				return {
 					key,
 					pos: block.position,
@@ -170,14 +167,14 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 		const tempCacheLinks = cachedMetaData.links
 			.filter((link) => {
 				const linkPath =
-					parseLinkTextToFullPath(link.link.startsWith("#") ? filePathWithoutExtension + link.link : link.link).toLocaleUpperCase() ||
+					parseLinkTextToFullPath(link.link.startsWith("#") ? filePathInUppercase + link.link : link.link).toLocaleUpperCase() ||
 					link.link.toLocaleUpperCase();
 				const refs = indexedReferences.get(linkPath);
 				return refs?.length > 0;
 			})
 			.map((link) => {
 				const linkPath =
-					parseLinkTextToFullPath(link.link.startsWith("#") ? filePathWithoutExtension + link.link : link.link).toLocaleUpperCase() ||
+					parseLinkTextToFullPath(link.link.startsWith("#") ? filePathInUppercase + link.link : link.link).toLocaleUpperCase() ||
 					link.link.toLocaleUpperCase();
 
 				const result = {
@@ -204,7 +201,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 			.filter((embed) => {
 				const embedPath =
 					(embed.link.startsWith("#")
-						? parseLinkTextToFullPath(filePathWithoutExtension + embed.link)
+						? parseLinkTextToFullPath(filePathInUppercase + embed.link)
 						: parseLinkTextToFullPath(embed.link)
 					).toLocaleUpperCase() || embed.link.toLocaleUpperCase();
 				const key = embedPath.startsWith("#") ? `${file.basename}${embedPath}` : embedPath;
@@ -212,7 +209,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 			})
 			.map((embed) => {
 				const getEmbedPath = () => {
-					const rawPath = embed.link.startsWith("#") ? filePathWithoutExtension + embed.link : embed.link;
+					const rawPath = embed.link.startsWith("#") ? filePathInUppercase + embed.link : embed.link;
 					return parseLinkTextToFullPath(rawPath).toLocaleUpperCase() || embed.link.toLocaleUpperCase();
 				};
 
@@ -263,5 +260,5 @@ export function parseLinkTextToFullPath(link: string): string {
 	const resolvedFilePath = parseLinktext(link);
 	const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
 	if (resolvedTFile === null) return "";
-	return resolvedTFile.path.replace(`.${resolvedTFile.extension}`, "") + resolvedFilePath.subpath;
+	return resolvedTFile.path + resolvedFilePath.subpath;
 }

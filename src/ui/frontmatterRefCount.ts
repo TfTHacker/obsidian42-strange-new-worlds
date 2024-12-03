@@ -67,7 +67,7 @@ function appendRefCounter(parentLink: HTMLElement, cacheItem: TransformedCachedI
 			"link",
 			cacheItem.references[0].realLink,
 			cacheItem.key,
-			(cacheItem.references[0]?.resolvedFile?.path ?? "").replace(`.${cacheItem.references[0]?.resolvedFile?.extension ?? ""}`, ""),
+			cacheItem.references[0]?.resolvedFile?.path ?? "",
 			"snw-frontmatter-count",
 			cacheItem.pos.start.line,
 		);
