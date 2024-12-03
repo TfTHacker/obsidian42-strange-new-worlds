@@ -29,17 +29,17 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownP
 	// if ( el.querySelectorAll(".contains-task-list").length > 0) return;
 
 	const currentFile = plugin.app.vault.fileMap[ctx.sourcePath];
-	// try {
 	if (currentFile === undefined) {
+		//this is run if the processor is not run within a markdown file, rather a card on a canvas
 		ctx.addChild(new snwChildComponentMardkownWithoutFile(el));
 	} else {
-		// check for incompatibility with other plugins
-		const fileCache = plugin.app.metadataCache.getFileCache(currentFile);
-		if (plugin.settings.pluginSupportKanban === false && fileCache?.frontmatter?.["kanban-plugin"]) return;
-		// || ctx.el.parentElement?.classList.contains("kanban-plugin__markdown-preview-view")
+		//this is run if the processor is run within a markdown file
+		if (plugin.settings.pluginSupportKanban === false) {
+			const fileCache = plugin.app.metadataCache.getFileCache(currentFile);
+			if (fileCache?.frontmatter?.["kanban-plugin"]) return;
+		}
 		ctx.addChild(new snwChildComponentForMarkdownFile(el, ctx.getSectionInfo(el), currentFile));
 	}
-	// } catch (error) {}
 }
 
 // Processes pure markdown not coming from a document, like a card on a canvas that is not based on a file
@@ -81,10 +81,10 @@ class snwChildComponentMardkownWithoutFile extends MarkdownRenderChild {
 // Processes markdown coming from a markdown file
 class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 	containerEl: HTMLElement;
-	sectionInfo: MarkdownSectionInformation;
+	sectionInfo: MarkdownSectionInformation | null;
 	currentFile: TFile;
 
-	constructor(containerEl: HTMLElement, sectionInfo: MarkdownSectionInformation, currentFile: TFile) {
+	constructor(containerEl: HTMLElement, sectionInfo: MarkdownSectionInformation | null, currentFile: TFile) {
 		super(containerEl);
 		this.containerEl = containerEl;
 		this.sectionInfo = sectionInfo;
@@ -99,7 +99,7 @@ class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 		if (transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-preview"] === true) return;
 
 		if (transformedCache?.blocks || transformedCache.embeds || transformedCache.headings || transformedCache.links) {
-			if (plugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks) {
+			if (plugin.settings.enableRenderingBlockIdInMarkdown && transformedCache?.blocks && this.sectionInfo) {
 				for (const value of transformedCache.blocks) {
 					if (
 						value.references.length >= minRefCountThreshold &&
@@ -111,31 +111,27 @@ class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 							"block",
 							value.references[0].realLink,
 							value.key,
-							value.references[0]?.resolvedFile?.path.replace(`.${value.references[0]?.resolvedFile?.path}`, ""),
+							value.references[0]?.resolvedFile?.path ?? "",
 							"snw-liveupdate",
 							value.pos.start.line,
 						);
-						let blockElement: HTMLElement = this.containerEl.querySelector("p");
+						let blockElement: HTMLElement | null = this.containerEl.querySelector("p");
 						const valueLineInSection: number = value.pos.start.line - this.sectionInfo.lineStart;
 						if (!blockElement) {
 							blockElement = this.containerEl.querySelector(`li[data-line="${valueLineInSection}"]`);
-							if (blockElement.querySelector("ul")) blockElement.querySelector("ul").before(referenceElement);
+							if (!blockElement) continue;
+							const ulElement = blockElement.querySelector("ul");
+							if (ulElement) ulElement.before(referenceElement);
 							else blockElement.append(referenceElement);
 						} else {
-							if (!blockElement) {
-								blockElement = this.containerEl.querySelector(`ol[data-line="${valueLineInSection}"]`);
-								blockElement.append(referenceElement);
-							} else {
-								blockElement.append(referenceElement);
-							}
+							// if (!blockElement) {
+							// 	blockElement = this.containerEl.querySelector(`ol[data-line="${valueLineInSection}"]`);
+							// 	blockElement.append(referenceElement);
+							// } else {
+							blockElement.append(referenceElement);
+							// }
 						}
-						try {
-							if (!blockElement.hasClass("snw-block-preview")) {
-								referenceElement.addClass("snw-block-preview");
-							}
-						} catch (error) {
-							/* nothing to do here */
-						}
+						if (blockElement && !blockElement.hasClass("snw-block-preview")) referenceElement.addClass("snw-block-preview");
 					}
 				}
 			}
