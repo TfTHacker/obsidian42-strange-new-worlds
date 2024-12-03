@@ -26,7 +26,7 @@ export default function markdownPreviewProcessor(el: HTMLElement, ctx: MarkdownP
 	if (el.hasAttribute("uic")) return; // this is a custom component, don't render SNW inside it.
 
 	// The following line addresses a conflict with the popular Tasks plugin.
-	// if ( el.querySelectorAll(".contains-task-list").length > 0) return;
+	if (el.querySelectorAll(".contains-task-list").length > 0) return;
 
 	const currentFile = plugin.app.vault.fileMap[ctx.sourcePath];
 	if (currentFile === undefined) {
