@@ -63,6 +63,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
 			node.addEventListener("click", async (e: MouseEvent) => {
 				e.preventDefault();
 				const handlerElement = (e.target as HTMLElement).closest(".snw-ref-item-file, .snw-ref-item-info, .snw-ref-title-popover-label");
+				if (!handlerElement) return;
 				let lineNu = Number(handlerElement.getAttribute("snw-data-line-number"));
 				const filePath = handlerElement.getAttribute("snw-data-file-name");
 				const fileT = app.metadataCache.getFirstLinkpathDest(filePath, filePath);
@@ -81,6 +82,7 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
 						// links to a block id
 						const destinationBlocks = Object.entries(plugin.app.metadataCache.getFileCache(fileT)?.blocks);
 						if (destinationBlocks) {
+							// @ts-ignore
 							const blockID = titleKey
 								.match(/#\^(.+)$/g)[0]
 								.replace("#^", "")
@@ -92,8 +94,10 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
 						// possibly links to a header
 						const destinationHeadings = plugin.app.metadataCache.getFileCache(fileT)?.headings;
 						if (destinationHeadings) {
+							// @ts-ignore
 							const headingKey = titleKey.match(/#(.+)/g)[0].replace("#", "");
 							const l = destinationHeadings.find((h) => h.heading.toLocaleUpperCase() === headingKey);
+							// @ts-ignore
 							lineNu = l.position.start.line;
 						}
 					}
@@ -103,20 +107,19 @@ export const setFileLinkHandlers = async (isHoverView: boolean, rootElementForVi
 					setTimeout(() => {
 						// jumps to the line of the file where the reference is located
 						try {
-							plugin.app.workspace.getActiveViewOfType(MarkdownView).setEphemeralState({ line: lineNu });
-						} catch (error) {
-							/* Do nothing */
-						}
+							const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+							if (activeView) activeView.setEphemeralState({ line: lineNu });
+						} catch (error) {}
 					}, 400);
 				}
 			});
 			// mouseover event
-			// @ts-ignore
 			if (plugin.app.internalPlugins.plugins["page-preview"].enabled === true) {
+				// @ts-ignore
 				node.addEventListener("mouseover", (e: PointerEvent) => {
 					e.preventDefault();
-					// @ts-ignore
 					const hoverMetaKeyRequired =
+						// @ts-ignore
 						app.internalPlugins.plugins["page-preview"].instance.overrides["obsidian42-strange-new-worlds"] !== false;
 					if (hoverMetaKeyRequired === false || (hoverMetaKeyRequired === true && Keymap.isModifier(e, "Mod"))) {
 						const target = e.target as HTMLElement;
@@ -146,11 +149,11 @@ const getDataElements = async (
 	lineNu: number;
 }> => {
 	const parentElement: ReferenceElement = instance.reference;
-	const refType = parentElement.getAttribute("data-snw-type");
-	const realLink = parentElement.getAttribute("data-snw-reallink");
-	const key = parentElement.getAttribute("data-snw-key");
-	const path = parentElement.getAttribute("data-snw-filepath");
-	const lineNum = Number(parentElement.getAttribute("snw-data-line-number"));
+	const refType = parentElement.getAttribute("data-snw-type") || "";
+	const realLink = parentElement.getAttribute("data-snw-reallink") || "";
+	const key = parentElement.getAttribute("data-snw-key") || "";
+	const path = parentElement.getAttribute("data-snw-filepath") || "";
+	const lineNum = Number(parentElement.getAttribute("snw-data-line-number")) || 0;
 	return {
 		refType: refType,
 		realLink: realLink,

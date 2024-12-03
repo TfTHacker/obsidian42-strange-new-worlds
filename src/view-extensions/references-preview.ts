@@ -8,7 +8,6 @@ import {
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "../indexer";
 import type SNWPlugin from "../main";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
-import SnwAPI from "src/snwApi";
 
 let plugin: SNWPlugin;
 
@@ -57,7 +56,6 @@ class snwChildComponentMardkownWithoutFile extends MarkdownRenderChild {
 			const ref = ((link as HTMLElement).dataset.href || link.getAttribute("src")) as string;
 			const key = parseLinkTextToFullPath(ref).toLocaleUpperCase();
 			const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(parseLinktext(ref).path, "/");
-			// const key
 			const references = plugin.snwAPI.references.get(key);
 
 			const refCount = references?.length || 0;

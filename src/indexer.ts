@@ -95,8 +95,7 @@ export function buildLinksAndReferences(): void {
 		if (fileCache) getLinkReferencesForFile(file, fileCache);
 	}
 
-	// @ts-ignore
-	window.snwAPI.references = indexedReferences;
+	if (window.snwAPI) window.snwAPI.references = indexedReferences;
 	lastUpdateToReferences = Date.now();
 }
 

@@ -3,11 +3,12 @@
  * CM will call update as the doc updates.
  */
 import { Decoration, type DecorationSet, type EditorView, MatchDecorator, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
-import { editorInfoField, stripHeading } from "obsidian";
+import { editorInfoField, parseLinktext, stripHeading, TFile } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
 import type { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
+import SnwAPI from "src/snwApi";
 
 let plugin: SNWPlugin;
 
@@ -39,105 +40,141 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 				decorate: (add, from, to, match, view) => {
 					const mdView = view.state.field(editorInfoField);
 
-					// there is no file, likely a canvas file, so stop processing
-					if (!mdView.file) return;
+					const widgetsToAdd: {
+						key: string;
+						transformedCachedItem: TransformedCachedItem[] | null;
+						refType: string;
+						from: number;
+						to: number;
+					}[] = [];
 
-					// Check if should show in source mode
-					if (mdView.currentMode?.sourceMode === true && plugin.settings.displayInlineReferencesInSourceMode === false) return null;
+					let mdViewFile: TFile | null = null;
 
-					const mdViewFile = mdView.file;
-					const transformedCache = getSNWCacheByFile(mdViewFile);
+					// there is no file, likely a canvas file, look for links and embeds, process it with snwApi.references
+					if (!mdView.file && (plugin.settings.enableRenderingEmbedsInLivePreview || plugin.settings.enableRenderingLinksInLivePreview)) {
+						const ref = match[0].replace(/^\[\[|\]\]$|^!\[\[|\]\]$/g, "");
+						const key = parseLinkTextToFullPath(ref).toLocaleUpperCase();
+						if (key) {
+							const refType = match.input.startsWith("!") ? "embed" : "link";
+							mdViewFile = plugin.app.metadataCache.getFirstLinkpathDest(parseLinktext(ref).path, "/") as TFile;
+							const references = plugin.snwAPI.references.get(key);
 
-					if (
-						(transformedCache.links || transformedCache.headings || transformedCache.embeds || transformedCache.blocks) &&
-						transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"] !== true &&
-						transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"] !== true
-					) {
-						const firstCharacterMatch = match[0].charAt(0);
-						const widgetsToAdd: {
-							key: string;
-							transformedCachedItem: TransformedCachedItem[] | null;
-							refType: string;
-							from: number;
-							to: number;
-						}[] = [];
+							const newTransformedCachedItem = [
+								{
+									key: key,
+									page: mdViewFile.path,
+									type: refType,
+									pos: { start: { line: 0, ch: 0, col: 0, offset: 0 }, end: { line: 0, ch: 0, col: 0, offset: 0 } },
+									references: references ?? [],
+								},
+							];
 
-						if (firstCharacterMatch === "[" && (transformedCache?.links?.length ?? 0) > 0) {
-							let newLink = match[0].replace("[[", "").replace("]]", "");
-							//link to an internal page link, add page name
-							if (newLink.startsWith("#")) newLink = mdViewFile.path + newLink;
-							newLink = newLink.toLocaleUpperCase();
 							widgetsToAdd.push({
-								key: newLink,
-								transformedCachedItem: transformedCache.links ?? null,
-								refType: "link",
-								from: to,
-								to: to,
-							});
-						} else if (firstCharacterMatch === "#" && ((transformedCache?.headings?.length || transformedCache?.links?.length) ?? 0) > 0) {
-							//heading
-							widgetsToAdd.push({
-								// @ts-ignore
-								key: stripHeading(match[0].replace(/^#+/, "").substring(1)),
-								transformedCachedItem: transformedCache.headings ?? null,
-								refType: "heading",
-								from: to,
-								to: to,
-							});
-							if (plugin.settings.enableRenderingLinksInLivePreview) {
-								// this was not working with mobile from 0.16.4 so had to convert it to a string
-								const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
-								if (linksinHeader)
-									for (const l of linksinHeader) {
-										widgetsToAdd.push({
-											key: l.replace("![[", "").replace("[[", "").replace("]]", "").toLocaleUpperCase(), //change this to match the references cache
-											transformedCachedItem: l.startsWith("!") ? (transformedCache.embeds ?? null) : (transformedCache.links ?? null),
-											refType: "link",
-											from: to - match[0].length + (match[0].indexOf(l) + l.length),
-											to: to - match[0].length + (match[0].indexOf(l) + l.length),
-										});
-									}
-							}
-						} else if (firstCharacterMatch === "!" && (transformedCache?.embeds?.length ?? 0) > 0) {
-							//embeds
-							let newEmbed = match[0].replace("![[", "").replace("]]", "");
-							//link to an internal page link, add page name
-							if (newEmbed.startsWith("#")) newEmbed = mdViewFile.path + stripHeading(newEmbed);
-							widgetsToAdd.push({
-								key: newEmbed.toLocaleUpperCase(),
-								transformedCachedItem: transformedCache.embeds ?? null,
-								refType: "embed",
-								from: to,
-								to: to,
-							});
-						} else if (firstCharacterMatch === " " && (transformedCache?.blocks?.length ?? 0) > 0) {
-							widgetsToAdd.push({
-								//blocks
-								key: (mdViewFile.path + match[0].replace(" ^", "#^")).toLocaleUpperCase(), //change this to match the references cache
-								transformedCachedItem: transformedCache.blocks ?? null,
-								refType: "block",
+								key: key,
+								transformedCachedItem: newTransformedCachedItem ?? null,
+								refType: refType,
 								from: to,
 								to: to,
 							});
 						}
+					} else {
+						// If we get this far, then it is a file, and process it using getSNWCacheByFile
 
-						// first see if it is a heading, as it should be sorted to the end, then sort by position
-						const sortWidgets = widgetsToAdd.sort((a, b) => (a.to === b.to ? (a.refType === "heading" ? 1 : -1) : a.to - b.to));
+						// @ts-ignore && Check if should show in source mode
+						if (plugin.settings.displayInlineReferencesInSourceMode === false && mdView.currentMode?.sourceMode === true) return null;
 
-						for (const ref of widgetsToAdd) {
-							if (ref.key !== "") {
-								const wdgt = constructWidgetForInlineReference(
-									ref.refType,
-									ref.key,
-									ref.transformedCachedItem ?? [],
-									mdViewFile.path,
-									mdViewFile.extension,
-								);
-								if (wdgt != null) {
-									add(ref.from, ref.to, Decoration.widget({ widget: wdgt, side: 1 }));
+						mdViewFile = mdView.file as TFile;
+
+						const transformedCache = getSNWCacheByFile(mdViewFile);
+
+						if (
+							(transformedCache.links || transformedCache.headings || transformedCache.embeds || transformedCache.blocks) &&
+							transformedCache?.cacheMetaData?.frontmatter?.["snw-file-exclude"] !== true &&
+							transformedCache?.cacheMetaData?.frontmatter?.["snw-canvas-exclude-edit"] !== true
+						) {
+							const firstCharacterMatch = match[0].charAt(0);
+
+							if (firstCharacterMatch === "[" && (transformedCache?.links?.length ?? 0) > 0) {
+								let newLink = match[0].replace("[[", "").replace("]]", "");
+								//link to an internal page link, add page name
+								if (newLink.startsWith("#")) newLink = mdViewFile.path + newLink;
+								newLink = newLink.toLocaleUpperCase();
+								widgetsToAdd.push({
+									key: newLink,
+									transformedCachedItem: transformedCache.links ?? null,
+									refType: "link",
+									from: to,
+									to: to,
+								});
+							} else if (
+								firstCharacterMatch === "#" &&
+								((transformedCache?.headings?.length || transformedCache?.links?.length) ?? 0) > 0
+							) {
+								//heading
+								widgetsToAdd.push({
+									key: stripHeading(match[0].replace(/^#+/, "").substring(1)),
+									transformedCachedItem: transformedCache.headings ?? null,
+									refType: "heading",
+									from: to,
+									to: to,
+								});
+								if (plugin.settings.enableRenderingLinksInLivePreview) {
+									// this was not working with mobile from 0.16.4 so had to convert it to a string
+									const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
+									if (linksinHeader)
+										for (const l of linksinHeader) {
+											widgetsToAdd.push({
+												key: l.replace("![[", "").replace("[[", "").replace("]]", "").toLocaleUpperCase(), //change this to match the references cache
+												transformedCachedItem: l.startsWith("!") ? (transformedCache.embeds ?? null) : (transformedCache.links ?? null),
+												refType: "link",
+												from: to - match[0].length + (match[0].indexOf(l) + l.length),
+												to: to - match[0].length + (match[0].indexOf(l) + l.length),
+											});
+										}
 								}
+							} else if (firstCharacterMatch === "!" && (transformedCache?.embeds?.length ?? 0) > 0) {
+								//embeds
+								let newEmbed = match[0].replace("![[", "").replace("]]", "");
+								//link to an internal page link, add page name
+								if (newEmbed.startsWith("#")) newEmbed = mdViewFile.path + stripHeading(newEmbed);
+								widgetsToAdd.push({
+									key: newEmbed.toLocaleUpperCase(),
+									transformedCachedItem: transformedCache.embeds ?? null,
+									refType: "embed",
+									from: to,
+									to: to,
+								});
+							} else if (firstCharacterMatch === " " && (transformedCache?.blocks?.length ?? 0) > 0) {
+								widgetsToAdd.push({
+									//blocks
+									key: (mdViewFile.path + match[0].replace(" ^", "#^")).toLocaleUpperCase(), //change this to match the references cache
+									transformedCachedItem: transformedCache.blocks ?? null,
+									refType: "block",
+									from: to,
+									to: to,
+								});
 							}
 						} // end for
+					}
+
+					if (widgetsToAdd.length === 0 || !mdViewFile) return;
+
+					// first see if it is a heading, as it should be sorted to the end, then sort by position
+					const sortWidgets = widgetsToAdd.sort((a, b) => (a.to === b.to ? (a.refType === "heading" ? 1 : -1) : a.to - b.to));
+
+					for (const ref of widgetsToAdd) {
+						if (ref.key !== "") {
+							const wdgt = constructWidgetForInlineReference(
+								ref.refType,
+								ref.key,
+								ref.transformedCachedItem ?? [],
+								mdViewFile.path,
+								mdViewFile.extension,
+							);
+							if (wdgt != null) {
+								add(ref.from, ref.to, Decoration.widget({ widget: wdgt, side: 1 }));
+							}
+						}
 					}
 				},
 			});
@@ -166,9 +203,11 @@ const constructWidgetForInlineReference = (
 	fileExtension: string,
 ): InlineReferenceWidget | null => {
 	let modifyKey = key;
+
 	for (let i = 0; i < references.length; i++) {
 		const ref = references[i];
 		let matchKey = ref.key;
+
 		if (refType === "heading") {
 			matchKey = stripHeading(ref.headerMatch ?? ""); // headers require special comparison
 			modifyKey = modifyKey.replace(/^\s+|\s+$/g, ""); // should be not leading spaces
@@ -179,6 +218,7 @@ const constructWidgetForInlineReference = (
 			if (modifyKey.contains("|")) modifyKey = modifyKey.substring(0, key.search(/\|/));
 			const parsedKey = parseLinkTextToFullPath(modifyKey).toLocaleUpperCase();
 			modifyKey = parsedKey === "" ? modifyKey : parsedKey; //if no results, likely a ghost link
+
 			if (matchKey.startsWith("#")) {
 				// internal page link
 				matchKey = filePath + stripHeading(matchKey);

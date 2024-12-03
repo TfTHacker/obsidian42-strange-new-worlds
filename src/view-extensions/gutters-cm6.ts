@@ -1,6 +1,6 @@
 import { GutterMarker, gutter } from "@codemirror/view";
 import type { BlockInfo, EditorView } from "@codemirror/view";
-import { editorInfoField, stripHeading } from "obsidian";
+import { editorInfoField } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";

@@ -1,6 +1,7 @@
 # 2.3.0 (Pending - still in development)
 - New: Added support for references to show up in the kanban plugin. This can be toggled on and off in settings.
 - Changed: In the past there was a conflict with the Tasks plugin. It seems to be resolved, so the check for the plugin was removed. if it sitll causes issues, please let me know.
+- Changed: SNW's internal index did not include file extensions, which in some cases led to issues. the index now uses the full path with the extension.
 
 # 2.2.1
 
