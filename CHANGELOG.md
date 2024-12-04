@@ -1,6 +1,6 @@
-# 2.3.0 (Pending - still in development)
+# 2.3.0 
 - New: Added support for references to show up in the kanban plugin. This can be toggled on and off in settings.
-- Changed: SNW's internal index did not include file extensions, which in some cases led to issues. the index now uses the full path with the extension.
+- Changed: SNW's internal index did not include file extensions, which in some cases led to issues. the index now uses the full path with the extension, which means every file whether it is a MD file or not is included in the index.
 
 # 2.2.1
 
