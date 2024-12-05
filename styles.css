@@ -196,6 +196,20 @@ div:has(> .snw-reference),
   z-index: 1000;
 }
 
+/* Modification for when Edting Toolbar plugin is used */
+.view-content:has(.top.cMenuToolbarDefaultAesthetic),
+.view-content:has(.top.cMenuToolbarTinyAesthetic) {
+  .snw-header-count-wrapper {
+    top: 80px;
+  }
+}
+
+.view-content:has(.top.cMenuToolbarGlassAesthetic) {
+  .snw-header-count-wrapper {
+    top: 70px;
+  }
+}
+
 .snw-header-count {
   text-align: center;
 }
@@ -313,8 +327,6 @@ div:has(> .snw-reference),
   font-weight: var(--nav-item-weight);
 }
 
-
-
 .snw-sort-dropdown-list-item {
   padding-left: 5px;
 }
@@ -328,7 +340,6 @@ div:has(> .snw-reference),
   position: relative;
   bottom: 5px;
 }
-
 
 
 /* prevent printing of reference numbers */
