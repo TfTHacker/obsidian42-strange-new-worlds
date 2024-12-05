@@ -70,7 +70,10 @@ const ReferenceGutterExtension = gutter({
 		for (const embed of embedsFromMetaDataCache) {
 			if (embed.position.start.line + 1 === lineNumberInFile) {
 				for (const ref of transformedCache?.embeds ?? []) {
-					if (ref?.references.length >= plugin.settings.minimumRefCountThreshold && ref?.pos.start.line + 1 === lineNumberInFile) {
+					if (
+						ref?.references.length >= Math.max(2, plugin.settings.minimumRefCountThreshold) &&
+						ref?.pos.start.line + 1 === lineNumberInFile
+					) {
 						const lineToAnalyze = editorView.state.doc.lineAt(line.from).text.trim();
 						if (lineToAnalyze.startsWith("!")) {
 							// Remove  [[ and ]] and split by | to get the link text if aliased

@@ -1,3 +1,6 @@
+# # 2.3.1
+- Change: if a link is the only link in the vault to a destination (thus the reference count is 1), the reference counter will not be shown next to the link, regardless of the minimum threshold count set in settings. This makes sense. If the link is used once, its obvious without the counter, and the counter simply stating the link has one reference was redudant and annoying to many users.
+
 # 2.3.0 
 - New: Added support for references to show up in the kanban plugin. This can be toggled on and off in settings.
 - Changed: SNW's internal index did not include file extensions, which in some cases led to issues. the index now uses the full path with the extension, which means every file whether it is a MD file or not is included in the index.

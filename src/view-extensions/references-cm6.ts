@@ -213,6 +213,8 @@ const constructWidgetForInlineReference = (
 			modifyKey = modifyKey.replace(/^\s+|\s+$/g, ""); // should be not leading spaces
 		}
 
+		if (refType === "link" && ref.references.length === 1) continue; // if this is a link and there is only one reference, don't show the widget
+
 		if (refType === "embed" || refType === "link") {
 			// check for aliased references
 			if (modifyKey.contains("|")) modifyKey = modifyKey.substring(0, key.search(/\|/));

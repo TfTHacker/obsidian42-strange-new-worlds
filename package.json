@@ -1,6 +1,6 @@
 {
 	"name": "obsidian42-strange-new-worlds",
-	"version": "2.3.0",
+	"version": "2.3.1",
 	"description": "Revealing networked thought and the strange new worlds created by your vault",
 	"scripts": {
 		"dev": "node --no-warnings esbuild.config.mjs",

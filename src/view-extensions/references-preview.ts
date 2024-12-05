@@ -179,7 +179,10 @@ class snwChildComponentForMarkdownFile extends MarkdownRenderChild {
 						) || dataHref;
 
 					for (const value of transformedCache.links ?? []) {
-						if (value.references.length >= minRefCountThreshold && value.key.toLocaleUpperCase() === link.toLocaleUpperCase()) {
+						if (
+							value.references.length >= Math.max(2, minRefCountThreshold) &&
+							value.key.toLocaleUpperCase() === link.toLocaleUpperCase()
+						) {
 							const referenceElement = htmlDecorationForReferencesElement(
 								value.references.length,
 								"link",
