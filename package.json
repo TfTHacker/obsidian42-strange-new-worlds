@@ -20,7 +20,7 @@
 		"@codemirror/view": "^6.35.0",
 		"@types/node": "^22.10.1",
 		"builtin-modules": "4.0.0",
-		"esbuild": "0.24.0",
+		"esbuild": "^0.25.9",
 		"obsidian": "^1.7.2",
 		"obsidian-typings": "^2.3.4",
 		"tslib": "^2.8.1",
