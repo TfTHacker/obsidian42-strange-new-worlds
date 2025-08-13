@@ -16,7 +16,17 @@ export function getIndexedReferences() {
 	return indexedReferences;
 }
 
-// Primary Indexing function. Adss to the indexedReferences map all outgoing links from a given file
+function parseLinkTextAndStripHeading(link: string): { path: string; subpath: string } {
+	let { path, subpath } = parseLinktext(link);
+	if (subpath.startsWith("#") && !subpath.startsWith("#^")) {
+		// subpath may link to a subheading (e.g. #parent#child). Keep the last subheading in this case.
+		subpath = subpath.substring(subpath.lastIndexOf('#'));
+		subpath = "#" + stripHeading(subpath);
+	}
+	return { path: path, subpath };
+}
+
+// Primary Indexing function. Adds to the indexedReferences map all outgoing links from a given file
 // The Database is primarily a key which is the link, and the value is an array of references that use that link
 export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => {
 	if (plugin.settings.enableIgnoreObsExcludeFoldersLinksFrom && file?.path && plugin.app.metadataCache.isUserIgnored(file?.path)) {
@@ -26,8 +36,8 @@ export const getLinkReferencesForFile = (file: TFile, cache: CachedMetadata) => 
 		if (!item) continue;
 		for (const ref of item) {
 			const { path, subpath } = ref.link.startsWith("#") // if link is pointing to itself, create a full path
-				? parseLinktext(file.path.replace(`.${file.extension}`, "") + ref.link)
-				: parseLinktext(ref.link);
+				? parseLinkTextAndStripHeading(file.path.replace(`.${file.extension}`, "") + ref.link)
+				: parseLinkTextAndStripHeading(ref.link);
 			const tfileDestination = plugin.app.metadataCache.getFirstLinkpathDest(path, "/");
 			if (tfileDestination) {
 				if (
@@ -123,7 +133,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 	if (!indexedReferences) buildLinksAndReferences();
 
 	if (cachedMetaData?.headings) {
-		// filter - fFirst confirm there are references
+		// filter - first confirm there are references
 		// map - map to the transformed cache
 		const baseFilePath = `${filePathInUppercase}#`;
 		const tempCacheHeadings = cachedMetaData.headings
@@ -229,7 +239,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 	}
 
 	if (cachedMetaData?.frontmatterLinks) {
-		// filter - fFirst confirm there are references
+		// filter - first confirm there are references
 		// map - map to the transformed cache
 		const tempCacheFrontmatter = cachedMetaData.frontmatterLinks
 			.filter((link) => indexedReferences.has(parseLinkTextToFullPath(link.link).toLocaleUpperCase() || link.link.toLocaleUpperCase()))
@@ -256,7 +266,7 @@ export function getSNWCacheByFile(file: TFile): TransformedCache {
 }
 
 export function parseLinkTextToFullPath(link: string): string {
-	const resolvedFilePath = parseLinktext(link);
+	const resolvedFilePath = parseLinkTextAndStripHeading(link);
 	const resolvedTFile = plugin.app.metadataCache.getFirstLinkpathDest(resolvedFilePath.path, "/");
 	if (resolvedTFile === null) return "";
 	return resolvedTFile.path + resolvedFilePath.subpath;
