@@ -20,8 +20,8 @@ function parseLinkTextAndStripHeading(link: string): { path: string; subpath: st
 	let { path, subpath } = parseLinktext(link);
 	if (subpath.startsWith("#") && !subpath.startsWith("#^")) {
 		// subpath may link to a subheading (e.g. #parent#child). Keep the last subheading in this case.
-		subpath = subpath.substring(subpath.lastIndexOf('#'));
-		subpath = "#" + stripHeading(subpath);
+		subpath = subpath.substring(subpath.lastIndexOf("#"));
+		subpath = `#${stripHeading(subpath)}`;
 	}
 	return { path: path, subpath };
 }

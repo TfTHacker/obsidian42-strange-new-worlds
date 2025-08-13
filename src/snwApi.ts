@@ -1,6 +1,6 @@
+import type { CachedMetadata, TFile } from "obsidian";
 import { getIndexedReferences, getSNWCacheByFile, parseLinkTextToFullPath } from "./indexer";
 import type SNWPlugin from "./main";
-import type { TFile, CachedMetadata } from "obsidian";
 import type { TransformedCache } from "./types";
 
 /**

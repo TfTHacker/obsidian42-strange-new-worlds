@@ -2,8 +2,8 @@ import {
 	type MarkdownPostProcessorContext,
 	MarkdownRenderChild,
 	type MarkdownSectionInformation,
-	parseLinktext,
 	type TFile,
+	parseLinktext,
 } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "../indexer";
 import type SNWPlugin from "../main";
