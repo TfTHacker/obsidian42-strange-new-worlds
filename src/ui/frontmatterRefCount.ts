@@ -1,4 +1,4 @@
-import { MarkdownView, Platform, View, type WorkspaceLeaf, debounce } from "obsidian";
+import { type MarkdownView, Platform, type View, type WorkspaceLeaf, debounce } from "obsidian";
 import { getSNWCacheByFile } from "src/indexer";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
 import type SNWPlugin from "../main";

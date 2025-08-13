@@ -3,12 +3,11 @@
  * CM will call update as the doc updates.
  */
 import { Decoration, type DecorationSet, type EditorView, MatchDecorator, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
-import { editorInfoField, parseLinktext, stripHeading, TFile } from "obsidian";
+import { type TFile, editorInfoField, parseLinktext, stripHeading } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
 import type { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
-import SnwAPI from "src/snwApi";
 
 let plugin: SNWPlugin;
 
