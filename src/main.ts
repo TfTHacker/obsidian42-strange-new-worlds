@@ -111,7 +111,7 @@ export default class SNWPlugin extends Plugin {
 		});
 
 		this.toggleStateSNWMarkdownPreview();
-		this.toggleStateSNWLivePreview();
+		this.toggleStateSNWCMEditor();
 		this.toggleStateSNWGutters();
 
 		this.app.workspace.onLayoutReady(async () => {
@@ -163,8 +163,9 @@ export default class SNWPlugin extends Plugin {
 	}
 
 	// Turns on and off the SNW reference counters in CM editor
-	toggleStateSNWLivePreview(): void {
-		let state = this.settings.displayInlineReferencesLivePreview;
+	toggleStateSNWCMEditor(): void {
+		// The CM editor is used for both Live Preview and Source Mode.
+		let state = this.settings.displayInlineReferencesLivePreview || this.settings.displayInlineReferencesInSourceMode;
 
 		if (state === true) state = this.showCountsActive;
 
