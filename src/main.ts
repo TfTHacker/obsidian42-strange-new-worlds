@@ -93,6 +93,7 @@ export default class SNWPlugin extends Plugin {
 		);
 
 		this.registerEvent(this.app.vault.on("rename", indexFullUpdateDebounce));
+		this.registerEvent(this.app.vault.on("create", indexFullUpdateDebounce));
 		this.registerEvent(this.app.vault.on("delete", indexFullUpdateDebounce));
 		this.registerEvent(this.app.metadataCache.on("changed", indexFileUpdateDebounce));
 
