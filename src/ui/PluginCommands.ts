@@ -15,7 +15,7 @@ export default class PluginCommands {
 				msg += "Tabs may require reloading for this change to take effect.";
 				new Notice(msg);
 				this.plugin.toggleStateSNWMarkdownPreview();
-				this.plugin.toggleStateSNWLivePreview();
+				this.plugin.toggleStateSNWCMEditor();
 				this.plugin.toggleStateSNWGutters();
 			},
 		},

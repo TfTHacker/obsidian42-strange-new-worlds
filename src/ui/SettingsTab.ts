@@ -34,7 +34,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Require modifier key to activate SNW")
 			.setDesc(
-				`If enabled, SNW will only activate when the modifier key is pressed when hovering the mouse over an SNW counter.  
+				`If enabled, SNW will only activate when the modifier key is pressed when hovering the mouse over an SNW counter.
 						Otherwise, SNW will activate on a mouse hover. May require reopening open files to take effect.`,
 			)
 			.addToggle((cb: ToggleComponent) => {
@@ -149,7 +149,7 @@ export class SettingsTab extends PluginSettingTab {
 				cb.setValue(this.plugin.settings.displayInlineReferencesLivePreview);
 				cb.onChange(async (value: boolean) => {
 					this.plugin.settings.displayInlineReferencesLivePreview = value;
-					this.plugin.toggleStateSNWLivePreview();
+					this.plugin.toggleStateSNWCMEditor();
 					await this.plugin.saveSettings();
 				});
 			});
@@ -157,7 +157,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Show SNW indicators in Reading view ")
 			.setDesc(
-				"While in Reading View of a document, display inline of the text of documents all reference counts for links, blocks and embeds." +
+				"While in Reading View of a document, display inline of the text of documents all reference counts for links, blocks and embeds. " +
 					"Note: files may need to be closed and reopened for this setting to take effect.",
 			)
 			.addToggle((cb: ToggleComponent) => {
@@ -172,7 +172,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Show SNW indicators in Source Mode ")
 			.setDesc(
-				"While in Source Mode of a document, display inline of the text of documents all reference counts for links, blocks and embeds." +
+				"While in Source Mode of a document, display inline of the text of documents all reference counts for links, blocks and embeds. " +
 					"By default, this is turned off since the goal of Source Mode is to see the raw markdown." +
 					"Note: files may need to be closed and reopened for this setting to take effect.",
 			)
@@ -180,6 +180,7 @@ export class SettingsTab extends PluginSettingTab {
 				cb.setValue(this.plugin.settings.displayInlineReferencesInSourceMode);
 				cb.onChange(async (value: boolean) => {
 					this.plugin.settings.displayInlineReferencesInSourceMode = value;
+					this.plugin.toggleStateSNWCMEditor();
 					await this.plugin.saveSettings();
 				});
 			});
@@ -188,8 +189,8 @@ export class SettingsTab extends PluginSettingTab {
 			.setName("Embed references in Gutter in Live Preview Mode (Desktop)")
 			.setDesc(
 				`Displays a count of references in the gutter while in live preview. This is done only in a
-					  special scenario. It has to do with the way Obsidian renders embeds, example: ![[link]] when  
-					  they are on its own line. Strange New Worlds cannot embed the count in this scenario, so a hint is 
+					  special scenario. It has to do with the way Obsidian renders embeds, example: ![[link]] when
+					  they are on its own line. Strange New Worlds cannot embed the count in this scenario, so a hint is
 					  displayed in the gutter. It is a hack, but at least we get some information.`,
 			)
 			.addToggle((cb: ToggleComponent) => {
@@ -332,7 +333,7 @@ export class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Kanban by mgmeyers")
 			.setDesc(
-				`Enables SNW support with in the preview mode of the Kanban plugin by mgmeyers at https://github.com/mgmeyers/obsidian-kanban. 
+				`Enables SNW support with in the preview mode of the Kanban plugin by mgmeyers at https://github.com/mgmeyers/obsidian-kanban.
 				SNW references will always show when editing a card. Changing this setting may require reopening files.`,
 			)
 			.addToggle((cb: ToggleComponent) => {
