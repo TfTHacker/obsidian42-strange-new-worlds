@@ -139,11 +139,13 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});
 
+		const REOPEN_NOTICE = "Note: files may need to be closed and reopened for this setting to take effect.";
+
 		new Setting(containerEl)
 			.setName("Show SNW indicators in Live Preview Editor")
 			.setDesc(
-				"While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds." +
-					"Note: files may need to be closed and reopened for this setting to take effect.",
+				"While using Live Preview, Display inline of the text of documents all reference counts for links, blocks and embeds. " +
+					REOPEN_NOTICE,
 			)
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.displayInlineReferencesLivePreview);
@@ -158,7 +160,7 @@ export class SettingsTab extends PluginSettingTab {
 			.setName("Show SNW indicators in Reading view ")
 			.setDesc(
 				"While in Reading View of a document, display inline of the text of documents all reference counts for links, blocks and embeds. " +
-					"Note: files may need to be closed and reopened for this setting to take effect.",
+					REOPEN_NOTICE,
 			)
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.displayInlineReferencesMarkdown);
@@ -174,7 +176,7 @@ export class SettingsTab extends PluginSettingTab {
 			.setDesc(
 				"While in Source Mode of a document, display inline of the text of documents all reference counts for links, blocks and embeds. " +
 					"By default, this is turned off since the goal of Source Mode is to see the raw markdown." +
-					"Note: files may need to be closed and reopened for this setting to take effect.",
+					REOPEN_NOTICE,
 			)
 			.addToggle((cb: ToggleComponent) => {
 				cb.setValue(this.plugin.settings.displayInlineReferencesInSourceMode);
