@@ -1,5 +1,3 @@
-DEV_NOTES.MD
-
 # Updating the version
 
 1. update package.json version number
