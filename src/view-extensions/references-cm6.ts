@@ -28,9 +28,12 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 			// The constructor seems to be called only once when a file is viewed. The decorator is called multipe times.
 			const enableLivePreview = plugin.settings.displayInlineReferencesLivePreview;
 			if (enableLivePreview && plugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = "(\\s\\^)(\\S+)$";
-			if (enableLivePreview && plugin.settings.enableRenderingEmbedsInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}!\\[\\[(.*?)\\]\\]`;
-			if (enableLivePreview && plugin.settings.enableRenderingLinksInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}\\[\\[(.*?)\\]\\]`;
-			if (enableLivePreview && plugin.settings.enableRenderingHeadersInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}^#+\\s.+`;
+			if (enableLivePreview && plugin.settings.enableRenderingEmbedsInLivePreview)
+				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}!\\[\\[(.*?)\\]\\]`;
+			if (enableLivePreview && plugin.settings.enableRenderingLinksInLivePreview)
+				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}\\[\\[(.*?)\\]\\]`;
+			if (enableLivePreview && plugin.settings.enableRenderingHeadersInLivePreview)
+				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}^#+\\s.+`;
 
 			//if there is no regex pattern, then don't go further
 			if (this.regxPattern === "") return;
@@ -51,7 +54,11 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 					let mdViewFile: TFile | null = null;
 
 					// there is no file, likely a canvas file, look for links and embeds, process it with snwApi.references
-					if (!mdView.file && enableLivePreview && (plugin.settings.enableRenderingEmbedsInLivePreview || plugin.settings.enableRenderingLinksInLivePreview)) {
+					if (
+						!mdView.file &&
+						enableLivePreview &&
+						(plugin.settings.enableRenderingEmbedsInLivePreview || plugin.settings.enableRenderingLinksInLivePreview)
+					) {
 						const ref = match[0].replace(/^\[\[|\]\]$|^!\[\[|\]\]$/g, "");
 						const key = parseLinkTextToFullPath(ref).toLocaleUpperCase();
 						if (key) {
