@@ -1,3 +1,9 @@
+# 2.3.4
+
+- Fix: Update index when creating new files. [#179](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/179).
+- Fix: Fix showing indicators in source mode only. [#165](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/165).
+- Chore: Add package-lock.json, update dependencies.
+
 # 2.3.3
 
 - Fix: detection of links to headings with special characters. [#163](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/163).
