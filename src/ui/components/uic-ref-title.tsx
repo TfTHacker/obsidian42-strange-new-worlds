@@ -45,7 +45,7 @@ export const getUIC_Ref_Title_Div = (
 						onClick={(e: MouseEvent) => {
 							e.stopPropagation();
 							hideAll({ duration: 0 }); // hide popup
-							plugin.activateView(refType, realLink, key, filePath, Number(lineNu));
+							plugin.activateViewFromRef(refType, realLink, key, filePath, Number(lineNu));
 						}}
 					>
 						<IconMoreDetails />

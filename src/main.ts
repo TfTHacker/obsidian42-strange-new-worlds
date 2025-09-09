@@ -124,13 +124,7 @@ export default class SNWPlugin extends Plugin {
 	}
 
 	// Displays the sidebar SNW pane
-	async activateView(refType: string, realLink: string, key: string, filePath: string, lineNu: number) {
-		this.lastSelectedReferenceType = refType;
-		this.lastSelectedReferenceRealLink = realLink;
-		this.lastSelectedReferenceKey = key;
-		this.lastSelectedReferenceFilePath = filePath;
-		this.lastSelectedLineNumber = lineNu;
-
+	async activateView() {
 		const { workspace } = this.app;
 		let leaf: WorkspaceLeaf | null = null;
 		const leaves = workspace.getLeavesOfType(VIEW_TYPE_SNW);
@@ -146,6 +140,17 @@ export default class SNWPlugin extends Plugin {
 
 		// "Reveal" the leaf in case it is in a collapsed sidebar
 		if (leaf) workspace.revealLeaf(leaf);
+	}
+
+	// Displays the sidebar SNW pane with the specified reference selected
+	async activateViewFromRef(refType: string, realLink: string, key: string, filePath: string, lineNu: number) {
+		this.lastSelectedReferenceType = refType;
+		this.lastSelectedReferenceRealLink = realLink;
+		this.lastSelectedReferenceKey = key;
+		this.lastSelectedReferenceFilePath = filePath;
+		this.lastSelectedLineNumber = lineNu;
+
+		await this.activateView();
 		await (this.app.workspace.getLeavesOfType(VIEW_TYPE_SNW)[0].view as SideBarPaneView).updateView();
 	}
 

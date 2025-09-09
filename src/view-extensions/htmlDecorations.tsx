@@ -98,7 +98,7 @@ export const processHtmlDecorationReferenceEvent = async (target: HTMLElement) =
 	const key = target.getAttribute("data-snw-key") ?? "";
 	const filePath = target.getAttribute("data-snw-filepath") ?? "";
 	const lineNu = target.getAttribute("snw-data-line-number") ?? "";
-	plugin.activateView(refType, realLink, key, filePath, Number(lineNu));
+	plugin.activateViewFromRef(refType, realLink, key, filePath, Number(lineNu));
 };
 
 // loops all visble references marked with the class snw-liveupdate and updates the count if needed
