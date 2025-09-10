@@ -261,7 +261,7 @@ export class SettingsTab extends PluginSettingTab {
 				});
 			});
 
-		new Setting(containerEl).setHeading().setName("Enable reference types in Live Preview Mode");
+		new Setting(containerEl).setHeading().setName("Enable reference types in Live Preview Mode and Source Mode");
 		containerEl.createEl("sup", {
 			text: "(requires reopening documents to take effect)",
 		});

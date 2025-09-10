@@ -6,6 +6,7 @@ import { Decoration, type DecorationSet, type EditorView, MatchDecorator, ViewPl
 import { type TFile, editorInfoField, parseLinktext, stripHeading } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
+import { isEnabledForMode } from "src/settings";
 import type { TransformedCachedItem } from "../types";
 import { htmlDecorationForReferencesElement } from "./htmlDecorations";
 
@@ -26,14 +27,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 
 		constructor(public view: EditorView) {
 			// The constructor seems to be called only once when a file is viewed. The decorator is called multipe times.
-			const enableLivePreview = plugin.settings.displayInlineReferencesLivePreview;
-			if (enableLivePreview && plugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = "(\\s\\^)(\\S+)$";
-			if (enableLivePreview && plugin.settings.enableRenderingEmbedsInLivePreview)
-				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}!\\[\\[(.*?)\\]\\]`;
-			if (enableLivePreview && plugin.settings.enableRenderingLinksInLivePreview)
-				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}\\[\\[(.*?)\\]\\]`;
-			if (enableLivePreview && plugin.settings.enableRenderingHeadersInLivePreview)
-				this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}^#+\\s.+`;
+			if (plugin.settings.enableRenderingBlockIdInLivePreview) this.regxPattern = "(\\s\\^)(\\S+)$";
+			if (plugin.settings.enableRenderingEmbedsInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}!\\[\\[(.*?)\\]\\]`;
+			if (plugin.settings.enableRenderingLinksInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}\\[\\[(.*?)\\]\\]`;
+			if (plugin.settings.enableRenderingHeadersInLivePreview) this.regxPattern += `${this.regxPattern !== "" ? "|" : ""}^#+\\s.+`;
 
 			//if there is no regex pattern, then don't go further
 			if (this.regxPattern === "") return;
@@ -54,11 +51,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 					let mdViewFile: TFile | null = null;
 
 					// there is no file, likely a canvas file, look for links and embeds, process it with snwApi.references
-					if (
-						!mdView.file &&
-						enableLivePreview &&
-						(plugin.settings.enableRenderingEmbedsInLivePreview || plugin.settings.enableRenderingLinksInLivePreview)
-					) {
+					if (!mdView.file && (plugin.settings.enableRenderingEmbedsInLivePreview || plugin.settings.enableRenderingLinksInLivePreview)) {
 						const ref = match[0].replace(/^\[\[|\]\]$|^!\[\[|\]\]$/g, "");
 						const key = parseLinkTextToFullPath(ref).toLocaleUpperCase();
 						if (key) {
@@ -87,8 +80,10 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 					} else {
 						// If we get this far, then it is a file, and process it using getSNWCacheByFile
 
-						// @ts-ignore && Check if should show in source mode
-						if (plugin.settings.displayInlineReferencesInSourceMode === false && mdView.currentMode?.sourceMode === true) return null;
+						// @ts-ignore
+						const sourceMode = mdView.currentMode?.sourceMode === true;
+						// Check if should show in source mode or live preview mode
+						if (!isEnabledForMode(plugin.settings, sourceMode)) return null;
 
 						mdViewFile = mdView.file as TFile;
 
@@ -125,7 +120,7 @@ export const InlineReferenceExtension = ViewPlugin.fromClass(
 									from: to,
 									to: to,
 								});
-								if (enableLivePreview && plugin.settings.enableRenderingLinksInLivePreview) {
+								if (plugin.settings.enableRenderingLinksInLivePreview) {
 									// this was not working with mobile from 0.16.4 so had to convert it to a string
 									const linksinHeader = match[0].match(/\[\[(.*?)\]\]|!\[\[(.*?)\]\]/g);
 									if (linksinHeader)
