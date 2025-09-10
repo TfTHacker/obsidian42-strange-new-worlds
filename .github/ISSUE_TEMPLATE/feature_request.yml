@@ -1,0 +1,61 @@
+name: Feature request
+description: Request a feature and help improve the plugin
+title: "[FR] Short description of the feature"
+labels: enhancement
+assignees: spasche
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+  - type: textarea
+    attributes:
+      label: Description
+      description: A clear and concise description of the feature request. Include any relevant details.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Details
+      description: Provide a step-by-step description.
+      value: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Notice that '...'
+        ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Desired Behavior
+      description: What do you want to happen?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: What actually happens?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Attachments
+      description: Required for feature investigation
+      value: |
+        - Please attach a video showing the current behavior. It is not mandatory, but might be very helpful to speed up the feature implementation
+        - Please attach a sample vault where the desired Feature Request could be applied. It is not mandatory, but might be very helpful to speed up the feature implementation
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Confirmations
+      description: Ensure the following conditions are met
+      options:
+        - label: I attached a video showing the current behavior, or it is not necessary
+          required: true
+        - label: I attached a sample vault where the desired Feature Request could be applied, or it is not necessary
+          required: true
+        - label: I have tested the absence of the requested feature with the latest version of the plugin
+          required: true
+        - label: I have checked GitHub for existing Feature Requests
+          required: true
