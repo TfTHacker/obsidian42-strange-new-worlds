@@ -3,6 +3,7 @@ import type { BlockInfo, EditorView } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
+import { isEnabledForMode } from "src/settings";
 import { htmlDecorationForReferencesElement } from "src/view-extensions/htmlDecorations";
 
 let plugin: SNWPlugin;
@@ -53,8 +54,10 @@ const ReferenceGutterExtension = gutter({
 	lineMarker(editorView: EditorView, line: BlockInfo) {
 		const mdView = editorView.state.field(editorInfoField);
 
-		// @ts-ignore - Check if should show in source mode
-		if (mdView.currentMode?.sourceMode === true && plugin.settings.displayInlineReferencesInSourceMode === false) return null;
+		// @ts-ignore
+		const sourceMode = mdView.currentMode?.sourceMode === true;
+		// Check if should show in source mode or live preview mode
+		if (!isEnabledForMode(plugin.settings, sourceMode)) return null;
 
 		if (!mdView.file) return null;
 		const transformedCache = getSNWCacheByFile(mdView.file);

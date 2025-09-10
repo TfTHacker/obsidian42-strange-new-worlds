@@ -17,6 +17,8 @@ export interface Settings {
 	enableRenderingLinksInMarkdown: boolean;
 	enableRenderingHeadersInMarkdown: boolean;
 	enableRenderingEmbedsInMarkdown: boolean;
+	// enableRenderingXXXInLivePreview are used for both live preview and source mode
+	// they should probably be renamed to reflect that
 	enableRenderingBlockIdInLivePreview: boolean;
 	enableRenderingLinksInLivePreview: boolean;
 	enableRenderingHeadersInLivePreview: boolean;
@@ -57,3 +59,10 @@ export const DEFAULT_SETTINGS: Settings = {
 	displayCustomPropertyList: "",
 	pluginSupportKanban: false,
 };
+
+export function isEnabledForMode(settings: Settings, sourceMode: boolean): boolean {
+	if (sourceMode) {
+		return settings.displayInlineReferencesInSourceMode;
+	}
+	return settings.displayInlineReferencesLivePreview;
+}
