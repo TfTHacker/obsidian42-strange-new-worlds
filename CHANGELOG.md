@@ -1,3 +1,8 @@
+# 2.3.5
+
+- Add command to activate SNW view. [#167](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/167).
+- Fix: Fix showing indicators in source mode only. [#165](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/165).
+
 # 2.3.4
 
 - Fix: Update index when creating new files. [#179](https://github.com/TfTHacker/obsidian42-strange-new-worlds/issues/179).
