@@ -10,8 +10,9 @@ Documentation for this plugin can be found at: https://tfthacker.com/SNW
 
 See videos on how to use Strange New Worlds: https://tfthacker.com/SNW-videos
 
-You might also be interested in a few products I have made for Obsidian:
 
+## Ways to connect with me and more information on my work
 
-- [JournalCraft](https://tfthacker.com/jco) - A curated collection of 10 powerful journaling templates designed to enhance your journaling experience. Whether new to journaling or looking to step up your game, JournalCraft has something for you.
-- [Cornell Notes Learning Vault](https://tfthacker.com/cornell-notes) - This vault teaches you how to use the Cornell Note-Taking System in your Obsidian vault. It includes learning material, samples, and Obsidian configuration files to enable Cornell Notes in your vault.
+You can find me on Twitter [@TfTHacker](https://x.com/TfTHacker)
+
+My website https://tfthacker.com/
