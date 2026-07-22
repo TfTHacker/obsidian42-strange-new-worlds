@@ -1,5 +1,9 @@
 export type SortOption = "name-asc" | "name-desc" | "mtime-asc" | "mtime-desc";
 
+export enum DisplayNameMode {
+	Basename = "basename",
+	Alias = "alias",
+}
 export interface Settings {
 	enableOnStartupDesktop: boolean;
 	enableOnStartupMobile: boolean;
@@ -27,6 +31,7 @@ export interface Settings {
 	enableIgnoreObsExcludeFoldersLinksTo: boolean; //Use Obsidians Exclude Files from folder - links to those "excluded" files
 	requireModifierKeyToActivateSNWView: boolean; //require CTRL hover to activate SNW view
 	sortOptionDefault: SortOption;
+	displayNameMode: DisplayNameMode;
 	displayCustomPropertyList: string; //list of custom properties to display when showing references
 	pluginSupportKanban: boolean;
 }

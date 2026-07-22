@@ -5,6 +5,7 @@ import type SNWPlugin from "src/main";
 import { hideAll } from "tippy.js";
 import { IconMoreDetails } from "../IconMoreDetails";
 import { SortOrderDropdown } from "../SortOrderDropdown";
+import { getDisplayLink } from "../../displayName";
 
 export const getUIC_Ref_Title_Div = (
 	refType: string,
@@ -27,7 +28,13 @@ export const getUIC_Ref_Title_Div = (
 				snw-data-file-name={filePath}
 				snw-data-line-number={lineNu.toString()}
 			>
-				{realLink}
+			{
+        getDisplayLink(
+          plugin,
+          realLink,
+          filePath,
+        )
+      }
 			</div>
 			<SortOrderDropdown plugin={plugin} onChange={handleSortOptionChangeCallback} />
 			{isPopover && (

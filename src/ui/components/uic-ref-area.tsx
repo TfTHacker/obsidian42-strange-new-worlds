@@ -5,6 +5,7 @@ import { render } from "preact";
 import { getIndexedReferences } from "src/indexer";
 import type SNWPlugin from "src/main";
 import type { Link } from "src/types";
+import { getDisplayFileName } from "../../displayName";
 import type { SortOption } from "../../settings";
 import { setFileLinkHandlers } from "./uic-ref--parent";
 import { getUIC_Ref_Item } from "./uic-ref-item";
@@ -57,22 +58,30 @@ export const getUIC_Ref_Area = async (
 };
 
 const sortLinks = (links: Link[], option: SortOption): Link[] => {
-	return links.sort((a, b) => {
-		const fileA = a.sourceFile;
-		const fileB = b.sourceFile;
-		switch (option) {
-			case "name-asc":
-				return fileA?.basename.localeCompare(fileB?.basename);
-			case "name-desc":
-				return fileB?.basename.localeCompare(fileA?.basename);
-			case "mtime-asc":
-				return fileA?.stat.mtime - fileB?.stat.mtime;
-			case "mtime-desc":
-				return fileB?.stat.mtime - fileA?.stat.mtime;
-			default:
-				return 0;
-		}
-	});
+  return links.sort((a, b) => {
+    const fileA = a.sourceFile;
+    const fileB = b.sourceFile;
+
+    const displayA = getDisplayFileName(plugin, fileA);
+    const displayB = getDisplayFileName(plugin, fileB);
+
+    switch (option) {
+      case "name-asc":
+        return displayA.localeCompare(displayB);
+
+      case "name-desc":
+        return displayB.localeCompare(displayA);
+
+      case "mtime-asc":
+        return fileA?.stat.mtime - fileB?.stat.mtime;
+
+      case "mtime-desc":
+        return fileB?.stat.mtime - fileA?.stat.mtime;
+
+      default:
+        return 0;
+    }
+  });
 };
 
 // Creates a DIV for a collection of reference blocks to be displayed
@@ -148,7 +157,10 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 		const refItemFileLabelEl = createDiv();
 		refItemFileLabelEl.addClass("snw-ref-item-file-label");
 		refItemFileLabelEl.addClass("tree-item-inner");
-		refItemFileLabelEl.innerText = file_path.sourceFile.basename;
+    refItemFileLabelEl.innerText = getDisplayFileName(
+      plugin,
+      file_path.sourceFile,
+    );
 
 		refItemFileEl.append(refItemFileIconEl);
 		refItemFileEl.append(refItemFileLabelEl);
@@ -194,12 +206,17 @@ const getRefAreaItems = async (refType: string, key: string, filePath: string): 
 
 const sortRefCache = async (refCache: Link[]): Promise<Link[]> => {
 	return refCache.sort((a, b) => {
-		let positionA = 0; //added because of properties - need to fix later
-		if (a.reference.position !== undefined) positionA = Number(a.reference.position.start.line);
+		let positionA = 0;
+		if (a.reference.position !== undefined)
+			positionA = Number(a.reference.position.start.line);
 
-		let positionB = 0; //added because of properties - need to fix later
-		if (b.reference.position !== undefined) positionB = Number(b.reference.position.start.line);
+		let positionB = 0;
+		if (b.reference.position !== undefined)
+			positionB = Number(b.reference.position.start.line);
 
-		return a.sourceFile?.basename.localeCompare(b.sourceFile.basename) || Number(positionA) - Number(positionB);
+		const displayA = getDisplayFileName(plugin, a.sourceFile);
+		const displayB = getDisplayFileName(plugin, b.sourceFile);
+
+		return displayA.localeCompare(displayB) || positionA - positionB;
 	});
 };
