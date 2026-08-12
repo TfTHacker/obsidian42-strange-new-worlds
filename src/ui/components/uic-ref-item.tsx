@@ -1,5 +1,5 @@
 // Component creates an individual reference item
-
+import { transformRenderedList } from "./context/rendered-list-utils";
 import { MarkdownRenderer } from "obsidian";
 import { render } from "preact";
 import type SNWPlugin from "src/main";
@@ -19,7 +19,7 @@ export const getUIC_Ref_Item = async (ref: Link): Promise<HTMLElement> => {
 
 	const itemElJsx = (
 		<div
-			className="snw-ref-item-info search-result-file-match"
+			className="snw-ref-item-info"
 			snw-data-line-number={startLine}
 			snw-data-file-name={ref?.sourceFile?.path}
 			data-href={ref?.sourceFile?.path}
@@ -95,14 +95,21 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 
 		const listItemWithDescendants = contextBuilder.getListItemWithDescendants(indexOfListItemContainingLink);
 
-		const contextEl = container.createDiv();
+		const contextEl = container.createDiv({
+			cls: "snw-context",
+		});
+
 		await MarkdownRenderer.render(
 			plugin.app,
 			formatListWithDescendants(fileContents, listItemWithDescendants),
-			contextEl,
-			ref.sourceFile.path,
-			plugin,
+				contextEl,
+				ref.sourceFile.path,
+				plugin,
 		);
+
+		transformRenderedList(contextEl);
+    console.log(contextEl.innerHTML);
+
 	} else {
 		const sectionContainingLink = contextBuilder.getSectionContaining(linkPosition);
 
@@ -113,14 +120,27 @@ const grabChunkOfFile = async (ref: Link): Promise<HTMLElement> => {
 		const regex = /^\[\^([\w]+)\]:(.*)$/;
 		if (regex.test(blockContents)) blockContents = blockContents.replace("[", "").replace("]:", "");
 
-		await MarkdownRenderer.render(plugin.app, blockContents, container, ref.sourceFile.path, plugin);
+		const contextEl = container.createDiv({
+			cls: "snw-context",
+		});
+
+		await MarkdownRenderer.render(
+			plugin.app,
+			blockContents,
+			contextEl,
+			ref.sourceFile.path,
+			plugin,
+		);
 	}
 
 	const headingThatContainsLink = contextBuilder.getHeadingContaining(linkPosition);
 	if (headingThatContainsLink) {
 		const firstSectionPosition = contextBuilder.getFirstSectionUnder(headingThatContainsLink.position);
 		if (firstSectionPosition) {
-			const contextEl = container.createDiv();
+			const contextEl = container.createDiv({
+				cls: "snw-context",
+			});
+
 			await MarkdownRenderer.render(
 				plugin.app,
 				getTextAtPosition(fileContents, firstSectionPosition.position),

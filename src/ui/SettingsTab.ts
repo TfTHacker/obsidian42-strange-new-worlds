@@ -1,5 +1,6 @@
 import { type App, PluginSettingTab, Setting, type ToggleComponent } from "obsidian";
 import type SNWPlugin from "../main";
+import { DisplayNameMode } from "../settings";
 
 export class SettingsTab extends PluginSettingTab {
 	plugin: SNWPlugin;
@@ -309,7 +310,27 @@ export class SettingsTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+		new Setting(containerEl)
+			.setName("Display file names as")
+			.setDesc("Choose how file names are displayed throughout Strange New Worlds.")
+			.addDropdown((dropdown) => {
+				dropdown
+					.addOption(
+						DisplayNameMode.Basename,
+						"File name",
+					)
+					.addOption(
+						DisplayNameMode.Alias,
+						"First alias",
+					)
+					.setValue(this.plugin.settings.displayNameMode)
+					.onChange(async (value) => {
+						this.plugin.settings.displayNameMode =
+							value as DisplayNameMode;
 
+						await this.plugin.saveSettings();
+					});
+			});
 		new Setting(containerEl).setHeading().setName("Custom Display Settings");
 
 		new Setting(this.containerEl)
