@@ -2,7 +2,7 @@ import tippy from "tippy.js";
 import type SNWPlugin from "../main";
 import { UPDATE_DEBOUNCE } from "../main";
 import "tippy.js/dist/tippy.css";
-import { Platform, debounce } from "obsidian";
+import { debounce, Platform } from "obsidian";
 import { render } from "preact";
 import { getUIC_Hoverview } from "src/ui/components/uic-ref--parent";
 

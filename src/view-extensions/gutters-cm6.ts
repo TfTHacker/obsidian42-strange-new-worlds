@@ -1,5 +1,5 @@
-import { GutterMarker, gutter } from "@codemirror/view";
 import type { BlockInfo, EditorView } from "@codemirror/view";
+import { GutterMarker, gutter } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";

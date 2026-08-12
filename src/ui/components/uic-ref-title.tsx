@@ -39,7 +39,8 @@ export const getUIC_Ref_Title_Div = (
 					snw-data-file-name={filePath}
 					snw-data-line-number={lineNu.toString()}
 				>
-					{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+					{/* biome-ignore lint/a11y/noStaticElementInteractions: This existing icon interaction is intentionally mouse-only. */}
+					{/* biome-ignore lint/a11y/useKeyWithClickEvents: This existing icon interaction is intentionally mouse-only. */}
 					<span
 						className="snw-ref-title-popover-icon"
 						onClick={(e: MouseEvent) => {

@@ -1,24 +1,24 @@
 import type { Extension } from "@codemirror/state";
 import {
 	type CachedMetadata,
+	debounce,
 	type MarkdownPostProcessor,
 	MarkdownPreviewRenderer,
 	Platform,
 	Plugin,
 	type TFile,
 	type WorkspaceLeaf,
-	debounce,
 } from "obsidian";
 import { buildLinksAndReferences, getLinkReferencesForFile, removeLinkReferencesForFile, setPluginVariableForIndexer } from "./indexer";
 import { DEFAULT_SETTINGS, type Settings } from "./settings";
 import SnwAPI from "./snwApi";
-import PluginCommands from "./ui/PluginCommands";
-import { SettingsTab } from "./ui/SettingsTab";
-import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/SideBarPaneView";
 import { setPluginVariableForUIC } from "./ui/components/uic-ref--parent";
 import { setPluginVariableUIC_RefArea } from "./ui/components/uic-ref-area";
 import { setPluginVariableForFrontmatterLinksRefCount, updatePropertiesDebounce } from "./ui/frontmatterRefCount";
 import { setPluginVariableForHeaderRefCount, updateHeadersDebounce } from "./ui/headerRefCount";
+import PluginCommands from "./ui/PluginCommands";
+import { SettingsTab } from "./ui/SettingsTab";
+import { SideBarPaneView, VIEW_TYPE_SNW } from "./ui/SideBarPaneView";
 import ReferenceGutterExtension, { setPluginVariableForCM6Gutter } from "./view-extensions/gutters-cm6";
 import { setPluginVariableForHtmlDecorations, updateAllSnwLiveUpdateReferencesDebounce } from "./view-extensions/htmlDecorations";
 import { InlineReferenceExtension, setPluginVariableForCM6InlineReferences } from "./view-extensions/references-cm6";
