@@ -3,7 +3,7 @@
  * CM will call update as the doc updates.
  */
 import { Decoration, type DecorationSet, type EditorView, MatchDecorator, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
-import { type TFile, editorInfoField, parseLinktext, stripHeading } from "obsidian";
+import { editorInfoField, parseLinktext, stripHeading, type TFile } from "obsidian";
 import { getSNWCacheByFile, parseLinkTextToFullPath } from "src/indexer";
 import type SNWPlugin from "src/main";
 import { isEnabledForMode } from "src/settings";

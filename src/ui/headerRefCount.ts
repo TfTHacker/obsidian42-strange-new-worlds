@@ -1,6 +1,6 @@
 // Displays in the header of open documents the count of incoming links
 
-import { type MarkdownView, Platform, type WorkspaceLeaf, debounce } from "obsidian";
+import { debounce, type MarkdownView, Platform, type WorkspaceLeaf } from "obsidian";
 import tippy from "tippy.js";
 import { getIndexedReferences, getSNWCacheByFile } from "../indexer";
 import type SNWPlugin from "../main";

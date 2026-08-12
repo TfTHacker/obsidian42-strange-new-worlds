@@ -1,6 +1,6 @@
 // This module builds on Obsidians cache to provide more specific link information
 
-import { type CachedMetadata, type HeadingCache, type Pos, type TFile, parseLinktext, stripHeading } from "obsidian";
+import { type CachedMetadata, type HeadingCache, type Pos, parseLinktext, stripHeading, type TFile } from "obsidian";
 import type SNWPlugin from "./main";
 import type { TransformedCache } from "./types";
 

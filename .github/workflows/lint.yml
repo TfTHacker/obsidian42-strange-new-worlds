@@ -23,7 +23,9 @@ jobs:
           node-version: '21.x'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
 
       - name: Run linter
         run: npm run lint
