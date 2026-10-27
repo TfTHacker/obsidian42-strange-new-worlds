@@ -36,8 +36,10 @@ export function htmlDecorationForReferencesElement(
 	attachCSSClass: string,
 	lineNu: number,
 ): HTMLElement {
+	// Span, not div: a block box inside a list line splits the line and drops
+	// Obsidian's hanging indent (negative text-indent / floated bullet).
 	const referenceElementJsx = (
-		<div
+		<span
 			className={`snw-reference snw-${referenceType} ${attachCSSClass}`}
 			data-snw-type={referenceType}
 			data-snw-reallink={realLink}
@@ -46,10 +48,10 @@ export function htmlDecorationForReferencesElement(
 			snw-data-line-number={lineNu.toString()}
 		>
 			{count.toString()}
-		</div>
+		</span>
 	);
 
-	const refenceElement = createDiv();
+	const refenceElement = createSpan();
 	render(referenceElementJsx, refenceElement);
 	const refCountBox = refenceElement.firstElementChild as HTMLElement;
 

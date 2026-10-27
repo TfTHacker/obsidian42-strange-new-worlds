@@ -4,23 +4,30 @@ body {
 }
 
 
-div:has(> .snw-reference),
-.snw-link-preview {
+/* Counter host must stay inline. A block-level div (the previous wrapper)
+   splits the list line box, so text after the count drops down and loses
+   the hanging indent. */
+:is(div, span):has(> .snw-reference),
+.snw-link-preview,
+.markdown-source-view.mod-cm6 .cm-line > :is(div, span):has(> .snw-reference),
+.markdown-rendered li :is(div, span):has(> .snw-reference) {
   display: inline;
+  white-space: normal;
 }
 
 .snw-reference {
-  display: inline;
+  display: inline-block;
   font-size: var(--font-ui-smaller);
   border-radius: var(--radius-s);
   border: var(--border-width) dotted;
-  vertical-align: top;
+  vertical-align: baseline;
   opacity: var(--snw-counter-opacity);
   min-width: 10px;
   padding-left: 3px;
   padding-right: 3px !important;
   margin-left: 3px !important;
   margin-right: 2px;
+  white-space: nowrap;
 }
 
 .is-mobile .snw-reference {
@@ -263,9 +270,28 @@ div:has(> .snw-reference),
 }
 
 .snw-breadcrumbs {
-  display: flex;
-  align-items: baseline;
+  display: block;
   border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Trail text stays on the H/L marker's line. Nested lists stay blocks so
+   their indent, and the breaks between items, are preserved. */
+.snw-breadcrumbs > :not(ul):not(ol),
+.snw-breadcrumbs > :not(ul):not(ol) > p {
+  display: inline;
+}
+
+.snw-breadcrumbs :is(ul, ol),
+[uic='uic'] :is(ul, ol) {
+  display: block;
+  white-space: normal;
+  padding-inline-start: var(--list-indent);
+  margin-block: 0.15em;
+}
+
+.snw-breadcrumbs li,
+[uic='uic'] li {
+  white-space: normal;
 }
 
 .snw-breadcrumbs>span {
